@@ -725,8 +725,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				isNeedMetaAttrs ||
 				innerMessage?.protocolMessage?.memberLabel ||
 				innerMessage?.protocolMessage?.editedMessage ||
-				innerMessage?.protocolMessage?.mediaNotifyMessage ||
-				innerMessage?.messageHistoryNotice
+				innerMessage?.protocolMessage?.mediaNotifyMessage
 			) {
 				extraAttrs['decrypt-fail'] = 'hide' // todo: expand for reactions and other types
 			}
