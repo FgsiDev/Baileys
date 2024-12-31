@@ -5,8 +5,8 @@
     "allowImportingTsExtensions": false,
     "outDir": "lib",
     "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true
+    "declarationMap": false,
+    "sourceMap": false
   },
   "exclude": ["node_modules","src/__tests__"]
 }

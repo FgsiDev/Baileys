@@ -104,16 +104,17 @@ export const NEWSLETTER_MEDIA_PATH_MAP: { [T in MediaType]?: string } = {
 	'thumbnail-link': '/newsletter/newsletter-thumbnail-link'
 }
 
-export const MEDIA_HKDF_KEY_MAPPING = {
+export const MEDIA_HKDF_KEY_MAPPING: Record<string, string> = {
 	audio: 'Audio',
+	ptt: 'Audio',
 	document: 'Document',
 	gif: 'Video',
 	image: 'Image',
 	ppic: '',
 	product: 'Image',
-	ptt: 'Audio',
 	sticker: 'Image',
 	video: 'Video',
+	ptv: 'Video',
 	'sticker-pack': 'Sticker Pack',
 	'thumbnail-sticker-pack': 'Sticker Pack Thumbnail',
 	'thumbnail-document': 'Document Thumbnail',
@@ -125,8 +126,42 @@ export const MEDIA_HKDF_KEY_MAPPING = {
 	'md-app-state': 'App State',
 	'product-catalog-image': '',
 	'payment-bg-image': 'Payment Background',
-	ptv: 'Video',
-	'biz-cover-photo': 'Image'
+	'biz-cover-photo': 'Image',
+	//New
+	'payment-br-document': 'Payment Document',
+	'music-artwork': 'Music Artwork',
+	'ads-image': 'Ads Image',
+	'ads-video': 'Ads Video',
+	'waffle-image': 'Waffle Image',
+	'waffle-video': 'Waffle Video',
+	'waffle-gif': 'Waffle GIF',
+	//Newsletter
+	'newsletter-image': 'Newsletter Image',
+	'newsletter-video': 'Newsletter Video',
+	'newsletter-ptt': 'Newsletter Audio',
+	'newsletter-ptv': 'Newsletter Video',
+	'newsletter-audio': 'Newsletter Audio',
+	'newsletter-document': 'Newsletter Document',
+	'newsletter-gif': 'Newsletter Video',
+	'newsletter-sticker': 'Newsletter Image',
+	'newsletter-sticker-pack': 'Newsletter Sticker Pack',
+	'newsletter-thumbnail-image': 'Newsletter Image Thumbnail',
+	'newsletter-thumbnail-video': 'Newsletter Video Thumbnail',
+	'newsletter-thumbnail-link': 'Newsletter Link Thumbnail',
+	'newsletter-thumbnail-sticker-pack': 'Newsletter Sticker Pack Thumbnail',
+	'newsletter-thumbnail-status': 'Newsletter Image Thumbnail',
+	'newsletter-music-artwork': 'Newsletter Music Artwork',
+	'newsletter-image-status': 'Newsletter Image',
+	'newsletter-video-status': 'Newsletter Video',
+	'newsletter-gif-status': 'Newsletter Video',
+	'newsletter-audio-status': 'Newsletter Audio',
+	//more
+	'kyc-id': 'Image',
+	'maiba-file': 'Document',
+	db: 'Document',
+	'biz-flows': 'Image',
+	'wamo-image': 'Image',
+	'wamo-video': 'Video'
 }
 
 export type MediaType = keyof typeof MEDIA_HKDF_KEY_MAPPING

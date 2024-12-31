@@ -26,6 +26,8 @@ import {
 	generateMessageIDV2,
 	generateParticipantHashV2,
 	generateWAMessage,
+	generateWAMessageFromContent,
+	preparePollOptionImages,
 	getStatusCodeForMediaRetry,
 	getUrlFromDirectPath,
 	getWAUploadToServer,
@@ -632,6 +634,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 
 		await authState.keys.transaction(async () => {
 			const mediaType = getMediaType(message)
+			const innerMessage = normalizeMessageContent(message)
 			if (mediaType) {
 				extraAttrs['mediatype'] = mediaType
 			}
@@ -639,6 +642,28 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 			if (isNewsletter) {
 				const patched = patchMessageBeforeSending ? await patchMessageBeforeSending(message, []) : message
 				const bytes = encodeNewsletterMessage(patched as proto.IMessage)
+				if (additionalNodes && additionalNodes.length > 0) {
+					binaryNodeContent.push(...additionalNodes)
+				}
+				const questionType = message?.questionMessage
+					? 'question'
+					: message?.questionReplyMessage
+						? 'reply'
+						: message?.questionResponseMessage
+							? 'response'
+							: undefined
+				if (questionType) {
+					const metaNode = binaryNodeContent.find(node => node?.tag === 'meta')
+					if (metaNode) {
+						metaNode.attrs = { ...metaNode.attrs, questiontype: questionType }
+					} else {
+						binaryNodeContent.push({
+							tag: 'meta',
+							attrs: { questiontype: questionType },
+							content: undefined
+						})
+					}
+				}
 				binaryNodeContent.push({
 					tag: 'plaintext',
 					attrs: extraAttrs,
@@ -659,8 +684,38 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				return
 			}
 
-			if (normalizeMessageContent(message)?.pinInChatMessage) {
+			const isNeedMetaAttrs =
+				innerMessage?.pinInChatMessage || innerMessage?.keepInChatMessage || innerMessage?.reactionMessage
+			const isGroupStatus = message?.groupStatusMessage || message?.groupStatusMessageV2
+			const isPollUpdate = innerMessage?.pollUpdateMessage
+			if (isNeedMetaAttrs || isGroupStatus || isPollUpdate) {
+				const metaAttrs: BinaryNodeAttributes = {}
+				if (isNeedMetaAttrs) {
+					metaAttrs.content_type = 'add_on'
+				}
+				if (isPollUpdate && !isGroupStatus) {
+					metaAttrs.polltype = 'vote'
+				}
+				if (isGroupStatus) {
+					metaAttrs.is_group_status = 'true'
+				}
+				binaryNodeContent.push({
+					tag: 'meta',
+					attrs: metaAttrs,
+					content: undefined
+				})
+			}
+			if (
+				isNeedMetaAttrs ||
+				innerMessage?.protocolMessage?.memberLabel ||
+				innerMessage?.protocolMessage?.editedMessage ||
+				innerMessage?.protocolMessage?.mediaNotifyMessage
+			) {
 				extraAttrs['decrypt-fail'] = 'hide' // todo: expand for reactions and other types
+			}
+
+			if (innerMessage?.interactiveResponseMessage?.nativeFlowResponseMessage?.name) {
+				extraAttrs['native_flow_name'] = innerMessage.interactiveResponseMessage.nativeFlowResponseMessage.name
 			}
 
 			if (isGroupOrStatus && !isRetryResend) {
@@ -1000,6 +1055,10 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 			message.pollCreationMessage ||
 			message.pollCreationMessageV2 ||
 			message.pollCreationMessageV3 ||
+			message.pollCreationMessageV5 ||
+			message.pollCreationMessageV6 ||
+			message.pollResultSnapshotMessage ||
+			message.pollResultSnapshotMessageV3 ||
 			message.pollUpdateMessage
 		) {
 			return 'poll'
@@ -1201,10 +1260,10 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 						: disappearingMessagesInChat
 				await groupToggleEphemeral(jid, value)
 			} else {
-				const fullMsg = await generateWAMessage(jid, content, {
+				const configMedia = {
 					logger,
 					userJid,
-					getUrlInfo: text =>
+					getUrlInfo: (text: string) =>
 						getUrlInfo(text, {
 							thumbnailWidth: linkPreviewImageThumbnailWidth,
 							fetchOpts: {
@@ -1222,13 +1281,18 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 					options: config.options,
 					messageId: generateMessageIDV2(sock.user?.id),
 					...options
-				})
+				}
+				const pollData = await preparePollOptionImages(jid, content, configMedia)
+				const fullMsg = await generateWAMessage(jid, pollData.content, configMedia)
 				const isNewsletter = isJidNewsletter(jid)
 				const isEventMsg = 'event' in content && !!content.event
 				const isDeleteMsg = 'delete' in content && !!content.delete
 				const isEditMsg = 'edit' in content && !!content.edit
 				const isPinMsg = 'pin' in content && !!content.pin
 				const isPollMessage = 'poll' in content && !!content.poll
+				const isPollResultMessage = 'pollResult' in content && !!content.pollResult
+				const isQuizMessage = isPollMessage && !!content.poll.pollType
+				const isPhotoPollMsg = pollData.isPhotoPollMsg
 				const additionalAttributes: BinaryNodeAttributes = {}
 				const additionalNodes: BinaryNode[] = []
 				// required for delete
@@ -1247,10 +1311,21 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				} else if (isPinMsg) {
 					additionalAttributes.edit = '2'
 				} else if (isPollMessage) {
+					if (!isNewsletter && isQuizMessage) {
+						throw new Boom('Quiz Message is for newsletter only', { statusCode: 400 })
+					}
 					additionalNodes.push({
 						tag: 'meta',
 						attrs: {
-							polltype: 'creation'
+							polltype: isQuizMessage ? 'quiz_creation' : 'creation',
+							contenttype: isPhotoPollMsg ? 'image' : isPollMessage && isNewsletter ? 'text' : undefined
+						}
+					} as BinaryNode)
+				} else if (isPollResultMessage) {
+					additionalNodes.push({
+						tag: 'meta',
+						attrs: {
+							polltype: 'result_snapshot'
 						}
 					} as BinaryNode)
 				} else if (isEventMsg) {
@@ -1273,6 +1348,55 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 					process.nextTick(async () => {
 						await processingMutex.mutex(() => upsertMessage(fullMsg, 'append'))
 					})
+				}
+
+				if (pollData.pollOptionImages && pollData.pollOptionImages.length) {
+					for (const optionImage of pollData.pollOptionImages) {
+						const optionMsg = generateWAMessageFromContent(
+							jid,
+							{
+								pollCreationOptionImageMessage: {
+									message: optionImage.content
+								},
+								messageContextInfo: {
+									messageSecret: randomBytes(32),
+									messageAssociation: {
+										parentMessageKey: fullMsg.key,
+										associationType: proto.MessageAssociation.AssociationType.MEDIA_POLL
+									}
+								}
+							},
+							{
+								userJid,
+								messageId: generateMessageIDV2(userJid)
+							}
+						)
+
+						if (!optionMsg.message) {
+							continue
+						}
+
+						await relayMessage(jid, optionMsg.message, {
+							messageId: optionMsg.key.id!,
+							useCachedGroupMetadata: options.useCachedGroupMetadata,
+							statusJidList: options.statusJidList,
+							additionalAttributes,
+							additionalNodes: [
+								{
+									tag: 'meta',
+									attrs: {
+										message_association_type: 'media_poll'
+									},
+									content: undefined
+								}
+							]
+						})
+						if (config.emitOwnEvents) {
+							process.nextTick(async () => {
+								await processingMutex.mutex(() => upsertMessage(optionMsg, 'append'))
+							})
+						}
+					}
 				}
 
 				return fullMsg

@@ -1,5 +1,5 @@
 import { Boom } from '@hapi/boom'
-import { randomBytes } from 'crypto'
+import { createHash, randomBytes } from 'crypto'
 import { zip } from 'fflate'
 import { promises as fs } from 'fs'
 import { type Transform } from 'stream'
@@ -116,6 +116,14 @@ const assertColor = async (color: any) => {
 		assertedColor = parseInt(hex, 16)
 		return assertedColor
 	}
+}
+
+export const getPollOptionHash = (optionName: string, fileSha256?: string | Buffer | Uint8Array) => {
+	const nameHash = createHash('sha256').update(String(optionName), 'utf-8').digest('hex')
+	const fileHash = fileSha256 ? Buffer.from(fileSha256).toString('base64') : ''
+	return createHash('sha256')
+		.update(nameHash + fileHash, 'utf-8')
+		.digest('hex')
 }
 
 export const prepareWAMessageMedia = async (
@@ -321,6 +329,64 @@ export const prepareWAMessageMedia = async (
 	return obj
 }
 
+export const preparePollOptionImages = async (
+	jid: string,
+	content: AnyMessageContent,
+	options: MessageContentGenerationOptions
+) => {
+	const pollOptionImages: Array<{
+		content: Awaited<ReturnType<typeof prepareWAMessageMedia>>
+	}> = []
+	if (!('poll' in content) || !content.poll) {
+		return {
+			content,
+			pollOptionImages,
+			isPhotoPollMsg: false
+		}
+	}
+	const isPhotoPollMsg =
+		Array.isArray(content.poll.values) && content.poll.values.some(value => typeof value === 'object' && !!value?.image)
+	if (!isPhotoPollMsg) {
+		return {
+			content,
+			pollOptionImages,
+			isPhotoPollMsg: false
+		}
+	}
+	const preparedValues = []
+	for (const value of content.poll.values) {
+		if (typeof value === 'string' || !value?.image) {
+			preparedValues.push(value)
+			continue
+		}
+		const prepared = await prepareWAMessageMedia(
+			{ image: value.image },
+			{
+				...options,
+				jid
+			}
+		)
+		preparedValues.push({
+			name: value.name,
+			optionHash: getPollOptionHash(value.name, prepared.imageMessage?.fileSha256 ?? undefined)
+		})
+		pollOptionImages.push({
+			content: prepared
+		})
+	}
+	return {
+		content: {
+			...content,
+			poll: {
+				...content.poll,
+				values: preparedValues
+			}
+		} as AnyMessageContent,
+		pollOptionImages,
+		isPhotoPollMsg: true
+	}
+}
+
 export const prepareDisappearingMessageSettingContent = (ephemeralExpiration?: number) => {
 	ephemeralExpiration = ephemeralExpiration || 0
 	const content: WAMessageContent = {
@@ -512,17 +578,13 @@ export const generateWAMessageContent = async (
 	} else if ('event' in message) {
 		m.eventMessage = {}
 		const startTime = Math.floor(message.event.startDate.getTime() / 1000)
-
 		if (message.event.call && options.getCallLink) {
 			const token = await options.getCallLink(message.event.call, { startTime })
 			m.eventMessage.joinLink = (message.event.call === 'audio' ? CALL_AUDIO_PREFIX : CALL_VIDEO_PREFIX) + token
 		}
-
 		m.messageContextInfo = {
-			// encKey
 			messageSecret: message.event.messageSecret || randomBytes(32)
 		}
-
 		m.eventMessage.name = message.event.name
 		m.eventMessage.description = message.event.description
 		m.eventMessage.startTime = startTime
@@ -534,39 +596,79 @@ export const generateWAMessageContent = async (
 	} else if ('poll' in message) {
 		message.poll.selectableCount ||= 0
 		message.poll.toAnnouncementGroup ||= false
-
 		if (!Array.isArray(message.poll.values)) {
 			throw new Boom('Invalid poll values', { statusCode: 400 })
 		}
-
 		if (message.poll.selectableCount < 0 || message.poll.selectableCount > message.poll.values.length) {
 			throw new Boom(`poll.selectableCount in poll should be >= 0 and <= ${message.poll.values.length}`, {
 				statusCode: 400
 			})
 		}
-
-		m.messageContextInfo = {
-			// encKey
-			messageSecret: message.poll.messageSecret || randomBytes(32)
+		let hasPollOptionImage = false
+		const pollOptions: proto.Message.PollCreationMessage.IOption[] = []
+		for (const value of message.poll.values) {
+			if (typeof value === 'string') {
+				pollOptions.push({ optionName: value })
+				continue
+			}
+			if (!value?.name) {
+				throw new Boom('Each photo poll option needs a name', { statusCode: 400 })
+			}
+			if (value.optionHash) {
+				hasPollOptionImage = true
+				pollOptions.push({ optionName: value.name, optionHash: value.optionHash })
+				continue
+			}
+			if (!value.image) {
+				pollOptions.push({ optionName: value.name })
+				continue
+			}
+			const prepared = await prepareWAMessageMedia({ image: value.image }, options)
+			hasPollOptionImage = true
+			pollOptions.push({
+				optionName: value.name,
+				optionHash: getPollOptionHash(value.name, prepared.imageMessage?.fileSha256 ?? undefined)
+			})
 		}
-
+		const usesExtendedPollSettings =
+			Boolean(message.poll.endDate) || message.poll.hideVoter === true || message.poll.canAddOption === true
 		const pollCreationMessage = {
 			name: message.poll.name,
 			selectableOptionsCount: message.poll.selectableCount,
-			options: message.poll.values.map(optionName => ({ optionName }))
+			options: pollOptions,
+			endTime: message.poll.endDate?.getTime() ?? 0,
+			hideParticipantName: message.poll.hideVoter ?? false,
+			allowAddOption: message.poll.canAddOption ?? false,
+			pollContentType: undefined as proto.Message.PollContentType | undefined
 		}
-
+		if (hasPollOptionImage) {
+			pollCreationMessage.pollContentType = proto.Message.PollContentType.IMAGE
+		}
 		if (message.poll.toAnnouncementGroup) {
-			// poll v2 is for community announcement groups (single select and multiple)
 			m.pollCreationMessageV2 = pollCreationMessage
 		} else {
-			if (message.poll.selectableCount === 1) {
-				//poll v3 is for single select polls
+			if (message.poll.pollType === 1) {
+				if (!message.poll.correctAnswer) {
+					throw new Boom('No "correctAnswer" provided for quiz', { statusCode: 400 })
+				}
+				m.pollCreationMessageV5 = {
+					...pollCreationMessage,
+					correctAnswer: {
+						optionName: message.poll.correctAnswer.toString()
+					},
+					pollType: 1,
+					selectableOptionsCount: 1
+				}
+			} else if (usesExtendedPollSettings) {
+				m.pollCreationMessageV6 = pollCreationMessage
+			} else if (message.poll.selectableCount === 1) {
 				m.pollCreationMessageV3 = pollCreationMessage
 			} else {
-				// poll for multiple choice polls
 				m.pollCreationMessage = pollCreationMessage
 			}
+		}
+		m.messageContextInfo = {
+			messageSecret: message.poll.messageSecret || randomBytes(32)
 		}
 	} else if ('sharePhoneNumber' in message) {
 		m.protocolMessage = {

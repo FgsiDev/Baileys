@@ -1,14 +1,35 @@
-import type { NewsletterCreateResponse, SocketConfig, WAMediaUpload } from '../Types'
-import type { NewsletterMetadata, NewsletterUpdate } from '../Types'
+import type {
+	NewsletterCreateResponse,
+	SocketConfig,
+	WAMediaUpload,
+	NewsletterMetadata,
+	NewsletterUpdate,
+	NewsletterViewRole,
+	NewsletterAdminCapabilities,
+	NewsletterAdminInfo,
+	NewsletterPollVoterOptions,
+	NewsletterReactionSender,
+	NewsletterDirectoryOptions,
+	NewsletterDirectorySearchOptions,
+	NewsletterDirectoryCategoriesOptions,
+	NewsletterPollVoteOptions,
+	NewsletterInsightsOptions,
+	NewsletterFollowersOptions,
+	NewsletterQuestionResponseState,
+	NewsletterRecommendedOptions,
+	NewsletterSimilarOptions
+} from '../Types'
 import { QueryIds, XWAPaths } from '../Types'
 import { generateProfilePicture } from '../Utils/messages-media'
 import { getBinaryNodeChild, getBinaryNodeChildren, S_WHATSAPP_NET } from '../WABinary'
 import { makeGroupsSocket } from './groups'
 import { executeWMexQuery as genericExecuteWMexQuery } from './mex'
 import { proto } from '../../WAProto/index.js'
+import { createHash } from 'node:crypto'
 
 const parseNewsletterCreateResponse = (response: NewsletterCreateResponse): NewsletterMetadata => {
 	const { id, thread_metadata: thread, viewer_metadata: viewer } = response
+
 	return {
 		id,
 		owner: undefined,
@@ -27,19 +48,25 @@ const parseNewsletterCreateResponse = (response: NewsletterCreateResponse): News
 }
 
 const parseNewsletterMetadata = (result: unknown): NewsletterMetadata | null => {
-	if (typeof result !== 'object' || result === null) return null
+	if (typeof result !== 'object' || result === null) {
+		return null
+	}
 
-	if ('id' in result && typeof (result as any).id === 'string') {
+	if ('id' in result && typeof (result as { id?: unknown }).id === 'string') {
 		return result as NewsletterMetadata
 	}
 
 	if (
 		'result' in result &&
-		typeof (result as any).result === 'object' &&
-		(result as any).result !== null &&
-		'id' in (result as any).result
+		typeof (result as { result?: unknown }).result === 'object' &&
+		(result as { result?: unknown }).result !== null &&
+		'id' in (result as { result: object }).result
 	) {
-		return (result as any).result as NewsletterMetadata
+		return (
+			result as {
+				result: NewsletterMetadata
+			}
+		).result
 	}
 
 	return null
@@ -47,6 +74,7 @@ const parseNewsletterMetadata = (result: unknown): NewsletterMetadata | null => 
 
 export const makeNewsletterSocket = (config: SocketConfig) => {
 	const sock = makeGroupsSocket(config)
+
 	const { query, generateMessageTag } = sock
 
 	const executeWMexQuery = <T>(variables: Record<string, unknown>, queryId: string, dataPath: string): Promise<T> => {
@@ -61,11 +89,13 @@ export const makeNewsletterSocket = (config: SocketConfig) => {
 				settings: null
 			}
 		}
+
 		return executeWMexQuery(variables, QueryIds.UPDATE_METADATA, 'xwa2_newsletter_update')
 	}
 
 	return {
 		...sock,
+
 		executeWMexQuery,
 
 		newsletterCreate: async (name: string, description?: string) => {
@@ -91,7 +121,6 @@ export const makeNewsletterSocket = (config: SocketConfig) => {
 			return executeWMexQuery({ newsletter_id: jid }, QueryIds.SUBSCRIBERS, XWAPaths.xwa2_newsletter_subscribers)
 		},
 
-		// NEW (from updated version)
 		newsletterSubscribed: async () => {
 			return executeWMexQuery({}, QueryIds.SUBSCRIBED, XWAPaths.xwa2_newsletter_subscribed)
 		},
@@ -112,7 +141,6 @@ export const makeNewsletterSocket = (config: SocketConfig) => {
 			return parseNewsletterMetadata(result)
 		},
 
-		// UPDATED PATH (join/leave v2)
 		newsletterFollow: (jid: string) => {
 			return executeWMexQuery({ newsletter_id: jid }, QueryIds.FOLLOW, XWAPaths.xwa2_newsletter_join_v2)
 		},
@@ -139,11 +167,16 @@ export const makeNewsletterSocket = (config: SocketConfig) => {
 
 		newsletterUpdatePicture: async (jid: string, content: WAMediaUpload) => {
 			const { img } = await generateProfilePicture(content)
-			return newsletterUpdate(jid, { picture: img.toString('base64') })
+
+			return newsletterUpdate(jid, {
+				picture: img.toString('base64')
+			})
 		},
 
 		newsletterRemovePicture: (jid: string) => {
-			return newsletterUpdate(jid, { picture: '' })
+			return newsletterUpdate(jid, {
+				picture: ''
+			})
 		},
 
 		newsletterReactMessage: async (jid: string, serverId: string, reaction?: string) => {
@@ -165,7 +198,6 @@ export const makeNewsletterSocket = (config: SocketConfig) => {
 			})
 		},
 
-		// UPDATED FULL PARSE VERSION
 		newsletterFetchMessages: async (
 			type: 'jid' | 'key',
 			key: string,
@@ -173,14 +205,19 @@ export const makeNewsletterSocket = (config: SocketConfig) => {
 			after?: number,
 			before?: number
 		) => {
-			const attrs: any = {
+			const attrs: Record<string, string> = {
 				count: count.toString(),
 				type,
 				[type === 'jid' ? 'jid' : 'key']: key
 			}
 
-			if (after) attrs.after = after.toString()
-			if (before) attrs.before = before.toString()
+			if (after) {
+				attrs.after = after.toString()
+			}
+
+			if (before) {
+				attrs.before = before.toString()
+			}
 
 			const result = await query({
 				tag: 'iq',
@@ -199,28 +236,37 @@ export const makeNewsletterSocket = (config: SocketConfig) => {
 			})
 
 			const messagesNode = getBinaryNodeChild(result, 'messages')
-			if (!messagesNode) return []
+
+			if (!messagesNode) {
+				return []
+			}
 
 			const newsletterJid = messagesNode.attrs.jid || (type === 'jid' ? key : undefined)
 
-			const messages: any[] = []
+			const messages: proto.WebMessageInfo[] = []
 
 			for (const child of getBinaryNodeChildren(messagesNode, 'message')) {
 				const plaintext = getBinaryNodeChild(child, 'plaintext')
-				if (!plaintext?.content) continue
+
+				if (!plaintext?.content) {
+					continue
+				}
 
 				try {
 					const content = plaintext.content
+
 					let buf: Buffer
+
 					if (typeof content === 'string') {
 						buf = Buffer.from(content, 'binary')
 					} else if (content instanceof Uint8Array || Buffer.isBuffer(content)) {
 						buf = Buffer.from(content)
 					} else {
-						// BinaryNode[] atau tipe lain yang tidak didukung
 						continue
 					}
+
 					const msg = proto.Message.decode(buf).toJSON()
+
 					const full = proto.WebMessageInfo.fromObject({
 						key: {
 							remoteJid: newsletterJid,
@@ -230,10 +276,10 @@ export const makeNewsletterSocket = (config: SocketConfig) => {
 						},
 						message: msg,
 						messageTimestamp: child.attrs.t ? +child.attrs.t : undefined
-					}).toJSON()
+					})
 
 					messages.push(full)
-				} catch (e) {
+				} catch {
 					// ignore decode error
 				}
 			}
@@ -250,18 +296,29 @@ export const makeNewsletterSocket = (config: SocketConfig) => {
 					xmlns: 'newsletter',
 					to: jid
 				},
-				content: [{ tag: 'live_updates', attrs: {}, content: [] }]
+				content: [
+					{
+						tag: 'live_updates',
+						attrs: {},
+						content: []
+					}
+				]
 			})
 
 			const node = getBinaryNodeChild(result, 'live_updates')
+
 			const duration = node?.attrs?.duration
 
 			return duration ? { duration } : null
 		},
 
 		newsletterAdminCount: async (jid: string) => {
-			const res = await executeWMexQuery<{ admin_count: number }>(
-				{ newsletter_id: jid },
+			const res = await executeWMexQuery<{
+				admin_count: number
+			}>(
+				{
+					newsletter_id: jid
+				},
 				QueryIds.ADMIN_COUNT,
 				XWAPaths.xwa2_newsletter_admin_count
 			)
@@ -271,7 +328,10 @@ export const makeNewsletterSocket = (config: SocketConfig) => {
 
 		newsletterChangeOwner: async (jid: string, newOwnerJid: string) => {
 			return executeWMexQuery(
-				{ newsletter_id: jid, user_id: newOwnerJid },
+				{
+					newsletter_id: jid,
+					user_id: newOwnerJid
+				},
 				QueryIds.CHANGE_OWNER,
 				XWAPaths.xwa2_newsletter_change_owner
 			)
@@ -279,14 +339,337 @@ export const makeNewsletterSocket = (config: SocketConfig) => {
 
 		newsletterDemote: async (jid: string, userJid: string) => {
 			return executeWMexQuery(
-				{ newsletter_id: jid, user_id: userJid },
+				{
+					newsletter_id: jid,
+					user_id: userJid
+				},
 				QueryIds.DEMOTE,
 				XWAPaths.xwa2_newsletter_demote
 			)
 		},
 
 		newsletterDelete: async (jid: string) => {
-			return executeWMexQuery({ newsletter_id: jid }, QueryIds.DELETE, XWAPaths.xwa2_newsletter_delete_v2)
+			return executeWMexQuery(
+				{
+					newsletter_id: jid
+				},
+				QueryIds.DELETE,
+				XWAPaths.xwa2_newsletter_delete_v2
+			)
+		},
+
+		newsletterAdminCapabilities: async (jid: string): Promise<NewsletterAdminCapabilities> => {
+			const response = await executeWMexQuery<{
+				capabilities?: NewsletterAdminCapabilities
+			}>(
+				{
+					newsletter_id: jid
+				},
+				QueryIds.ADMIN_CAPABILITIES,
+				XWAPaths.xwa2_newsletter_admin_capabilities
+			)
+
+			return response?.capabilities ?? {}
+		},
+
+		newsletterAdminInfo: async (jid: string): Promise<NewsletterAdminInfo> => {
+			return executeWMexQuery<NewsletterAdminInfo>(
+				{
+					newsletter_id: jid
+				},
+				QueryIds.ADMIN_INFO,
+				XWAPaths.admin_profile
+			)
+		},
+
+		newsletterPollVoters: async (jid: string, serverId: string | number, options: NewsletterPollVoterOptions = {}) => {
+			return executeWMexQuery(
+				{
+					input: {
+						newsletter_id: jid,
+						server_id: String(serverId),
+						limit: options.limit ?? 100,
+						vote_hash: options.voteHash
+					}
+				},
+				QueryIds.POLL_VOTERS,
+				XWAPaths.voter_list
+			)
+		},
+
+		newsletterReactionSenders: async (jid: string, serverId: string | number): Promise<NewsletterReactionSender[]> => {
+			return executeWMexQuery<NewsletterReactionSender[]>(
+				{
+					input: {
+						id: jid,
+						server_id: String(serverId)
+					}
+				},
+				QueryIds.REACTION_SENDER_LIST,
+				XWAPaths.xwa2_newsletters_reaction_sender_list
+			)
+		},
+
+		newsletterPinMessages: async (jid: string, serverIds: string | number | Array<string | number>) => {
+			const messageIds = (Array.isArray(serverIds) ? serverIds : [serverIds]).map(id => String(id))
+
+			return executeWMexQuery(
+				{
+					newsletter_id: jid,
+					input: {
+						message_ids: messageIds
+					}
+				},
+				QueryIds.PIN_MESSAGES,
+				XWAPaths.xwa2_newsletter_pin_messages
+			)
+		},
+
+		newsletterUnpinMessages: async (jid: string, serverIds: string | number | Array<string | number>) => {
+			const messageIds = (Array.isArray(serverIds) ? serverIds : [serverIds]).map(id => String(id))
+
+			return executeWMexQuery(
+				{
+					newsletter_id: jid,
+					input: {
+						message_ids: messageIds
+					}
+				},
+				QueryIds.UNPIN_MESSAGES,
+				XWAPaths.xwa2_newsletter_unpin_messages
+			)
+		},
+
+		newsletterLabelAiContent: async (jid: string, serverId: string | number, messageType = 'MESSAGE') => {
+			return executeWMexQuery(
+				{
+					newsletter_id: jid,
+					server_id: String(serverId),
+					message_type: messageType
+				},
+				QueryIds.LABEL_AI_CONTENT,
+				XWAPaths.xwa2_newsletter_label_ai_content
+			)
+		},
+
+		newsletterLabelPaidPartnership: async (jid: string, serverId: string | number, messageType = 'MESSAGE') => {
+			return executeWMexQuery(
+				{
+					newsletter_id: jid,
+					server_id: String(serverId),
+					message_type: messageType
+				},
+				QueryIds.PAID_PARTNERSHIP_LABEL,
+				XWAPaths.xwa2_newsletter_label_paid_partnership
+			)
+		},
+
+		newsletterCreateAdminInvite: async (jid: string, userJid: string) => {
+			return executeWMexQuery(
+				{
+					newsletter_id: jid,
+					user_id: userJid
+				},
+				QueryIds.CREATE_ADMIN_INVITE,
+				XWAPaths.xwa2_newsletter_admin_invite_create
+			)
+		},
+
+		newsletterRevokeAdminInvite: async (jid: string, userJid: string) => {
+			return executeWMexQuery(
+				{
+					newsletter_id: jid,
+					user_id: userJid
+				},
+				QueryIds.REVOKE_ADMIN_INVITE,
+				XWAPaths.xwa2_newsletter_admin_invite_revoke
+			)
+		},
+
+		newsletterAcceptAdminInvite: async (jid: string) => {
+			return executeWMexQuery(
+				{
+					newsletter_id: jid
+				},
+				QueryIds.ACCEPT_ADMIN_INVITE,
+				XWAPaths.xwa2_newsletter_admin_invite_accept
+			)
+		},
+
+		newsletterDirectoryList: async (options: NewsletterDirectoryOptions = {}) => {
+			return executeWMexQuery(
+				{
+					fetch_status_metadata: options.fetchStatusMetadata ?? false,
+					input: {
+						view: options.view ?? 'RECOMMENDED',
+						filters: {
+							country_codes: options.countryCodes ?? [],
+							categories: options.categories ?? []
+						},
+						limit: options.limit ?? 20,
+						start_cursor: options.cursorToken
+					}
+				},
+				QueryIds.DIRECTORY_LIST,
+				XWAPaths.xwa2_newsletters_directory_list
+			)
+		},
+
+		newsletterDirectorySearch: async (searchText: string, options: NewsletterDirectorySearchOptions = {}) => {
+			return executeWMexQuery(
+				{
+					fetch_status_metadata: options.fetchStatusMetadata ?? false,
+					input: {
+						search_text: searchText,
+						categories: options.categories ?? [],
+						limit: options.limit ?? 20,
+						start_cursor: options.cursorToken
+					}
+				},
+				QueryIds.DIRECTORY_SEARCH,
+				XWAPaths.xwa2_newsletters_directory_search
+			)
+		},
+
+		newsletterDirectoryCategories: async (options: NewsletterDirectoryCategoriesOptions = {}) => {
+			return executeWMexQuery(
+				{
+					fetch_status_metadata: options.fetchStatusMetadata ?? false,
+					input: {
+						categories: options.categories ?? [],
+						country_code: options.countryCode || undefined,
+						per_category_limit: options.perCategoryLimit ?? 10
+					}
+				},
+				QueryIds.DIRECTORY_CATEGORIES,
+				XWAPaths.xwa2_newsletters_directory_category_preview
+			)
+		},
+
+		newsletterSendPollVote: async (
+			jid: string,
+			parentServerId: string | number,
+			options: NewsletterPollVoteOptions
+		) => {
+			const names = Array.isArray(options) ? options : [options]
+
+			const votes = names.map(name => ({
+				tag: 'vote' as const,
+				attrs: {},
+				content: createHash('sha256').update(String(name), 'utf-8').digest()
+			}))
+
+			const messageId = generateMessageTag()
+
+			await query({
+				tag: 'message',
+				attrs: {
+					to: jid,
+					id: messageId,
+					type: 'poll',
+					server_id: String(parentServerId)
+				},
+				content: [
+					{
+						tag: 'meta',
+						attrs: {
+							polltype: 'vote'
+						}
+					},
+					{
+						tag: 'votes',
+						attrs: {},
+						content: votes
+					}
+				]
+			})
+
+			return {
+				id: messageId
+			}
+		},
+
+		newsletterInsights: async (jid: string, options: NewsletterInsightsOptions = {}) => {
+			return executeWMexQuery(
+				{
+					input: {
+						newsletter_id: jid,
+						metrics: options.metrics ?? ['NET_FOLLOWS', 'UNFOLLOWS']
+					}
+				},
+				QueryIds.INSIGHTS,
+				XWAPaths.xwa2_newsletter_admin_insights
+			)
+		},
+
+		newsletterFollowers: async (jid: string, options: NewsletterFollowersOptions = {}) => {
+			return executeWMexQuery(
+				{
+					input: {
+						newsletter_id: jid,
+						count: options.count ?? 100
+					}
+				},
+				QueryIds.FOLLOWERS,
+				XWAPaths.xwa2_newsletter_followers
+			)
+		},
+
+		newsletterPendingAdminInvites: async (jid: string) => {
+			return executeWMexQuery(
+				{
+					newsletter_id: jid
+				},
+				QueryIds.PENDING_ADMIN_INVITES,
+				XWAPaths.pending_admin_invites
+			)
+		},
+
+		newsletterQuestionResponseState: async (
+			jid: string,
+			serverId: string | number,
+			responseServerId: string | number,
+			state: NewsletterQuestionResponseState
+		) => {
+			return executeWMexQuery(
+				{
+					newsletter_id: jid,
+					server_id: String(serverId),
+					response_server_id: String(responseServerId),
+					state
+				},
+				QueryIds.QUESTION_RESPONSE_STATE,
+				XWAPaths.xwa2_newsletter_question_response_state_update
+			)
+		},
+
+		newsletterRecommended: async (options: NewsletterRecommendedOptions = {}) => {
+			return executeWMexQuery(
+				{
+					fetch_status_metadata: options.fetchStatusMetadata ?? false,
+					input: {
+						limit: options.limit ?? 20,
+						country_codes: options.countryCodes ?? []
+					}
+				},
+				QueryIds.RECOMMENDED,
+				XWAPaths.xwa2_newsletters_recommended
+			)
+		},
+
+		newsletterSimilar: async (jid: string, options: NewsletterSimilarOptions = {}) => {
+			return executeWMexQuery(
+				{
+					fetch_status_metadata: options.fetchStatusMetadata ?? false,
+					input: {
+						newsletter_id: jid,
+						limit: options.limit ?? 20,
+						country_codes: options.countryCodes ?? []
+					}
+				},
+				QueryIds.SIMILAR,
+				XWAPaths.xwa2_newsletters_similar
+			)
 		}
 	}
 }

@@ -108,14 +108,7 @@ export type DownloadableMessage = {
 }
 
 export type MessageReceiptType =
-	| 'read'
-	| 'read-self'
-	| 'hist_sync'
-	| 'peer_msg'
-	| 'sender'
-	| 'inactive'
-	| 'played'
-	| undefined
+	'read' | 'read-self' | 'hist_sync' | 'peer_msg' | 'sender' | 'inactive' | 'played' | undefined
 
 export type MediaConnInfo = {
 	auth: string
@@ -155,13 +148,24 @@ type WithDimensions = {
 	height?: number
 }
 
+type PollOption = {
+	name: string
+	image?: WAMediaUpload
+	optionHash?: string
+}
+
 export type PollMessageOptions = {
 	name: string
 	selectableCount?: number
-	values: string[]
+	values: Array<string | PollOption>
 	/** 32 byte message secret to encrypt poll selections */
 	messageSecret?: Uint8Array
 	toAnnouncementGroup?: boolean
+	pollType?: 1
+	correctAnswer?: string | number
+	endDate?: Date
+	hideVoter?: boolean
+	canAddOption?: boolean
 }
 
 export type EventMessageOptions = {
