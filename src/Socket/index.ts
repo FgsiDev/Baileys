@@ -1,6 +1,6 @@
 import { DEFAULT_CONNECTION_CONFIG } from '../Defaults'
 import type { UserFacingSocketConfig } from '../Types'
-import { makeCommunitiesSocket } from './communities'
+import { makeFgsiSocket } from './fgsi'
 
 // export the last socket layer
 const makeWASocket = (config: UserFacingSocketConfig) => {
@@ -16,7 +16,7 @@ const makeWASocket = (config: UserFacingSocketConfig) => {
 		newConfig.shouldSyncHistoryMessage = () => !!newConfig.syncFullHistory
 	}
 
-	return makeCommunitiesSocket(newConfig)
+	return makeFgsiSocket(newConfig)
 }
 
 export default makeWASocket

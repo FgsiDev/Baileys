@@ -10,10 +10,10 @@ import {
 	type WaShareGroupHistoryResult
 } from '../Utils/group-history'
 import { isJidGroup, isLidUser, jidNormalizedUser, type BinaryNode } from '../WABinary'
-import { makeMessagesSocket } from './messages-send'
+import { makeCommunitiesSocket } from './communities'
 
 export const makeFgsiSocket = (config: SocketConfig) => {
-	const sock = makeMessagesSocket(config)
+	const sock = makeCommunitiesSocket(config)
 	const { logger } = config
 	const { authState, groupMetadata, relayMessage, waUploadToServer } = sock
 
