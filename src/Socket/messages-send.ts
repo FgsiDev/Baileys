@@ -1369,7 +1369,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 
 			// encode + upload
 			const { compressed } = await encodeGroupHistoryBundle(input.messages, input.outOfWindowPinnedMessages)
-			const mediaType = 'md-msg-hist' as any
+			const mediaType = 'group-history' as any
 			const { mediaKey, encFilePath, fileEncSha256, fileSha256 } = await encryptedStream(compressed, mediaType, {
 				logger
 			})

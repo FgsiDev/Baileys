@@ -90,7 +90,7 @@ export const MEDIA_PATH_MAP: { [T in MediaType]?: string } = {
 	'thumbnail-link': '/mms/image',
 	'product-catalog-image': '/product/image',
 	'md-app-state': '',
-	'md-msg-hist': '/mms/group-history',
+	'group-history': '/mms/group-history',
 	'md-msg-hist': '/mms/md-app-state',
 	'biz-cover-photo': '/pps/biz-cover-photo'
 }
