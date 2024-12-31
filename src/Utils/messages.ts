@@ -996,7 +996,6 @@ export const normalizeMessageContent = (content: WAMessageContent | null | undef
 			message?.limitSharingMessage ||
 			message?.lottieStickerMessage ||
 			message?.newsletterAdminProfileMessage ||
-			message?.newsletterAdminProfileMessageV2 ||
 			message?.newsletterAdminProfileStatusMessage ||
 			message?.pollCreationMessageV4 ||
 			message?.pollCreationOptionImageMessage ||
