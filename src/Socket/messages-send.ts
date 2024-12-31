@@ -583,7 +583,8 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 			additionalNodes,
 			useUserDevicesCache,
 			useCachedGroupMetadata,
-			statusJidList
+			statusJidList,
+			forceBot,
 		}: MessageRelayOptions
 	) => {
 		const meId = authState.creds.me!.id
@@ -880,7 +881,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 						devices.push(...sessionDevices)
 
 						// For bot JIDs, add bot device directly since getUSyncDevices doesnt resolve @bot
-						if (isJidMetaAI(jid)) {
+						if (isJidMetaAI(jid) || forceBot) {
 							devices.push({
 								user,
 								device: 0,
