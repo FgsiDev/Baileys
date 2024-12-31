@@ -135,7 +135,8 @@ export const prepareWAMessageMedia = async (
 
 	let mediaType: (typeof MEDIA_KEYS)[number] | undefined
 	for (const key of MEDIA_KEYS) {
-		if (key in message) {
+		// `ptt`/`ptv` are boolean flags on the parent media, never the upload payload itself
+		if (key in message && typeof (message as any)[key] !== 'boolean') {
 			mediaType = key
 		}
 	}
