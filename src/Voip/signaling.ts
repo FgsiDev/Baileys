@@ -1,4 +1,3 @@
-/* Elaina Baileys maintained distribution. Upstream notices and license are preserved in LICENSE and NOTICE.md. */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 const S_WHATSAPP_NET = '@s.whatsapp.net'

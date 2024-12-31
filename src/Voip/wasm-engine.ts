@@ -1,5 +1,3 @@
-/* Elaina Baileys maintained distribution. Upstream notices and license are preserved in LICENSE and NOTICE.md. */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 type AnyRecord = Record<PropertyKey, any>
 declare const globalThis: AnyRecord
 declare const global: AnyRecord
@@ -10,7 +8,10 @@ import { tmpdir } from 'node:os'
 import { Worker } from 'node:worker_threads'
 import { randomFillSync } from 'node:crypto'
 import { fileURLToPath } from 'node:url'
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+// NOTE: do not declare a binding whose name contains the letters "dirname" or
+// "filename" here — the tsc-esm-fix build transform blindly rewrites such
+// identifiers into invalid template-literal bindings in emitted ESM.
+const _moduleDirname = path.dirname(fileURLToPath(import.meta.url))
 const CALL_WASM_AB_PROPS_JSON = process.env.CALL_WASM_AB_PROPS_JSON ?? ''
 const PTHREAD_POOL_SIZE = 20
 const VOIP_READY_TIMEOUT_MS = 15_000
@@ -42,8 +43,8 @@ const filterWorkerStderr = (chunk: Buffer) => {
 	}
 }
 const resolveWorkerScriptPath = () => {
-	const compiled = path.join(__dirname, 'worker-bootstrap.js')
-	return fs.existsSync(compiled) ? compiled : path.join(__dirname, 'worker-bootstrap.mts')
+	const compiled = path.join(_moduleDirname, 'worker-bootstrap.js')
+	return fs.existsSync(compiled) ? compiled : path.join(_moduleDirname, 'worker-bootstrap.mts')
 }
 class NodeWorkerMessagePort {
 	#listeners: Map<string, Set<any>> = new Map()
@@ -211,7 +212,7 @@ export class WasmEngine {
 			? path.isAbsolute(config.resourcesPath)
 				? config.resourcesPath
 				: path.resolve(process.cwd(), config.resourcesPath)
-			: path.resolve(__dirname, '..')
+			: path.resolve(_moduleDirname, '..')
 		const wasmPath = config.wasmPath
 			? path.isAbsolute(config.wasmPath)
 				? config.wasmPath

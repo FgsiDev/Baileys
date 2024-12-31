@@ -1,4 +1,3 @@
-/* Elaina Baileys maintained distribution. Upstream notices and license are preserved in LICENSE and NOTICE.md. */
 import * as worker_threads_1 from 'node:worker_threads'
 import * as path from 'node:path'
 import * as os from 'node:os'
@@ -14,13 +13,16 @@ import { fileURLToPath } from 'node:url'
 type AnyRecord = Record<PropertyKey, any>
 declare const globalThis: AnyRecord
 declare const global: AnyRecord
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+// NOTE: do not declare a binding whose name contains the letters "dirname" or
+// "filename" here — the tsc-esm-fix build transform blindly rewrites such
+// identifiers into invalid template-literal bindings in emitted ESM.
+const _moduleFilename = fileURLToPath(import.meta.url)
+const _moduleDirname = path.dirname(_moduleFilename)
 const _require = createRequire(import.meta.url)
 const typedWorkerData = worker_threads_1.workerData
 if (typeof process === 'undefined') {
 	global.process = {
-		cwd: () => __dirname || '.',
+		cwd: () => _moduleDirname || '.',
 		env: {} as Record<string, string>,
 		platform: 'linux',
 		version: 'v18.0.0',
@@ -35,7 +37,7 @@ if (typeof process === 'undefined') {
 		emit: () => true
 	} as any
 } else if (!process.cwd) {
-	process.cwd = () => __dirname || '.'
+	process.cwd = () => _moduleDirname || '.'
 }
 global.babelHelpers = {
 	extends: function (target: any, ...sources: any[]) {
@@ -343,13 +345,13 @@ global.importScripts = function (...urls: string[]) {
 }
 if (typeof global.location === 'undefined') {
 	global.location = {
-		href: __filename,
+		href: _moduleFilename,
 		origin: 'file://',
 		protocol: 'file:',
 		host: '',
 		hostname: '',
 		port: '',
-		pathname: __filename,
+		pathname: _moduleFilename,
 		search: '',
 		hash: ''
 	}
@@ -751,7 +753,7 @@ if (typedWorkerData && (typedWorkerData.loaderCode || typedWorkerData.workerModu
 	} catch (e) {}
 }
 if (!wasmLoader) {
-	const resourcesPath = typedWorkerData?.resourcesPath || path.join(__dirname, 'wasm-resources')
+	const resourcesPath = typedWorkerData?.resourcesPath || path.join(_moduleDirname, 'wasm-resources')
 	const rsrcPath = path.join(resourcesPath, 'loader.js')
 	if (fs.existsSync(rsrcPath)) {
 		try {
