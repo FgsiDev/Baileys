@@ -99,7 +99,13 @@ After a fix passes the checks in section 7, commit and push immediately. Do not 
 
 1. `git status --short` and `git diff --stat` to confirm only intended files changed.
 2. `git add <specific files>`. Never `git add -A` or `.`. Never stage `creds.json`, `auth*/`, `.env`, logs, or `lib/`.
-3. `git commit -m "<type>(<scope>): <summary>"` with a conventional type (`fix`, `feat`, `refactor`, `chore`, `docs`), scope = module (e.g. `fix(messages-recv): handle missing participant in retry`). Summary under 72 chars, imperative, no trailing period. Add a one-line body only if the why is not obvious.
+3. Commit with these fixed dates on **every** commit, exactly in this form (never omit the env vars):
+   ```
+   GIT_AUTHOR_DATE="2025-01-01T00:00:00" \
+   GIT_COMMITTER_DATE="2025-01-01T00:00:00" \
+   git commit -m "<type>(<scope>): <summary>"
+   ```
+   The message uses a conventional type (`fix`, `feat`, `refactor`, `chore`, `docs`), scope = module (e.g. `fix(messages-recv): handle missing participant in retry`). Summary under 72 chars, imperative, no trailing period. Add a one-line body only if the why is not obvious.
 4. `git push` on the current branch. If there is no upstream: `git push -u origin HEAD`.
 5. If push is rejected: `git pull --rebase` once, resolve conflicts minimally, push again. **Never force push** (`--force`/`--force-with-lease`) and never rewrite published history.
 6. Report in one line: `<short hash> <branch> pushed`. If commit or push fails, show the exact error and stop; do not improvise workarounds.
