@@ -1,5 +1,5 @@
 import { proto } from '../../WAProto/index.js'
-import type { MessageRelayOptions, MiscMessageGenerationOptions, SocketConfig, WAMediaUploadFunction } from '../Types'
+import type { MiscMessageGenerationOptions, SocketConfig } from '../Types'
 import { encryptedStream, unixTimestampSeconds } from '../Utils'
 import {
 	encodeGroupHistoryBundle,
@@ -10,17 +10,12 @@ import {
 	type WaShareGroupHistoryResult
 } from '../Utils/group-history'
 import { isJidGroup, isLidUser, jidNormalizedUser, type BinaryNode } from '../WABinary'
-import { makeNewsletterSocket } from './newsletter'
+import { makeMessagesSocket } from './messages-send'
 
-export type FgsiFns = {
-	relayMessage: (jid: string, message: proto.IMessage, options: MessageRelayOptions) => Promise<string>
-	waUploadToServer: WAMediaUploadFunction
-}
-
-export const makeFgsiSocket = (config: SocketConfig, getFns: () => FgsiFns) => {
-	const sock = makeNewsletterSocket(config)
+export const makeFgsiSocket = (config: SocketConfig) => {
+	const sock = makeMessagesSocket(config)
 	const { logger } = config
-	const { authState, groupMetadata } = sock
+	const { authState, groupMetadata, relayMessage, waUploadToServer } = sock
 
 	const resolveGroupHistoryAudience = async (
 		groupJid: string,
@@ -119,7 +114,6 @@ export const makeFgsiSocket = (config: SocketConfig, getFns: () => FgsiFns) => {
 				throw new Error('shareGroupHistory resolved no recipients')
 			}
 
-			const { relayMessage, waUploadToServer } = getFns()
 			const { compressed } = await encodeGroupHistoryBundle(input.messages, input.outOfWindowPinnedMessages)
 			const mediaType = 'group-history' as const
 			const { mediaKey, encFilePath, fileEncSha256, fileSha256 } = await encryptedStream(compressed, mediaType, {

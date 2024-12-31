@@ -62,7 +62,7 @@ import {
 	S_WHATSAPP_NET
 } from '../WABinary'
 import { USyncQuery, USyncUser } from '../WAUSync'
-import { makeFgsiSocket } from './fgsi'
+import { makeNewsletterSocket } from './newsletter'
 
 export const makeMessagesSocket = (config: SocketConfig) => {
 	const {
@@ -75,7 +75,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 		enableRecentMessageCache,
 		maxMsgRetryCount
 	} = config
-	const sock = makeFgsiSocket(config, () => ({ relayMessage, waUploadToServer }))
+	const sock = makeNewsletterSocket(config)
 	const {
 		ev,
 		authState,
