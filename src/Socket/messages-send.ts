@@ -753,9 +753,14 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				const groupData =
 					(useCachedGroupMetadata && cachedGroupMetadata ? await cachedGroupMetadata(jid) : undefined) ||
 					(await groupMetadata(jid))
+				const groupAddressingMode: 'pn' | 'lid' =
+					groupData?.addressingMode ||
+					((groupData?.participants || []).some(participant => !!participant.id && isLidUser(participant.id))
+						? 'lid'
+						: 'pn')
 				additionalAttributes = {
 					...additionalAttributes,
-					addressing_mode: groupData?.addressingMode || 'lid'
+					addressing_mode: groupAddressingMode
 				}
 				if (groupData?.ephemeralDuration && groupData.ephemeralDuration > 0) {
 					additionalAttributes = {
@@ -764,12 +769,31 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 					}
 				}
 
-				const ownJids = [meId, meLid].filter(id => !!id) as string[]
-				const targetDevices = await getUSyncDevices(
-					[...new Set([...restrictedGroupTargets, ...ownJids])],
-					!!useUserDevicesCache,
-					false
-				)
+				// Own devices are resolved in the group's addressing mode only: mixing
+				// PN and LID device jids inside one <participants> node makes the
+				// server reject the stanza.
+				const ownJid = groupAddressingMode === 'lid' && meLid ? meLid : meId
+				const requestedJids = [...new Set([...restrictedGroupTargets, ownJid])]
+				const targetDevices = await getUSyncDevices(requestedJids, !!useUserDevicesCache, false)
+
+				// usync returns an empty device list for some LID targets; keep the
+				// recipient user jid itself (device 0) so it is not silently dropped
+				const resolvedUsers = new Set(targetDevices.map(device => jidNormalizedUser(device.jid)))
+				for (const recipientJid of restrictedGroupTargets) {
+					if (resolvedUsers.has(jidNormalizedUser(recipientJid))) {
+						continue
+					}
+					const decoded = jidDecode(recipientJid)
+					if (!decoded?.user) {
+						continue
+					}
+					targetDevices.push({
+						user: decoded.user,
+						device: 0,
+						jid: jidEncode(decoded.user, decoded.server, 0)
+					})
+				}
+
 				devices.push(...targetDevices)
 
 				const recipientJids = [...new Set(devices.map(device => device.jid))]
@@ -1307,7 +1331,11 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 		requestedJids: string[]
 	): Promise<WaGroupHistoryAudience> => {
 		const groupData = await groupMetadata(groupJid)
-		const addressingMode: 'pn' | 'lid' = groupData?.addressingMode === 'pn' ? 'pn' : 'lid'
+		const addressingMode: 'pn' | 'lid' =
+			groupData?.addressingMode ||
+			((groupData?.participants || []).some(participant => !!participant.id && isLidUser(participant.id))
+				? 'lid'
+				: 'pn')
 		const meId = authState.creds.me!.id
 		const meLid = authState.creds.me?.lid
 		const meUserJid = jidNormalizedUser(addressingMode === 'lid' && meLid ? meLid : meId)
@@ -1718,7 +1746,8 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 			})
 			const upload = await waUploadToServer(encFilePath, {
 				mediaType,
-				fileEncSha256B64: fileEncSha256.toString('base64')
+				fileEncSha256B64: fileEncSha256.toString('base64'),
+				contentType: GROUP_HISTORY_BUNDLE_MIMETYPE
 			})
 
 			const oldestInWindow = oldestTimestampSeconds(input.messages)
