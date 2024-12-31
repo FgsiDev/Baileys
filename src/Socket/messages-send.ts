@@ -1289,6 +1289,10 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 			return 'url'
 		} else if (message.messageHistoryBundle) {
 			return 'group_history'
+		} else if (message.protocolMessage?.chatThemeSetting) {
+			// chat theme settings require type="media" and mediatype="chat_theme"
+			// on the wire envelope; otherwise Android rejects with ChatThemeEnvelopeCheck
+			return 'chat_theme'
 		}
 
 		return ''
@@ -1577,6 +1581,6 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 
 				return fullMsg
 			}
-		},
+		}
 	}
 }

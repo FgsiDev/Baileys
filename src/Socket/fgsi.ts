@@ -83,9 +83,7 @@ export const makeFgsiSocket = (config: SocketConfig) => {
 
 		// toJids may arrive as either `...@lid` or `...@s.whatsapp.net`; both forms
 		// are resolved against the member list and mapped to the group's addressing mode.
-		const requested = [
-			...new Set(requestedJids.map(toUserJid).filter((jid): jid is string => !!jid))
-		]
+		const requested = [...new Set(requestedJids.map(toUserJid).filter((jid): jid is string => !!jid))]
 
 		const matchedTargets = new Set<string>()
 		const unknownJids: string[] = []
