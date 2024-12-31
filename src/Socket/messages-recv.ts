@@ -62,12 +62,12 @@ import {
 	S_WHATSAPP_NET
 } from '../WABinary'
 import { extractGroupMetadata } from './groups'
-import { makeFgsiSocket } from './fgsi'
+import { makeMessagesSocket } from './messages-send'
 
 export const makeMessagesRecvSocket = (config: SocketConfig) => {
 	const { logger, retryRequestDelayMs, maxMsgRetryCount, getMessage, shouldIgnoreJid, enableAutoSessionRecreation } =
 		config
-	const sock = makeFgsiSocket(config)
+	const sock = makeMessagesSocket(config)
 	const {
 		ev,
 		authState,
