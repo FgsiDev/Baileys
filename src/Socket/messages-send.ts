@@ -245,6 +245,17 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				const decoded = jidDecode(jid)
 				const user = decoded?.user
 				const device = decoded?.device
+				// Meta AI / bot (@bot server): a single device-0 endpoint that usync does NOT
+				// enumerate — left to the usync fetch it returns no devices and the bot is
+				// silently dropped from recipients. Inject it directly as device 0.
+				if (user && isJidMetaAI(jid)) {
+					deviceResults.push({
+						user,
+						device: typeof device === 'number' ? device : 0,
+						jid
+					})
+					return null
+				}
 				const isExplicitDevice = typeof device === 'number' && device >= 0
 
 				if (isExplicitDevice && user) {
@@ -802,6 +813,17 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 
 				const participantsList = groupData ? groupData.participants.map(p => p.id) : []
 
+			// Meta AI / bots invoked via botGroupMetadata are NOT in the group's member
+			// list, so without this they miss the sender-key distribution and can never
+			// decrypt the group message (-> no AI reply). Add their <fbid>@bot JIDs.
+			const botGroupParticipants =
+				message?.messageContextInfo?.botMetadata?.botGroupMetadata?.participantsMetadata || []
+			for (const bp of botGroupParticipants) {
+				if (!bp?.botFbid) continue
+				const botJid = `${bp.botFbid}@bot`
+				if (!participantsList.includes(botJid)) participantsList.push(botJid)
+			}
+
 				if (groupData?.ephemeralDuration && groupData.ephemeralDuration > 0) {
 					additionalAttributes = {
 						...additionalAttributes,
@@ -843,8 +865,13 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				for (const device of devices) {
 					const deviceJid = device.jid
 					const hasKey = !!senderKeyMap[deviceJid]
+					// A Meta AI / bot recipient must be addressed on EVERY invoke, never
+					// skipped via the sender-key cache — otherwise a follow-up ships the
+					// skmsg to 0 recipients, the bot isn't re-invoked and the server can
+					// reject the empty-fanout stanza (479).
+					const isBotRecipient = isJidMetaAI(deviceJid)
 					if (
-						(!hasKey || !!participant) &&
+						(!hasKey || !!participant || isBotRecipient) &&
 						!isHostedLidUser(deviceJid) &&
 						!isHostedPnUser(deviceJid) &&
 						device.device !== 99
