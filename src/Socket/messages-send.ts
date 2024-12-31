@@ -1,6 +1,6 @@
 import NodeCache from '@cacheable/node-cache'
 import { Boom } from '@hapi/boom'
-import { randomBytes, randomUUID } from 'crypto'
+import { randomBytes } from 'crypto'
 import { proto } from '../../WAProto/index.js'
 import { DEFAULT_CACHE_TTLS, WA_DEFAULT_EPHEMERAL } from '../Defaults'
 import type {
@@ -1577,111 +1577,6 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 
 				return fullMsg
 			}
-		},
-		// Meta AI (Hatch). Direct 1:1 -> send to the @bot JID. Group -> send to the
-		// group and invoke the bot by its fbid in botGroupMetadata (this is how you
-		// "mention"/summon Meta AI inside a group). messageSecret is required either
-		// way — the bot derives its msmsg reply key from it.
-		sendMetaAI: async (
-			text: string,
-			opts: {
-				jid?: string
-				invokerJid?: string
-				botFbid?: string
-				mention?: boolean
-				sessionId?: string
-				capabilities?: number[]
-				messageSecret?: Buffer
-				quoted?: any
-				links?: any
-				personaType?: string
-				agentEngagementType?: string
-				modeSelected?: string
-			} = {}
-		) => {
-			const META_AI_BOT_JID = '867051314767696@bot'
-			const META_AI_FBID = '867051314767696'
-			const jid = opts.jid || META_AI_BOT_JID
-			const isGroup = isJidGroup(jid)
-			const invokerJid = opts.invokerJid || authState.creds.me?.id
-			const botMetadata = isGroup
-				? {
-						botGroupMetadata: { participantsMetadata: [{ botFbid: opts.botFbid || META_AI_FBID }] },
-						botRenderingConfigMetadata: {
-							bloksVersioningId: 'd7c89519fd412464e4a4ddd60b2e5fa57c5000766a697d60835246ef0952daba',
-							pixelDensity: 2.625
-						}
-					}
-				: {
-						personaId: jid,
-						invokerJid,
-						sessionMetadata: { sessionId: opts.sessionId || randomUUID(), sessionSource: 3 },
-						capabilityMetadata: {
-							capabilities: opts.capabilities || Array.from({ length: 72 }, (_, i) => i + 1)
-						},
-						botMetricsMetadata: { destinationId: jid, destinationEntryPoint: 2 }
-					}
-			// Group invoke sends a plain conversation; opts.mention renders a real
-			// @Meta AI mention exactly like WA-Web (fbid token in the text, mentionedJid
-			// -> @bot, GROUP_MEMBER bot entry point). Direct chat sends an
-			// extendedTextMessage.
-			let content: proto.IMessage
-			if (isGroup) {
-				if (opts.mention) {
-					const fbid = opts.botFbid || META_AI_FBID
-					content = {
-						extendedTextMessage: proto.Message.ExtendedTextMessage.fromObject({
-							text: `@${fbid} ${text}`,
-							contextInfo: proto.ContextInfo.fromObject({
-								mentionedJid: [META_AI_BOT_JID],
-								botMessageSharingInfo: {
-									botEntryPointOrigin: 'GROUP_MEMBER',
-									forwardScore: 0
-								}
-							})
-						})
-					}
-				} else {
-					content = { conversation: text }
-				}
-			} else {
-				content = { extendedTextMessage: { text } }
-			}
-			const messageSecret = opts.messageSecret || randomBytes(32)
-			const message: proto.IMessage = {
-				...content,
-				messageContextInfo: proto.MessageContextInfo.fromObject({
-					messageSecret,
-					botMetadata
-				})
-			}
-			const msgId = generateMessageIDV2(invokerJid)
-			// The <bot> persona node is what tells the server to route to the AI
-			// backend (1:1 does not get a reply without it). Group invokes need it too;
-			// the engagement type reflects the group context.
-			const messageOptions = {
-				messageId: msgId,
-				quoted: opts.quoted,
-				links: opts.links,
-				additionalNodes: [
-					{
-						tag: 'bot',
-						attrs: {
-							persona_type: opts.personaType || 'default',
-							// APK DAH.smali enum: 0=direct_chat (1:1), 1=invoked (summoned
-							// in a group), 2=member (ambient group member). A group invoke
-							// is "invoked".
-							agent_engagement_type: opts.agentEngagementType || (isGroup ? 'invoked' : 'direct_chat'),
-							mode_selected: opts.modeSelected || '0'
-						}
-					} as BinaryNode
-				]
-			}
-			await relayMessage(jid, message, messageOptions)
-			// Register messageSecret immediately at send time so msmsg replies can be
-			// decrypted even if they arrive before our own message echo comes back.
-			setBotMessageSecret(msgId, messageSecret, jid)
-			return msgId
 		},
 	}
 }

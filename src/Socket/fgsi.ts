@@ -1,6 +1,8 @@
+import { randomBytes, randomUUID } from 'crypto'
 import { proto } from '../../WAProto/index.js'
 import type { MiscMessageGenerationOptions, SocketConfig } from '../Types'
-import { encryptedStream, unixTimestampSeconds } from '../Utils'
+import { encryptedStream, generateMessageIDV2, unixTimestampSeconds } from '../Utils'
+import { setBotMessageSecret } from '../Utils/decode-wa-message'
 import {
 	encodeGroupHistoryBundle,
 	GROUP_HISTORY_BUNDLE_MIMETYPE,
@@ -76,6 +78,95 @@ export const makeFgsiSocket = (config: SocketConfig) => {
 
 	return {
 		...sock,
+		sendMetaAI: async (
+			text: string,
+			opts: {
+				jid?: string
+				invokerJid?: string
+				botFbid?: string
+				mention?: boolean
+				sessionId?: string
+				capabilities?: number[]
+				messageSecret?: Buffer
+				quoted?: any
+				links?: any
+				personaType?: string
+				agentEngagementType?: string
+				modeSelected?: string
+			} = {}
+		) => {
+			const META_AI_BOT_JID = '867051314767696@bot'
+			const META_AI_FBID = '867051314767696'
+			const jid = opts.jid || META_AI_BOT_JID
+			const isGroup = isJidGroup(jid)
+			const invokerJid = opts.invokerJid || authState.creds.me?.id
+			const botMetadata = isGroup
+				? {
+						botGroupMetadata: { participantsMetadata: [{ botFbid: opts.botFbid || META_AI_FBID }] },
+						botRenderingConfigMetadata: {
+							bloksVersioningId: 'd7c89519fd412464e4a4ddd60b2e5fa57c5000766a697d60835246ef0952daba',
+							pixelDensity: 2.625
+						}
+					}
+				: {
+						personaId: jid,
+						invokerJid,
+						sessionMetadata: { sessionId: opts.sessionId || randomUUID(), sessionSource: 3 },
+						capabilityMetadata: {
+							capabilities: opts.capabilities || Array.from({ length: 72 }, (_, i) => i + 1)
+						},
+						botMetricsMetadata: { destinationId: jid, destinationEntryPoint: 2 }
+					}
+			let content: proto.IMessage
+			if (isGroup) {
+				if (opts.mention) {
+					const fbid = opts.botFbid || META_AI_FBID
+					content = {
+						extendedTextMessage: proto.Message.ExtendedTextMessage.fromObject({
+							text: `@${fbid} ${text}`,
+							contextInfo: proto.ContextInfo.fromObject({
+								mentionedJid: [META_AI_BOT_JID],
+								botMessageSharingInfo: {
+									botEntryPointOrigin: 'GROUP_MEMBER',
+									forwardScore: 0
+								}
+							})
+						})
+					}
+				} else {
+					content = { conversation: text }
+				}
+			} else {
+				content = { extendedTextMessage: { text } }
+			}
+			const messageSecret = opts.messageSecret || randomBytes(32)
+			const message: proto.IMessage = {
+				...content,
+				messageContextInfo: proto.MessageContextInfo.fromObject({
+					messageSecret,
+					botMetadata
+				})
+			}
+			const msgId = generateMessageIDV2(invokerJid)
+			const messageOptions = {
+				messageId: msgId,
+				quoted: opts.quoted,
+				links: opts.links,
+				additionalNodes: [
+					{
+						tag: 'bot',
+						attrs: {
+							persona_type: opts.personaType || 'default',
+							agent_engagement_type: opts.agentEngagementType || (isGroup ? 'invoked' : 'direct_chat'),
+							mode_selected: opts.modeSelected || '0'
+						}
+					} as BinaryNode
+				]
+			}
+			await relayMessage(jid, message, messageOptions)
+			setBotMessageSecret(msgId, messageSecret, jid)
+			return msgId
+		},
 		shareGroupHistory: async (
 			groupJid: string,
 			input: WaShareGroupHistoryInput,
