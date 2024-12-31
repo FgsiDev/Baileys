@@ -1715,7 +1715,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
     tag: 'meta',
     attrs: { appdata: 'group_history' },
     content: undefined
-  }]
+  }]}
 				)
 			} catch (error: any) {
 				logger.warn({ error, groupJid }, 'group history notice failed after bundle delivered')
