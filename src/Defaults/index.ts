@@ -120,6 +120,7 @@ export const MEDIA_HKDF_KEY_MAPPING = {
 	'thumbnail-image': 'Image Thumbnail',
 	'thumbnail-video': 'Video Thumbnail',
 	'thumbnail-link': 'Link Thumbnail',
+	'group-history': 'History',
 	'md-msg-hist': 'History',
 	'md-app-state': 'App State',
 	'product-catalog-image': '',
