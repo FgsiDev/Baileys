@@ -1205,8 +1205,6 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 			return 'native_flow_response'
 		} else if (message.groupInviteMessage) {
 			return 'url'
-		} else if (message.messageHistoryBundle) {
-			return 'group_history'
 		}
 
 		return ''
@@ -1698,12 +1696,10 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 						directPath: upload.directPath,
 						mediaKeyTimestamp: unixTimestampSeconds(),
 						messageHistoryMetadata: metadataProto
-					}
+					},
+					messageHistoryMetadata: metadataProto
 				},
-				{
-					...options,
-					restrictedGroupTargets: [...audience.historyReceivers, audience.meUserJid]
-				}
+				{}
 			)
 
 			// notice addressed to the whole group so other clients can render the
@@ -1715,7 +1711,11 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 					{
 						messageHistoryNotice: { messageHistoryMetadata: metadataProto }
 					},
-					options
+					{ additionalNodes: [{
+    tag: 'meta',
+    attrs: { appdata: 'group_history' },
+    content: undefined
+  }]
 				)
 			} catch (error: any) {
 				logger.warn({ error, groupJid }, 'group history notice failed after bundle delivered')
