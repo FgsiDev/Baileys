@@ -11,13 +11,13 @@ import {
 	type WaShareGroupHistoryInput,
 	type WaShareGroupHistoryResult
 } from '../Utils/group-history'
-import { isJidGroup, isLidUser, jidNormalizedUser, type BinaryNode } from '../WABinary'
+import { isJidGroup, isLidUser, isPnUser, jidNormalizedUser, type BinaryNode } from '../WABinary'
 import { makeCommunitiesSocket } from './communities'
 
 export const makeFgsiSocket = (config: SocketConfig) => {
 	const sock = makeCommunitiesSocket(config)
 	const { logger } = config
-	const { authState, groupMetadata, relayMessage, waUploadToServer } = sock
+	const { authState, groupMetadata, relayMessage, signalRepository, waUploadToServer } = sock
 
 	const resolveGroupHistoryAudience = async (
 		groupJid: string,
@@ -33,43 +33,123 @@ export const makeFgsiSocket = (config: SocketConfig) => {
 		const meLid = authState.creds.me?.lid
 		const meUserJid = jidNormalizedUser(addressingMode === 'lid' && meLid ? meLid : meId)
 
-		const pending = new Set<string>()
-		for (const jid of requestedJids) {
-			pending.add(jidNormalizedUser(jid))
+		type ParticipantRefs = {
+			/** jid in the group's addressing mode — what gets sent on the wire */
+			target: string
+			lidUserJid?: string
+			pnUserJid?: string
+		}
+
+		const toUserJid = (jid?: string | null) => (jid ? jidNormalizedUser(jid) : '')
+
+		const participants: ParticipantRefs[] = []
+		for (const participant of groupData?.participants || []) {
+			const idJid = toUserJid(participant.id)
+			const lidUserJid = toUserJid(participant.lid) || (idJid && isLidUser(idJid) ? idJid : undefined)
+			const pnUserJid = toUserJid(participant.phoneNumber) || (idJid && isPnUser(idJid) ? idJid : undefined)
+			const target = addressingMode === 'lid' ? lidUserJid || pnUserJid : pnUserJid || lidUserJid
+			if (!target) {
+				continue
+			}
+
+			participants.push({ target, lidUserJid, pnUserJid })
+		}
+
+		const byLid = new Map<string, ParticipantRefs>()
+		const byPn = new Map<string, ParticipantRefs>()
+		for (const participant of participants) {
+			if (participant.lidUserJid && !byLid.has(participant.lidUserJid)) {
+				byLid.set(participant.lidUserJid, participant)
+			}
+
+			if (participant.pnUserJid && !byPn.has(participant.pnUserJid)) {
+				byPn.set(participant.pnUserJid, participant)
+			}
+		}
+
+		const meJids = new Set<string>()
+		for (const jid of [meUserJid, meId, meLid]) {
+			const normalized = toUserJid(jid)
+			if (normalized) {
+				meJids.add(normalized)
+			}
+		}
+
+		const isSelfJid = (jid: string) => meJids.has(jid)
+		const isSelfParticipant = (participant: ParticipantRefs) =>
+			isSelfJid(participant.target) ||
+			(!!participant.lidUserJid && isSelfJid(participant.lidUserJid)) ||
+			(!!participant.pnUserJid && isSelfJid(participant.pnUserJid))
+
+		// toJids may arrive as either `...@lid` or `...@s.whatsapp.net`; both forms
+		// are resolved against the member list and mapped to the group's addressing mode.
+		const requested = [
+			...new Set(requestedJids.map(toUserJid).filter((jid): jid is string => !!jid))
+		]
+
+		const matchedTargets = new Set<string>()
+		const unknownJids: string[] = []
+		let requestedSelf = false
+		for (const jid of requested) {
+			if (isSelfJid(jid)) {
+				requestedSelf = true
+				continue
+			}
+
+			let participant = isLidUser(jid) ? byLid.get(jid) : undefined
+			if (!participant && isPnUser(jid)) {
+				participant = byPn.get(jid)
+			}
+
+			if (!participant) {
+				// member metadata does not always carry both sides of the pair, so fall
+				// back to the stored LID mapping before declaring the jid unknown
+				try {
+					const mapped = isPnUser(jid)
+						? await signalRepository.lidMapping.getLIDForPN(jid)
+						: await signalRepository.lidMapping.getPNForLID(jid)
+					const mappedJid = toUserJid(mapped)
+					if (mappedJid) {
+						participant = byLid.get(mappedJid) || byPn.get(mappedJid)
+					}
+				} catch (error) {
+					logger.debug({ error, jid }, 'group history audience: lid mapping lookup failed')
+				}
+			}
+
+			if (!participant) {
+				unknownJids.push(jid)
+				continue
+			}
+
+			if (isSelfParticipant(participant)) {
+				requestedSelf = true
+				continue
+			}
+
+			matchedTargets.add(participant.target)
 		}
 
 		const historyReceivers: string[] = []
 		const nonHistoryReceivers: string[] = []
-		for (const participant of groupData?.participants || []) {
-			const pnUserJid = participant.id ? jidNormalizedUser(participant.id) : undefined
-			const lidUserJid = participant.lid ? jidNormalizedUser(participant.lid) : undefined
-			const userJid = addressingMode === 'lid' ? lidUserJid || pnUserJid : pnUserJid
-			if (!userJid) {
+		const seenTargets = new Set<string>()
+		for (const participant of participants) {
+			if (isSelfParticipant(participant) || seenTargets.has(participant.target)) {
 				continue
 			}
-			if (userJid === meUserJid || pnUserJid === meUserJid || lidUserJid === meUserJid) {
-				continue
-			}
-			const matched =
-				pending.delete(userJid) ||
-				(!!pnUserJid && pending.delete(pnUserJid)) ||
-				(!!lidUserJid && pending.delete(lidUserJid))
-			if (matched) {
-				historyReceivers.push(userJid)
+
+			seenTargets.add(participant.target)
+			if (matchedTargets.has(participant.target)) {
+				historyReceivers.push(participant.target)
 			} else {
-				nonHistoryReceivers.push(userJid)
+				nonHistoryReceivers.push(participant.target)
 			}
 		}
-
-		const requestedSelf =
-			pending.delete(meUserJid) ||
-			pending.delete(jidNormalizedUser(meId)) ||
-			(!!meLid && pending.delete(jidNormalizedUser(meLid)))
 
 		return {
 			historyReceivers,
 			nonHistoryReceivers,
-			unknownJids: [...pending],
+			unknownJids,
 			requestedSelf,
 			addressingMode,
 			meUserJid
