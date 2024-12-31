@@ -735,8 +735,8 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				isNeedMetaAttrs ||
 				innerMessage?.protocolMessage?.memberLabel ||
 				innerMessage?.protocolMessage?.editedMessage ||
-				innerMessage?.protocolMessage?.mediaNotifyMessage ||
-				innerMessage?.messageHistoryNotice
+				innerMessage?.protocolMessage?.mediaNotifyMessage
+				//innerMessage?.messageHistoryNotice
 			) {
 				extraAttrs['decrypt-fail'] = 'hide' // todo: expand for reactions and other types
 			}
@@ -837,16 +837,16 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 
 				const participantsList = groupData ? groupData.participants.map(p => p.id) : []
 
-			// Meta AI / bots invoked via botGroupMetadata are NOT in the group's member
-			// list, so without this they miss the sender-key distribution and can never
-			// decrypt the group message (-> no AI reply). Add their <fbid>@bot JIDs.
-			const botGroupParticipants =
-				message?.messageContextInfo?.botMetadata?.botGroupMetadata?.participantsMetadata || []
-			for (const bp of botGroupParticipants) {
-				if (!bp?.botFbid) continue
-				const botJid = `${bp.botFbid}@bot`
-				if (!participantsList.includes(botJid)) participantsList.push(botJid)
-			}
+				// Meta AI / bots invoked via botGroupMetadata are NOT in the group's member
+				// list, so without this they miss the sender-key distribution and can never
+				// decrypt the group message (-> no AI reply). Add their <fbid>@bot JIDs.
+				const botGroupParticipants =
+					message?.messageContextInfo?.botMetadata?.botGroupMetadata?.participantsMetadata || []
+				for (const bp of botGroupParticipants) {
+					if (!bp?.botFbid) continue
+					const botJid = `${bp.botFbid}@bot`
+					if (!participantsList.includes(botJid)) participantsList.push(botJid)
+				}
 
 				if (groupData?.ephemeralDuration && groupData.ephemeralDuration > 0) {
 					additionalAttributes = {
@@ -1758,12 +1758,22 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 					: oldestInWindow === undefined
 						? oldestPin
 						: Math.min(oldestInWindow, oldestPin)
+			// the receiver rejects the bundle when `oldestMessageTimestampInWindow`
+			// is missing or <= 0 (X/EXZ.Ci5), so fall back to "now" when the shared
+			// messages carry no timestamp at all
+			const oldestInWindowOrNow = oldestInWindow ?? unixTimestampSeconds()
 			const metadataProto: proto.Message.IMessageHistoryMetadata = {
 				historyReceivers: audience.historyReceivers,
 				nonHistoryReceivers: audience.nonHistoryReceivers,
 				messageCount: input.messages.length,
-				oldestMessageTimestampInWindow: oldestInWindow,
-				oldestMessageTimestampInBundle: oldestInBundle
+				oldestMessageTimestampInWindow: oldestInWindowOrNow,
+				oldestMessageTimestampInBundle: oldestInBundle ?? oldestInWindowOrNow,
+				// presence-only field: X/EXZ.Ci5 uses `bitField0_ & 32` as the flag
+				// that lets X/6oq.A00 hydrate the metadata into the received
+				// FMessageGroupHistoryBundle. Without field 6 the receiver never
+				// reads historyReceivers/messageCount and the bundle can never be
+				// imported. `false` is correct: this bundle shares no chat theme.
+				includesChatTheme: input?.includesChatTheme || false
 			}
 
 			// the bundle reaches the requested members + our own devices, nobody else
@@ -1789,7 +1799,9 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 			)
 
 			// notice addressed to the whole group so other clients can render the
-			// "history was shared" marker
+			// "history was shared" marker. The receiver's notice parser
+			// (X/C3847EXa) only accepts stanzas whose <meta appdata> is
+			// "group_history", so the node is mandatory.
 			let noticeMessageId: string | undefined
 			try {
 				noticeMessageId = await relayMessage(
@@ -1797,7 +1809,14 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 					{
 						messageHistoryNotice: { messageHistoryMetadata: metadataProto }
 					},
-					{}
+					{
+						additionalNodes: [
+							{
+								tag: 'meta',
+								attrs: { appdata: 'group_history' }
+							} as BinaryNode
+						]
+					}
 				)
 			} catch (error: any) {
 				logger.warn({ error, groupJid }, 'group history notice failed after bundle delivered')

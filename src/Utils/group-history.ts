@@ -23,7 +23,8 @@ export async function encodeGroupHistoryBundle(
 			? (outOfWindowPinnedMessages as proto.IWebMessageInfo[])
 			: undefined
 	}).finish()
-	const compressed = Buffer.from(await deflateAsync(encoded))
+	// the app compresses with `Deflater(1, false)` (level 1, zlib wrapper)
+	const compressed = Buffer.from(await deflateAsync(encoded, { level: 1 }))
 	return { compressed, encoded: Buffer.from(encoded) }
 }
 
@@ -48,6 +49,7 @@ export interface WaShareGroupHistoryInput {
 	sinceMs?: number
 	messages?: proto.IWebMessageInfo[]
 	outOfWindowPinnedMessages?: proto.IWebMessageInfo[]
+	includesChatTheme?: boolean
 }
 
 export interface WaShareGroupHistoryResult {
