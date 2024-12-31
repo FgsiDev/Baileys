@@ -3,6 +3,7 @@ import { createHash, randomBytes } from 'crypto'
 import { zip } from 'fflate'
 import { promises as fs } from 'fs'
 import { type Transform } from 'stream'
+import { gunzipSync, gzipSync } from 'zlib'
 import { proto } from '../../WAProto/index.js'
 import {
 	CALL_AUDIO_PREFIX,
@@ -1395,6 +1396,102 @@ function isWebPBuffer(buffer: Buffer): boolean {
 	)
 }
 
+/** Stickers are enforced to a 512x512 canvas by the official client */
+const STICKER_DIMENSION = 512
+/** The tray icon (cover entry inside the sticker pack ZIP) is a 96x96 PNG */
+const TRAY_ICON_DIMENSION = 96
+const MAX_STICKER_SIZE = 1024 * 1024
+const TRANSPARENT_BACKGROUND = { r: 0, g: 0, b: 0, alpha: 0 }
+/** Cap for decompressed .was payloads, so a gzip bomb can't exhaust memory */
+const MAX_LOTTIE_DECOMPRESSED_SIZE = 8 * 1024 * 1024
+
+/**
+ * Checks if a buffer is gzip-compressed - the container used by WAS (.was) Lottie stickers
+ */
+function isGzipBuffer(buffer: Buffer): boolean {
+	return buffer.length >= 2 && buffer[0] === 0x1f && buffer[1] === 0x8b
+}
+
+/**
+ * Validates a Lottie animation by its root structure
+ */
+function isLottieJsonBuffer(buffer: Buffer): boolean {
+	try {
+		const parsed = JSON.parse(buffer.toString('utf8'))
+		return (
+			!!parsed && typeof parsed === 'object' && 'v' in parsed && 'layers' in parsed && 'ip' in parsed && 'op' in parsed
+		)
+	} catch {
+		return false
+	}
+}
+
+/**
+ * Detects Lottie sticker data: a gzipped .was payload or raw Lottie JSON
+ */
+export function isLottieBuffer(buffer: Buffer): boolean {
+	if (isGzipBuffer(buffer)) {
+		try {
+			return isLottieJsonBuffer(gunzipSync(buffer, { maxOutputLength: MAX_LOTTIE_DECOMPRESSED_SIZE }))
+		} catch {
+			// decompression failed or hit the size cap - not a usable Lottie payload
+			return false
+		}
+	}
+
+	return buffer.length > 0 && buffer[0] === 0x7b ? isLottieJsonBuffer(buffer) : false
+}
+
+/**
+ * Enforces the official client's sticker constraints: a 512x512 canvas and the 1MB
+ * size limit (checked after resizing). Lottie data is vector-only, so it is never
+ * resized - only size-checked. When the resized sticker still exceeds 1MB, it is
+ * recompressed at a lower quality (70, then 50) before failing
+ */
+async function fitStickerToLimits(
+	buffer: Buffer,
+	{
+		index,
+		isLottie,
+		lib
+	}: {
+		index: number
+		isLottie: boolean
+		lib: Awaited<ReturnType<typeof getImageProcessingLibrary>>
+	}
+): Promise<Buffer> {
+	let output = buffer
+
+	if (!isLottie && 'sharp' in lib && lib.sharp) {
+		const meta = await lib.sharp.default(output, { animated: true }).metadata()
+		if (meta.width !== STICKER_DIMENSION || meta.height !== STICKER_DIMENSION) {
+			output = await lib.sharp
+				.default(output, { animated: true })
+				.resize(STICKER_DIMENSION, STICKER_DIMENSION, {
+					fit: 'contain',
+					background: TRANSPARENT_BACKGROUND
+				})
+				.webp()
+				.toBuffer()
+		}
+
+		if (output.length > MAX_STICKER_SIZE) {
+			for (const quality of [70, 50]) {
+				output = await lib.sharp.default(output, { animated: true }).webp({ quality }).toBuffer()
+				if (output.length <= MAX_STICKER_SIZE) {
+					break
+				}
+			}
+		}
+	}
+
+	if (output.length > MAX_STICKER_SIZE) {
+		throw new Boom(`Sticker at index ${index} exceeds the 1MB size limit`, { statusCode: 400 })
+	}
+
+	return output
+}
+
 async function prepareStickerPackMessage(
 	stickerPack: StickerPack,
 	options: MessageContentGenerationOptions
@@ -1417,70 +1514,73 @@ async function prepareStickerPackMessage(
 		const { stream } = await getStream(s.data)
 		const buffer = await toBuffer(stream)
 
-		let webpBuffer: Buffer
-		let isAnimated = false
-		const isWebP = isWebPBuffer(buffer)
+		// Lottie stickers ship as .was (gzip-compressed Lottie JSON); sniff when not explicitly set
+		const isLottie = typeof s.isLottie === 'boolean' ? s.isLottie : isLottieBuffer(buffer)
 
-		if (s.isLottie) {
-			webpBuffer = buffer
-		} else if (isWebP) {
+		let stickerBuffer: Buffer
+		let isAnimated = false
+
+		if (isLottie) {
+			// The .was extension implies gzip: raw Lottie JSON must be compressed before zipping
+			stickerBuffer = isGzipBuffer(buffer) ? buffer : gzipSync(buffer)
+		} else if (isWebPBuffer(buffer)) {
 			// Already WebP - preserve original to keep exif metadata and animation
-			webpBuffer = buffer
+			stickerBuffer = buffer
 			isAnimated = isAnimatedWebP(buffer)
 		} else if ('sharp' in lib && lib.sharp) {
-			// Convert to WebP, preserving metadata
-			webpBuffer = await lib.sharp.default(buffer).webp().toBuffer()
-			// Non-WebP inputs converted to WebP are not animated
-			isAnimated = false
+			// Convert to WebP first; 512x512 enforcement happens in fitStickerToLimits
+			stickerBuffer = await lib.sharp.default(buffer).webp().toBuffer()
 		} else {
 			throw new Boom(
 				'No image processing library (sharp) available for converting sticker to WebP. Either install sharp or provide stickers in WebP format.'
 			)
 		}
 
-		if (webpBuffer.length > 1024 * 1024) {
-			throw new Boom(`Sticker at index ${i} exceeds the 1MB size limit`, { statusCode: 400 })
-		}
+		stickerBuffer = await fitStickerToLimits(stickerBuffer, { index: i, isLottie, lib })
 
-		const hash = sha256(webpBuffer).toString('base64').replace(/\//g, '-')
-		const fileName = s.fileName || `${hash}.webp`
-		stickerData[fileName] = [new Uint8Array(webpBuffer), { level: 0 as 0 }]
+		const hash = sha256(stickerBuffer).toString('base64').replace(/\//g, '-')
+		const fileName = s.fileName || `${hash}${isLottie ? '.was' : '.webp'}`
+		stickerData[fileName] = [new Uint8Array(stickerBuffer), { level: 0 as 0 }]
 		return {
 			fileName,
-			mimetype: 'image/webp',
+			mimetype: isLottie ? 'application/was' : 'image/webp',
 			isAnimated: s.isAnimated || isAnimated,
 			emojis: s.emojis || [],
 			accessibilityLabel: s.accessibilityLabel || '',
-			isLottie: s.isLottie || false
+			isLottie
 		}
 	})
 
 	const stickerMetadata = await Promise.all(stickerPromises)
 
-	// Process and add cover/tray icon to the ZIP
+	// Process and add cover/tray icon to the ZIP - the official client stores it as a 96x96 PNG
 	const trayIconFileName = isWebpThumb ? `${stickerPackIdValue}.webp` : `${stickerPackIdValue}.png`
 	const { stream: coverStream } = await getStream(stickerPack.cover)
 	const coverBuffer = await toBuffer(coverStream)
 
-	let coverWebpBuffer: Buffer
-	const isCoverWebP = isWebPBuffer(coverBuffer)
+	let trayIconBuffer: Buffer
 
 	if (isWebpThumb) {
-		// Already WebP - preserve original to keep exif metadata
-		coverWebpBuffer = coverBuffer
-	} else if (isCoverWebP) {
-		// Already WebP - preserve original to keep exif metadata
-		coverWebpBuffer = coverBuffer
+		// Explicitly requested WebP tray icon - keep the original bytes
+		trayIconBuffer = coverBuffer
 	} else if ('sharp' in lib && lib.sharp) {
-		coverWebpBuffer = await lib.sharp.default(coverBuffer).webp().toBuffer()
+		trayIconBuffer = await lib.sharp
+			.default(coverBuffer)
+			.resize(TRAY_ICON_DIMENSION, TRAY_ICON_DIMENSION, {
+				fit: 'contain',
+				background: TRANSPARENT_BACKGROUND
+			})
+			.png()
+			.toBuffer()
+	} else if ('jimp' in lib && lib.jimp) {
+		const jimpImage = await lib.jimp.Jimp.read(coverBuffer)
+		trayIconBuffer = await jimpImage.contain({ w: TRAY_ICON_DIMENSION, h: TRAY_ICON_DIMENSION }).getBuffer('image/png')
 	} else {
-		throw new Boom(
-			'No image processing library (sharp) available for converting cover to WebP. Either install sharp or provide cover in WebP format.'
-		)
+		throw new Boom('No image processing library available for converting cover to PNG', { statusCode: 400 })
 	}
 
 	// Add cover to ZIP data
-	stickerData[trayIconFileName] = [new Uint8Array(coverWebpBuffer), { level: 0 as 0 }]
+	stickerData[trayIconFileName] = [new Uint8Array(trayIconBuffer), { level: 0 as 0 }]
 
 	const zipBuffer = await new Promise<Buffer>((resolve, reject) => {
 		zip(stickerData, (err, data) => {
@@ -1527,7 +1627,7 @@ async function prepareStickerPackMessage(
 	}
 
 	try {
-		// Reuse the cover buffer we already processed for thumbnail generation
+		// The 252x252 JPEG thumbnail is uploaded separately from the tray icon, from the original cover
 		let thumbnailBuffer: Buffer
 
 		if ('sharp' in lib && lib.sharp) {
