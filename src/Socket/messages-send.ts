@@ -1697,7 +1697,6 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 						mediaKeyTimestamp: unixTimestampSeconds(),
 						messageHistoryMetadata: metadataProto
 					},
-					messageHistoryMetadata: metadataProto
 				},
 				{}
 			)
