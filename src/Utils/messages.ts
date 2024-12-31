@@ -540,6 +540,8 @@ export const generateWAMessageContent = async (
 		}
 	} else if ('stickerPack' in message) {
 		m = await prepareStickerPackMessage(message.stickerPack, options)
+	} else if ('stickerPackV2' in message) {
+		m = await prepareStickerPackMessageV2(message.stickerPackV2, options)
 	} else if ('pin' in message) {
 		m.pinInChatMessage = {}
 		m.messageContextInfo = {}
@@ -1396,6 +1398,8 @@ function isWebPBuffer(buffer: Buffer): boolean {
 	)
 }
 
+/** Max stickers converted in parallel while building the sticker pack ZIP */
+const CONCURRENCY_LIMIT = 4
 /** Stickers are enforced to a 512x512 canvas by the official client */
 const STICKER_DIMENSION = 512
 /** The tray icon (cover entry inside the sticker pack ZIP) is a 96x96 PNG */
@@ -1493,6 +1497,230 @@ async function fitStickerToLimits(
 }
 
 async function prepareStickerPackMessage(
+	stickerPack: StickerPack,
+	options: MessageContentGenerationOptions
+): Promise<proto.IMessage> {
+	const { cover, stickers = [], name = '📦 Sticker Pack', publisher = '', description = '' } = stickerPack
+
+	if (stickers.length > 60) {
+		throw new Boom('Sticker pack exceeds the maximum limit of 60 stickers', { statusCode: 400 })
+	}
+
+	if (stickers.length === 0) {
+		throw new Boom('Sticker pack must contain at least one sticker', { statusCode: 400 })
+	}
+
+	if (!cover) {
+		throw new Boom('Sticker pack must contain a cover', { statusCode: 400 })
+	}
+
+	const logger = options.logger
+
+	// Cache the built sticker pack, keyed by the sticker media URLs
+	let cacheableKey: string | undefined
+	if (stickers.length && options.mediaCache) {
+		const urls: string[] = []
+		for (const sticker of stickers) {
+			const data = sticker.data
+			if (typeof data === 'object' && 'url' in data && data.url) {
+				urls.push(data.url.toString())
+			}
+		}
+
+		if (urls.length > 0) {
+			cacheableKey = 'sticker:' + urls.join('@')
+		}
+	}
+
+	if (cacheableKey) {
+		const mediaBuff = await options.mediaCache!.get<Buffer>(cacheableKey)
+		if (mediaBuff) {
+			logger?.debug({ cacheableKey }, 'got media cache hit')
+			return { stickerPackMessage: proto.Message.StickerPackMessage.decode(mediaBuff) }
+		}
+	}
+
+	const lib = await getImageProcessingLibrary()
+	const hasSharp = 'sharp' in lib && !!lib.sharp?.default
+	const hasImage = 'image' in lib && !!lib.image?.Transformer
+	const hasJimp = 'jimp' in lib && !!lib.jimp?.Jimp
+
+	if (!hasSharp && !hasImage) {
+		throw new Boom('No image processing library (sharp or @napi-rs/image) available for converting sticker to WebP.')
+	}
+
+	const stickerPackIdValue = generateMessageIDV2()
+	const stickerData: Record<string, [Uint8Array, { level: 0 }]> = {}
+	const stickerMetadata: proto.Message.StickerPackMessage.ISticker[] = new Array(stickers.length)
+
+	for (let i = 0; i < stickers.length; i += CONCURRENCY_LIMIT) {
+		const chunkEnd = Math.min(i + CONCURRENCY_LIMIT, stickers.length)
+		const promises: Promise<void>[] = []
+		for (let j = i; j < chunkEnd; j++) {
+			promises.push(
+				(async (index: number) => {
+					const sticker = stickers[index]!
+					const { stream } = await getStream(sticker.data)
+					const buffer = await toBuffer(stream)
+
+					let webpBuffer: Buffer
+					let isAnimated = false
+
+					if (isWebPBuffer(buffer)) {
+						webpBuffer = buffer
+						isAnimated = isAnimatedWebP(buffer)
+					} else if (hasSharp) {
+						webpBuffer = await lib.sharp
+							.default(buffer)
+							.resize(STICKER_DIMENSION, STICKER_DIMENSION, { fit: 'inside' })
+							.webp({ quality: 80 })
+							.toBuffer()
+					} else if (hasImage) {
+						webpBuffer = await new lib.image.Transformer(buffer).resize(STICKER_DIMENSION, STICKER_DIMENSION).webp(80)
+					} else {
+						throw new Boom(
+							'No image processing library (sharp or @napi-rs/image) available for converting sticker to WebP.'
+						)
+					}
+
+					if (webpBuffer.length > MAX_STICKER_SIZE) {
+						throw new Boom(`Sticker at index ${index} exceeds the 1MB size limit`, { statusCode: 400 })
+					}
+
+					const hash = sha256(webpBuffer).toString('base64').replace(/\//g, '-')
+					const fileName = `${hash}.webp`
+					stickerData[fileName] = [new Uint8Array(webpBuffer), { level: 0 }]
+					stickerMetadata[index] = {
+						fileName,
+						mimetype: 'image/webp',
+						isAnimated,
+						emojis: sticker.emojis || ['✨'],
+						accessibilityLabel: sticker.accessibilityLabel || '‎'
+					}
+				})(j)
+			)
+		}
+
+		await Promise.all(promises)
+	}
+
+	const trayIconFileName = `${stickerPackIdValue}.webp`
+	const { stream: coverStream } = await getStream(cover)
+	const coverBuffer = await toBuffer(coverStream)
+
+	let coverWebpBuffer: Buffer
+	if (isWebPBuffer(coverBuffer)) {
+		coverWebpBuffer = coverBuffer
+	} else if (hasSharp) {
+		coverWebpBuffer = await lib.sharp
+			.default(coverBuffer)
+			.resize(STICKER_DIMENSION, STICKER_DIMENSION, { fit: 'inside' })
+			.webp({ quality: 80 })
+			.toBuffer()
+	} else if (hasImage) {
+		coverWebpBuffer = await new lib.image.Transformer(coverBuffer).resize(STICKER_DIMENSION, STICKER_DIMENSION).webp(80)
+	} else {
+		throw new Boom('No image processing library (sharp or @napi-rs/image) available for converting cover to WebP.')
+	}
+
+	stickerData[trayIconFileName] = [new Uint8Array(coverWebpBuffer), { level: 0 }]
+
+	const zipBuffer = await new Promise<Buffer>((resolve, reject) => {
+		zip(stickerData, (error, data) => (error ? reject(error) : resolve(Buffer.from(data))))
+	})
+
+	const stickerPackUpload = await encryptedStream(zipBuffer, 'sticker-pack', {
+		logger,
+		opts: options.options
+	})
+
+	let stickerPackUploadResult: Awaited<ReturnType<MessageContentGenerationOptions['upload']>>
+	try {
+		stickerPackUploadResult = await options.upload(stickerPackUpload.encFilePath, {
+			fileEncSha256B64: stickerPackUpload.fileEncSha256.toString('base64'),
+			mediaType: 'sticker-pack',
+			timeoutMs: options.mediaUploadTimeoutMs
+		})
+	} finally {
+		fs.unlink(stickerPackUpload.encFilePath).catch(() => logger?.warn('failed to remove tmp file'))
+	}
+
+	const obj: proto.Message.IStickerPackMessage = {
+		name,
+		publisher,
+		stickerPackId: stickerPackIdValue,
+		packDescription: description,
+		stickerPackOrigin: proto.Message.StickerPackMessage.StickerPackOrigin.USER_CREATED,
+		stickerPackSize: zipBuffer.length,
+		stickers: stickerMetadata,
+
+		fileSha256: stickerPackUpload.fileSha256,
+		fileEncSha256: stickerPackUpload.fileEncSha256,
+		mediaKey: stickerPackUpload.mediaKey,
+		directPath: stickerPackUploadResult.directPath,
+		fileLength: stickerPackUpload.fileLength,
+		mediaKeyTimestamp: unixTimestampSeconds(),
+
+		trayIconFileName
+	}
+
+	try {
+		let thumbnailBuffer: Buffer
+		if (hasSharp) {
+			thumbnailBuffer = await lib.sharp.default(coverBuffer).resize(252, 252).jpeg().toBuffer()
+		} else if (hasImage) {
+			thumbnailBuffer = await new lib.image.Transformer(coverBuffer).resize(252, 252).jpeg()
+		} else if (hasJimp) {
+			const jimpImage = await lib.jimp.Jimp.read(coverBuffer)
+			thumbnailBuffer = await jimpImage.resize({ w: 252, h: 252 }).getBuffer('image/jpeg')
+		} else {
+			throw new Error('No image processing library available for thumbnail generation')
+		}
+
+		if (!thumbnailBuffer || thumbnailBuffer.length === 0) {
+			throw new Error('Failed to generate thumbnail buffer')
+		}
+
+		const thumbUpload = await encryptedStream(thumbnailBuffer, 'thumbnail-sticker-pack', {
+			logger,
+			opts: options.options,
+			mediaKey: stickerPackUpload.mediaKey // Use same mediaKey as the sticker pack ZIP
+		})
+
+		let thumbUploadResult: Awaited<ReturnType<MessageContentGenerationOptions['upload']>>
+		try {
+			thumbUploadResult = await options.upload(thumbUpload.encFilePath, {
+				fileEncSha256B64: thumbUpload.fileEncSha256.toString('base64'),
+				mediaType: 'thumbnail-sticker-pack',
+				timeoutMs: options.mediaUploadTimeoutMs
+			})
+		} finally {
+			fs.unlink(thumbUpload.encFilePath).catch(() => logger?.warn('failed to remove tmp file'))
+		}
+
+		Object.assign(obj, {
+			thumbnailDirectPath: thumbUploadResult.directPath,
+			thumbnailSha256: thumbUpload.fileSha256,
+			thumbnailEncSha256: thumbUpload.fileEncSha256,
+			thumbnailHeight: 252,
+			thumbnailWidth: 252,
+			imageDataHash: sha256(thumbnailBuffer).toString('base64')
+		})
+	} catch (error) {
+		logger?.warn(`Thumbnail generation failed: ${error}`)
+	}
+
+	if (cacheableKey) {
+		logger?.debug({ cacheableKey }, 'set cache (background)')
+		Promise.resolve(options.mediaCache!.set(cacheableKey, proto.Message.StickerPackMessage.encode(obj).finish())).catch(
+			(error: any) => logger?.warn({ trace: error?.stack, cacheableKey }, 'failed to set sticker pack cache')
+		)
+	}
+
+	return { stickerPackMessage: WAProto.Message.StickerPackMessage.fromObject(obj) }
+}
+
+async function prepareStickerPackMessageV2(
 	stickerPack: StickerPack,
 	options: MessageContentGenerationOptions
 ): Promise<proto.IMessage> {

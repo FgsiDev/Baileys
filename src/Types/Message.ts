@@ -261,6 +261,7 @@ export type AnyRegularMessageContent = (
 			Editable)
 	| AnyMediaMessageContent
 	| { stickerPack: StickerPack }
+	| { stickerPackV2: StickerPack }
 	| { event: EventMessageOptions }
 	| ({
 			poll: PollMessageOptions

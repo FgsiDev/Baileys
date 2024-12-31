@@ -38,12 +38,36 @@ import type { ILogger } from './logger'
 
 const getTmpFilesDirectory = () => tmpdir()
 
-export const getImageProcessingLibrary = async () => {
+/**
+ * The dynamically imported image-processing backend - only one of them is populated.
+ * Types are loose because the packages are all optional dependencies
+ */
+type ImageProcessingLibrary = {
+	sharp?: any
+	image?: any
+	jimp?: any
+}
+
+// memoized so repeated calls don't re-import the modules
+let imageProcessingLibrary: ImageProcessingLibrary | undefined
+
+const importImageProcessingLibrary = async (): Promise<ImageProcessingLibrary> => {
 	//@ts-ignore
-	const [jimp, sharp] = await Promise.all([import('jimp').catch(() => {}), import('sharp').catch(() => {})])
+	const [sharp, image, jimp] = await Promise.all([
+		//@ts-ignore
+		import('sharp').catch(() => {}),
+		//@ts-ignore
+		import('@napi-rs/image').catch(() => {}),
+		//@ts-ignore
+		import('jimp').catch(() => {})
+	])
 
 	if (sharp) {
 		return { sharp }
+	}
+
+	if (image) {
+		return { image }
 	}
 
 	if (jimp) {
@@ -51,6 +75,14 @@ export const getImageProcessingLibrary = async () => {
 	}
 
 	throw new Boom('No image processing library available')
+}
+
+export const getImageProcessingLibrary = async () => {
+	if (!imageProcessingLibrary) {
+		imageProcessingLibrary = await importImageProcessingLibrary()
+	}
+
+	return imageProcessingLibrary
 }
 
 export const hkdfInfoKey = (type: MediaType) => {
