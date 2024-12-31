@@ -807,6 +807,24 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				}
 				reportingMessage = patched
 
+				// A group stanza that carries only <participants> is rejected by the
+				// server with ack error 479 (smax-invalid): group messages need a
+				// top-level sender-key <enc>. Members that are not listed in
+				// historyReceivers drop the bundle on receipt
+				// (validateRecipientAuthorization), so the fanout stays scoped by
+				// the metadata while the envelope stays valid.
+				const groupSenderIdentity = groupAddressingMode === 'lid' && meLid ? meLid : meId
+				const { ciphertext: groupCiphertext } = await signalRepository.encryptGroupMessage({
+					group: destinationJid,
+					data: encodeWAMessage(patched),
+					meId: groupSenderIdentity
+				})
+				binaryNodeContent.push({
+					tag: 'enc',
+					attrs: { v: '2', type: 'skmsg', ...extraAttrs },
+					content: groupCiphertext
+				})
+
 				await assertSessions(recipientJids)
 				const result = await createParticipantNodes(recipientJids, message, extraAttrs)
 				shouldIncludeDeviceIdentity = shouldIncludeDeviceIdentity || result.shouldIncludeDeviceIdentity
