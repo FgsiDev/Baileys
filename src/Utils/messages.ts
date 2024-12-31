@@ -478,6 +478,10 @@ export const generateWAMessageContent = async (
 			extContent.font = options.font
 		}
 
+		if ('viewOnce' in message && !!message.viewOnce) {
+			extContent.viewOnce = Boolean(message.viewOnce)
+		}
+
 		m.extendedTextMessage = extContent
 	} else if ('contacts' in message) {
 		const contactLen = message.contacts.contacts.length
@@ -594,79 +598,185 @@ export const generateWAMessageContent = async (
 		m.eventMessage.isScheduleCall = message.event.isScheduleCall ?? false
 		m.eventMessage.location = message.event.location
 	} else if ('poll' in message) {
-		message.poll.selectableCount ||= 0
-		message.poll.toAnnouncementGroup ||= false
-		if (!Array.isArray(message.poll.values)) {
-			throw new Boom('Invalid poll values', { statusCode: 400 })
-		}
-		if (message.poll.selectableCount < 0 || message.poll.selectableCount > message.poll.values.length) {
-			throw new Boom(`poll.selectableCount in poll should be >= 0 and <= ${message.poll.values.length}`, {
+		if (!Array.isArray(message.poll.values) || message.poll.values.length === 0) {
+			throw new Boom('Invalid poll values', {
 				statusCode: 400
 			})
 		}
+		if (message.poll.selectableCount !== undefined) {
+			if (
+				typeof message.poll.selectableCount !== 'number' ||
+				!Number.isInteger(message.poll.selectableCount) ||
+				message.poll.selectableCount < 1 ||
+				message.poll.selectableCount > message.poll.values.length
+			) {
+				throw new Boom(`poll.selectableCount should be >= 1 and <= ${message.poll.values.length}`, {
+					statusCode: 400
+				})
+			}
+		}
+
+		/*
+		 * forceVersion allow:
+		 *
+		 * 1 = Poll normal V1
+		 * 2 = Announcement V2
+		 * 3 = Poll V3
+		 * 5 = Quiz V5
+		 * 6 = Advanced Poll V6
+		 */
+		if (message.poll.forceVersion !== undefined && ![1, 2, 3, 5, 6].includes(message.poll.forceVersion)) {
+			throw new Boom('Invalid poll.forceVersion. Use 1, 2, 3, 5, or 6', {
+				statusCode: 400
+			})
+		}
+
 		let hasPollOptionImage = false
 		const pollOptions: proto.Message.PollCreationMessage.IOption[] = []
 		for (const value of message.poll.values) {
 			if (typeof value === 'string') {
-				pollOptions.push({ optionName: value })
+				if (!value.trim()) {
+					throw new Boom('Poll option cannot be empty', {
+						statusCode: 400
+					})
+				}
+				pollOptions.push({
+					optionName: value
+				})
 				continue
 			}
-			if (!value?.name) {
-				throw new Boom('Each photo poll option needs a name', { statusCode: 400 })
+			if (!value || typeof value !== 'object' || !value.name) {
+				throw new Boom('Each poll option needs a name', {
+					statusCode: 400
+				})
 			}
 			if (value.optionHash) {
 				hasPollOptionImage = true
-				pollOptions.push({ optionName: value.name, optionHash: value.optionHash })
+				pollOptions.push({
+					optionName: value.name,
+					optionHash: value.optionHash
+				})
 				continue
 			}
 			if (!value.image) {
-				pollOptions.push({ optionName: value.name })
+				pollOptions.push({
+					optionName: value.name
+				})
 				continue
 			}
-			const prepared = await prepareWAMessageMedia({ image: value.image }, options)
+
+			const prepared = await prepareWAMessageMedia(
+				{
+					image: value.image
+				},
+				options
+			)
+			const fileSha256 = prepared.imageMessage?.fileSha256
+			if (!fileSha256) {
+				throw new Boom(`Failed to prepare image for poll option "${value.name}"`, {
+					statusCode: 400
+				})
+			}
 			hasPollOptionImage = true
 			pollOptions.push({
 				optionName: value.name,
-				optionHash: getPollOptionHash(value.name, prepared.imageMessage?.fileSha256 ?? undefined)
+				optionHash: getPollOptionHash(value.name, fileSha256)
 			})
 		}
-		const usesExtendedPollSettings =
-			Boolean(message.poll.endDate) || message.poll.hideVoter === true || message.poll.canAddOption === true
-		const pollCreationMessage = {
+
+		const pollCreationMessage: any = {
 			name: message.poll.name,
-			selectableOptionsCount: message.poll.selectableCount,
-			options: pollOptions,
-			endTime: message.poll.endDate?.getTime() ?? 0,
-			hideParticipantName: message.poll.hideVoter ?? false,
-			allowAddOption: message.poll.canAddOption ?? false,
-			pollContentType: undefined as proto.Message.PollContentType | undefined
+			options: pollOptions
+		}
+
+		if (message.poll.selectableCount !== undefined) {
+			pollCreationMessage.selectableOptionsCount = message.poll.selectableCount
+		}
+		if (message.poll.endDate !== undefined) {
+			const endDate = message.poll.endDate instanceof Date ? message.poll.endDate : new Date(message.poll.endDate)
+			if (Number.isNaN(endDate.getTime())) {
+				throw new Boom('Invalid poll.endDate', {
+					statusCode: 400
+				})
+			}
+			pollCreationMessage.endTime = endDate.getTime()
+		}
+		if (message.poll.hideVoter !== undefined) {
+			pollCreationMessage.hideParticipantName = Boolean(message.poll.hideVoter)
+		}
+		if (message.poll.canAddOption !== undefined) {
+			pollCreationMessage.allowAddOption = Boolean(message.poll.canAddOption)
+		}
+		if (message.poll.correctAnswer !== undefined) {
+			pollCreationMessage.correctAnswer = {
+				optionName: message.poll.correctAnswer.toString()
+			}
 		}
 		if (hasPollOptionImage) {
 			pollCreationMessage.pollContentType = proto.Message.PollContentType.IMAGE
 		}
-		if (message.poll.toAnnouncementGroup) {
-			m.pollCreationMessageV2 = pollCreationMessage
-		} else {
-			if (message.poll.pollType === 1) {
-				if (!message.poll.correctAnswer) {
-					throw new Boom('No "correctAnswer" provided for quiz', { statusCode: 400 })
+
+		if (message.poll.forceVersion !== undefined) {
+			switch (message.poll.forceVersion) {
+				case 1: {
+					m.pollCreationMessage = pollCreationMessage
+					break
 				}
-				m.pollCreationMessageV5 = {
-					...pollCreationMessage,
-					correctAnswer: {
-						optionName: message.poll.correctAnswer.toString()
-					},
-					pollType: 1,
-					selectableOptionsCount: 1
+				case 2: {
+					m.pollCreationMessageV2 = pollCreationMessage
+					break
 				}
-			} else if (usesExtendedPollSettings) {
-				m.pollCreationMessageV6 = pollCreationMessage
-			} else if (message.poll.selectableCount === 1) {
-				m.pollCreationMessageV3 = pollCreationMessage
-			} else {
-				m.pollCreationMessage = pollCreationMessage
+				case 3: {
+					m.pollCreationMessageV3 = pollCreationMessage
+					break
+				}
+				case 5: {
+					if (
+						message.poll.correctAnswer === undefined ||
+						message.poll.correctAnswer === null ||
+						message.poll.correctAnswer === ''
+					) {
+						throw new Boom('No "correctAnswer" provided for quiz', {
+							statusCode: 400
+						})
+					}
+					m.pollCreationMessageV5 = {
+						...pollCreationMessage,
+						pollType: 1,
+						selectableOptionsCount: 1
+					}
+					break
+				}
+				case 6: {
+					m.pollCreationMessageV6 = pollCreationMessage
+					break
+				}
 			}
+		} else if (message.poll.toAnnouncementGroup === true) {
+			m.pollCreationMessageV2 = pollCreationMessage
+		} else if (message.poll.pollType === 1) {
+			if (
+				message.poll.correctAnswer === undefined ||
+				message.poll.correctAnswer === null ||
+				message.poll.correctAnswer === ''
+			) {
+				throw new Boom('No "correctAnswer" provided for quiz', {
+					statusCode: 400
+				})
+			}
+			m.pollCreationMessageV5 = {
+				...pollCreationMessage,
+				pollType: 1,
+				selectableOptionsCount: 1
+			}
+		} else if (message.poll.canAddOption !== undefined || message.poll.hideVoter !== undefined) {
+			m.pollCreationMessageV6 = pollCreationMessage
+		} else if (message.poll.selectableCount !== undefined) {
+			m.pollCreationMessageV3 = pollCreationMessage
+		} else {
+			m.pollCreationMessage = pollCreationMessage
 		}
+
 		m.messageContextInfo = {
 			messageSecret: message.poll.messageSecret || randomBytes(32)
 		}

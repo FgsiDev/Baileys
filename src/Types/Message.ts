@@ -166,6 +166,7 @@ export type PollMessageOptions = {
 	endDate?: Date
 	hideVoter?: boolean
 	canAddOption?: boolean
+	forceVersion?: 1 | 2 | 3 | 5 | 6
 }
 
 export type EventMessageOptions = {

@@ -382,6 +382,21 @@ export const makeNewsletterSocket = (config: SocketConfig) => {
 			)
 		},
 
+		newsletterDehydrated: async (type: 'GUEST' | 'ADMIN' | 'SUBSCRIBER', key: string, options: any = {}) => {
+			const { viewRole = 'GUEST', fetchPinnedMessages = false, fetchWamoSub = false } = options
+			const variables = {
+				input: {
+					key,
+					type: type.toUpperCase(),
+					view_role: viewRole
+				},
+				fetch_wamo_sub: fetchWamoSub,
+				fetch_pinned_messages: fetchPinnedMessages
+			}
+			const result = await executeWMexQuery(variables, QueryIds.DEHYDRATED, XWAPaths.xwa2_newsletter_metadata)
+			return parseNewsletterMetadata(result)
+		},
+
 		newsletterPollVoters: async (jid: string, serverId: string | number, options: NewsletterPollVoterOptions = {}) => {
 			return executeWMexQuery(
 				{

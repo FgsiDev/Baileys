@@ -125,8 +125,8 @@ export const isRealMessage = (message: WAMessage) => {
 export const shouldIncrementChatUnread = (message: WAMessage) => !message.key.fromMe && !message.messageStubType
 
 /**
- * Get the ID of the chat from the given key.
- * Typically -- that'll be the remoteJid, but for broadcasts, it'll be the participant
+ * Get the ID of the chat from the given key.  
+ * Typically -- that'll be the remoteJid, but for broadcasts, it'll be the participant  
  */
 export const getChatId = ({ remoteJid, participant, fromMe }: WAMessageKey) => {
 	if (isJidBroadcast(remoteJid!) && !isJidStatusBroadcast(remoteJid!) && !fromMe) {
@@ -158,11 +158,39 @@ type EventContext = {
 	responderJid: string
 }
 
+type MessageEditContext = {
+	/** JID of the original message sender */
+	originalSenderJid: string
+	/** ID of the original message */
+	originalMsgId: string
+	/** Encryption key of the original message */
+	editEncKey: Uint8Array
+	/** JID of the person who edited the message */
+	editorJid: string
+}
+
+type BuildEditUpdateArgs = {
+	encPayload: Uint8Array
+	encIv: Uint8Array
+	editEncKey: Uint8Array
+	originalSenderJid: string
+	originalMsgId: string
+	editorJid: string
+	targetKey: WAMessageKey
+	fallbackTimestamp: number
+	logger?: ILogger
+}
+
+type MessageKeyWithAlt = WAMessageKey & {
+	remoteJidAlt?: string | null
+	participantAlt?: string | null
+}
+
 /**
- * Decrypt a poll vote
- * @param vote encrypted vote
- * @param ctx additional info about the poll required for decryption
- * @returns list of SHA256 options
+ * Decrypt a poll vote  
+ * @param vote encrypted vote  
+ * @param ctx additional info about the poll required for decryption  
+ * @returns list of SHA256 options  
  */
 export function decryptPollVote(
 	{ encPayload, encIv }: proto.Message.IPollEncValue,
@@ -189,10 +217,10 @@ export function decryptPollVote(
 }
 
 /**
- * Decrypt an event response
- * @param response encrypted event response
- * @param ctx additional info about the event required for decryption
- * @returns event response message
+ * Decrypt an event response  
+ * @param response encrypted event response  
+ * @param ctx additional info about the event required for decryption  
+ * @returns event response message  
  */
 export function decryptEventResponse(
 	{ encPayload, encIv }: proto.Message.IPollEncValue,
@@ -215,6 +243,95 @@ export function decryptEventResponse(
 
 	function toBinary(txt: string) {
 		return Buffer.from(txt)
+	}
+}
+
+/**
+ * Decrypt a message edit  
+ * @param message encrypted message edit payload  
+ * @param ctx additional info required for decryption  
+ * @returns decrypted message  
+ */
+export function decryptMessageEdit(
+	{ encPayload, encIv }: proto.Message.IPollEncValue,
+	{ originalSenderJid, originalMsgId, editEncKey, editorJid }: MessageEditContext
+) {
+	const sign = Buffer.concat([
+		toBinary(originalMsgId),
+		toBinary(originalSenderJid),
+		toBinary(editorJid),
+		toBinary('Message Edit'),
+		new Uint8Array([1])
+	])
+	const key0 = hmacSign(editEncKey, new Uint8Array(32), 'sha256')
+	const decKey = hmacSign(sign, key0, 'sha256')
+	const aad = Buffer.alloc(0)
+	const decrypted = aesDecryptGCM(encPayload!, decKey, encIv!, aad)
+	return proto.Message.decode(decrypted)
+	function toBinary(txt: string) {
+		return Buffer.from(txt)
+	}
+}
+
+const resolveMessageEditAuthor = async (
+	key: WAMessageKey,
+	meId: string,
+	lidMapping: SignalRepositoryWithLIDStore['lidMapping']
+): Promise<string> => {
+	if (!key) {
+		return ''
+	}
+	const rawJid = key.fromMe
+		? key.participantAlt || key.participant || meId
+		: key.participantAlt || key.participant || key.remoteJidAlt || key.remoteJid
+	if (!rawJid) {
+		return ''
+	}
+	const normalized = jidNormalizedUser(rawJid)
+	if (!normalized) {
+		return ''
+	}
+	if (!isLidUser(normalized)) {
+		return normalized
+	}
+	const pn = await lidMapping.getPNForLID(normalized)
+	return pn ? jidNormalizedUser(pn) : ''
+}
+
+const buildEditUpdate = (args: BuildEditUpdateArgs) => {
+	const editedInner = decryptMessageEdit(
+		{
+			encPayload: args.encPayload,
+			encIv: args.encIv
+		},
+		{
+			editEncKey: args.editEncKey,
+			originalSenderJid: args.originalSenderJid,
+			originalMsgId: args.originalMsgId,
+			editorJid: args.editorJid
+		}
+	)
+	const editProtocol = editedInner.protocolMessage
+	const innerEdited = editProtocol?.editedMessage
+	if (!innerEdited) {
+		args.logger?.warn(
+			{ targetKey: args.targetKey },
+			'decrypted MESSAGE_EDIT plaintext had no protocolMessage.editedMessage — skipping update'
+		)
+		return null
+	}
+	return {
+		key: { ...args.targetKey },
+		update: {
+			message: {
+				editedMessage: {
+					message: innerEdited
+				}
+			},
+			messageTimestamp: editProtocol?.timestampMs
+				? Math.floor(toNumber(editProtocol.timestampMs) / 1000)
+				: args.fallbackTimestamp
+		}
 	}
 }
 
@@ -379,6 +496,18 @@ const processMessage = async (
 					}
 				])
 				break
+			case proto.Message.ProtocolMessage.Type.GROUP_MEMBER_LABEL_CHANGE:
+				const labelAssociationMsg = protocolMsg.memberLabel
+				if (labelAssociationMsg?.label) {
+					ev.emit('group.member-tag.update', {
+						groupId: chat.id!,
+						label: labelAssociationMsg.label,
+						participant: message.key.participant,
+						participantAlt: message.key.participantAlt,
+						messageTimestamp: Number(message.messageTimestamp)
+					})
+				}
+				break
 			case proto.Message.ProtocolMessage.Type.LID_MIGRATION_MAPPING_SYNC:
 				const encodedPayload = protocolMsg.lidMigrationMappingSyncMessage?.encodedMappingPayload!
 				const { pnToLidMappings, chatDbMigrationTimestamp } =
@@ -461,6 +590,66 @@ const processMessage = async (
 			}
 		} else {
 			logger?.warn({ creationMsgKey }, 'event creation message not found, cannot decrypt response')
+		}
+	} else if (
+		content?.secretEncryptedMessage &&
+		content.secretEncryptedMessage.secretEncType === proto.Message.SecretEncryptedMessage.SecretEncType.MESSAGE_EDIT
+	) {
+		const secEnc = content.secretEncryptedMessage
+		const targetKey = secEnc.targetMessageKey as MessageKeyWithAlt | undefined
+		const targetId = typeof targetKey?.id === 'string' ? targetKey.id.trim() : ''
+		const targetRemoteJid = targetKey?.remoteJid || targetKey?.remoteJidAlt
+		if (!targetKey || !targetId || !targetRemoteJid) {
+			logger?.warn({ targetKey }, 'message edit: incomplete targetMessageKey — cannot decrypt')
+			return
+		}
+		const lookupTargetKey = {
+			...targetKey,
+			remoteJid: targetKey.remoteJid || targetKey.remoteJidAlt,
+			participant: targetKey.participant || targetKey.participantAlt
+		}
+		const targetMsg = await getMessage(lookupTargetKey)
+		if (!targetMsg) {
+			logger?.warn({ targetKey }, 'original message not found in store, cannot decrypt secretEncryptedMessage edit')
+			return
+		}
+		try {
+			const meIdNormalised = jidNormalizedUser(meId)
+			const editEncKey = targetMsg?.messageContextInfo?.messageSecret
+			if (!editEncKey?.length) {
+				logger?.warn({ targetKey }, 'message edit: missing messageSecret on original message — cannot decrypt')
+				return
+			}
+			const originalSenderJid = await resolveMessageEditAuthor(targetKey, meIdNormalised, signalRepository.lidMapping)
+			if (!originalSenderJid) {
+				logger?.warn({ targetKey }, 'message edit: original sender JID unavailable — cannot decrypt')
+				return
+			}
+			const editorJid = await resolveMessageEditAuthor(message.key, meIdNormalised, signalRepository.lidMapping)
+			if (!editorJid) {
+				logger?.warn({ key: message.key, targetKey }, 'message edit: editor JID unavailable — cannot decrypt')
+				return
+			}
+			if (!secEnc.encPayload?.length || !secEnc.encIv?.length) {
+				logger?.warn({ targetKey }, 'message edit: encrypted payload or IV missing — cannot decrypt')
+				return
+			}
+			const update = buildEditUpdate({
+				editEncKey,
+				encPayload: secEnc.encPayload,
+				encIv: secEnc.encIv,
+				originalSenderJid,
+				originalMsgId: targetId,
+				editorJid,
+				targetKey,
+				fallbackTimestamp: toNumber(message.messageTimestamp),
+				logger
+			})
+			if (update) {
+				ev.emit('messages.update', [update])
+			}
+		} catch (err) {
+			logger?.warn({ err, targetKey }, 'failed to decrypt secretEncryptedMessage MESSAGE_EDIT')
 		}
 	} else if (message.messageStubType) {
 		const jid = message.key?.remoteJid!
@@ -564,54 +753,54 @@ const processMessage = async (
 				emitGroupRequestJoin(participant, action, method)
 				break
 		}
-	} /*  else if(content?.pollUpdateMessage) {
-		const creationMsgKey = content.pollUpdateMessage.pollCreationMessageKey!
-		// we need to fetch the poll creation message to get the poll enc key
-		// TODO: make standalone, remove getMessage reference
-		// TODO: Remove entirely
-		const pollMsg = await getMessage(creationMsgKey)
-		if(pollMsg) {
-			const meIdNormalised = jidNormalizedUser(meId)
-			const pollCreatorJid = getKeyAuthor(creationMsgKey, meIdNormalised)
-			const voterJid = getKeyAuthor(message.key, meIdNormalised)
-			const pollEncKey = pollMsg.messageContextInfo?.messageSecret!
-
-			try {
-				const voteMsg = decryptPollVote(
-					content.pollUpdateMessage.vote!,
-					{
-						pollEncKey,
-						pollCreatorJid,
-						pollMsgId: creationMsgKey.id!,
-						voterJid,
-					}
-				)
-				ev.emit('messages.update', [
-					{
-						key: creationMsgKey,
-						update: {
-							pollUpdates: [
-								{
-									pollUpdateMessageKey: message.key,
-									vote: voteMsg,
-									senderTimestampMs: (content.pollUpdateMessage.senderTimestampMs! as Long).toNumber(),
-								}
-							]
-						}
-					}
-				])
-			} catch(err) {
-				logger?.warn(
-					{ err, creationMsgKey },
-					'failed to decrypt poll vote'
-				)
-			}
-		} else {
-			logger?.warn(
-				{ creationMsgKey },
-				'poll creation message not found, cannot decrypt update'
-			)
-		}
+	} /*  else if(content?.pollUpdateMessage) {  
+		const creationMsgKey = content.pollUpdateMessage.pollCreationMessageKey!  
+		// we need to fetch the poll creation message to get the poll enc key  
+		// TODO: make standalone, remove getMessage reference  
+		// TODO: Remove entirely  
+		const pollMsg = await getMessage(creationMsgKey)  
+		if(pollMsg) {  
+			const meIdNormalised = jidNormalizedUser(meId)  
+			const pollCreatorJid = getKeyAuthor(creationMsgKey, meIdNormalised)  
+			const voterJid = getKeyAuthor(message.key, meIdNormalised)  
+			const pollEncKey = pollMsg.messageContextInfo?.messageSecret!  
+  
+			try {  
+				const voteMsg = decryptPollVote(  
+					content.pollUpdateMessage.vote!,  
+					{  
+						pollEncKey,  
+						pollCreatorJid,  
+						pollMsgId: creationMsgKey.id!,  
+						voterJid,  
+					}  
+				)  
+				ev.emit('messages.update', [  
+					{  
+						key: creationMsgKey,  
+						update: {  
+							pollUpdates: [  
+								{  
+									pollUpdateMessageKey: message.key,  
+									vote: voteMsg,  
+									senderTimestampMs: (content.pollUpdateMessage.senderTimestampMs! as Long).toNumber(),  
+								}  
+							]  
+						}  
+					}  
+				])  
+			} catch(err) {  
+				logger?.warn(  
+					{ err, creationMsgKey },  
+					'failed to decrypt poll vote'  
+				)  
+			}  
+		} else {  
+			logger?.warn(  
+				{ creationMsgKey },  
+				'poll creation message not found, cannot decrypt update'  
+			)  
+		}  
 		} */
 
 	if (Object.keys(chat).length > 1) {

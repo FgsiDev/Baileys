@@ -69,6 +69,13 @@ export type BaileysEventMap = {
 		participants: GroupParticipant[]
 		action: ParticipantAction
 	}
+	'group.member-tag.update': {
+		groupId: string
+		label: string
+		participant?: string | null
+		participantAlt?: string | null
+		messageTimestamp: number
+	}
 	'group.join-request': {
 		id: string
 		author: string
