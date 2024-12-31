@@ -5,6 +5,9 @@ import { proto } from '../../WAProto/index.js'
 const deflateAsync = promisify(deflate)
 const unzipAsync = promisify(unzip)
 
+/** Wire mimetype of an uploaded group-history bundle blob. */
+export const GROUP_HISTORY_BUNDLE_MIMETYPE = 'application/protobuf'
+
 export interface WaGroupHistoryBundleEncoding {
 	readonly compressed: Buffer
 	readonly encoded: Buffer
@@ -35,6 +38,8 @@ export interface WaGroupHistoryAudience {
 	unknownJids: string[]
 	requestedSelf: boolean
 	addressingMode: 'pn' | 'lid'
+	/** This account's own user jid, written in the group's addressing mode. */
+	meUserJid: string
 }
 
 export interface WaShareGroupHistoryInput {
@@ -51,4 +56,30 @@ export interface WaShareGroupHistoryResult {
 	messagesCount: number
 	historyReceivers: string[]
 	nonHistoryReceivers: string[]
+}
+
+/** Reads `messageTimestamp` (unix seconds, may arrive as a protobuf Long) as a number. */
+const timestampSeconds = (message: proto.IWebMessageInfo | null | undefined): number | undefined => {
+	const raw = message?.messageTimestamp
+	const seconds = typeof raw === 'object' && raw !== null ? Number(raw) : raw
+	return typeof seconds === 'number' && Number.isFinite(seconds) ? seconds : undefined
+}
+
+/**
+ * Oldest message timestamp (unix seconds) of the list, or `undefined` when no
+ * message carries one. The sender reports it so the receiver can tell how far
+ * back the shared window reaches.
+ */
+export function oldestTimestampSeconds(messages: readonly proto.IWebMessageInfo[] | null | undefined): number | undefined {
+	let oldest: number | undefined
+	for (const message of messages || []) {
+		const seconds = timestampSeconds(message)
+		if (seconds === undefined) {
+			continue
+		}
+		if (oldest === undefined || seconds < oldest) {
+			oldest = seconds
+		}
+	}
+	return oldest
 }

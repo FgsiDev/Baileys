@@ -335,6 +335,8 @@ export type MessageRelayOptions = MinimalRelayOptions & {
 	useUserDevicesCache?: boolean
 	/** jid list of participants for status@broadcast */
 	statusJidList?: string[]
+	/** restrict a group send to these members (+ our own devices), encrypted per device instead of the group sender key; used by group history bundles */
+	restrictedGroupTargets?: string[]
 	forceBot?: boolean
 }
 

@@ -39,6 +39,8 @@ import {
 } from '../Utils'
 import {
 	encodeGroupHistoryBundle,
+	GROUP_HISTORY_BUNDLE_MIMETYPE,
+	oldestTimestampSeconds,
 	type WaGroupHistoryAudience,
 	type WaShareGroupHistoryInput,
 	type WaShareGroupHistoryResult
@@ -585,6 +587,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 			useUserDevicesCache,
 			useCachedGroupMetadata,
 			statusJidList,
+			restrictedGroupTargets,
 			forceBot
 		}: MessageRelayOptions
 	) => {
@@ -722,7 +725,8 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				isNeedMetaAttrs ||
 				innerMessage?.protocolMessage?.memberLabel ||
 				innerMessage?.protocolMessage?.editedMessage ||
-				innerMessage?.protocolMessage?.mediaNotifyMessage
+				innerMessage?.protocolMessage?.mediaNotifyMessage ||
+				innerMessage?.messageHistoryNotice
 			) {
 				extraAttrs['decrypt-fail'] = 'hide' // todo: expand for reactions and other types
 			}
@@ -731,7 +735,50 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				extraAttrs['native_flow_name'] = innerMessage.interactiveResponseMessage.nativeFlowResponseMessage.name
 			}
 
-			if (isGroupOrStatus && !isRetryResend) {
+			if (isGroup && !participant && restrictedGroupTargets?.length) {
+				// restricted group fanout (group history bundles): the message goes
+				// only to the named members + our own devices, encrypted per device
+				// instead of through the group sender key, so members who are not
+				// receiving it can never decrypt it
+				const groupData =
+					(useCachedGroupMetadata && cachedGroupMetadata
+						? await cachedGroupMetadata(jid)
+						: undefined) || (await groupMetadata(jid))
+				additionalAttributes = {
+					...additionalAttributes,
+					addressing_mode: groupData?.addressingMode || 'lid'
+				}
+				if (groupData?.ephemeralDuration && groupData.ephemeralDuration > 0) {
+					additionalAttributes = {
+						...additionalAttributes,
+						expiration: groupData.ephemeralDuration.toString()
+					}
+				}
+
+				const ownJids = [meId, meLid].filter(id => !!id) as string[]
+				const targetDevices = await getUSyncDevices(
+					[...new Set([...restrictedGroupTargets, ...ownJids])],
+					!!useUserDevicesCache,
+					false
+				)
+				devices.push(...targetDevices)
+
+				const recipientJids = [...new Set(devices.map(device => device.jid))]
+				if (!recipientJids.length) {
+					throw new Boom('restricted group send resolved no target devices', { statusCode: 400 })
+				}
+
+				const patched = await patchMessageBeforeSending(message)
+				if (Array.isArray(patched)) {
+					throw new Boom('Per-jid patching is not supported in groups')
+				}
+				reportingMessage = patched
+
+				await assertSessions(recipientJids)
+				const result = await createParticipantNodes(recipientJids, message, extraAttrs)
+				shouldIncludeDeviceIdentity = shouldIncludeDeviceIdentity || result.shouldIncludeDeviceIdentity
+				participants.push(...result.nodes)
+			} else if (isGroupOrStatus && !isRetryResend) {
 				const [groupData, senderKeyMap] = await Promise.all([
 					(async () => {
 						let groupData = useCachedGroupMetadata && cachedGroupMetadata ? await cachedGroupMetadata(jid) : undefined // todo: should we rely on the cache specially if the cache is outdated and the metadata has new fields?
@@ -1158,6 +1205,8 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 			return 'native_flow_response'
 		} else if (message.groupInviteMessage) {
 			return 'url'
+		} else if (message.messageHistoryBundle) {
+			return 'group_history'
 		}
 
 		return ''
@@ -1224,6 +1273,67 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 	const waUploadToServer = getWAUploadToServer(config, refreshMediaConn)
 
 	const waitForMsgMediaUpdate = bindWaitForEvent(ev, 'messages.media-update')
+
+	/**
+	 * Narrows the requested recipients of a group history bundle to the current
+	 * members of the group, split into the members who receive it and the ones
+	 * who do not. Every jid is written in the group's addressing mode, so a PN
+	 * request against a LID-addressed group (or the other way around) still
+	 * resolves, and requesting this account itself is reported instead of
+	 * silently dropped.
+	 */
+	const resolveGroupHistoryAudience = async (
+		groupJid: string,
+		requestedJids: string[]
+	): Promise<WaGroupHistoryAudience> => {
+		const groupData = await groupMetadata(groupJid)
+		const addressingMode: 'pn' | 'lid' = groupData?.addressingMode === 'pn' ? 'pn' : 'lid'
+		const meId = authState.creds.me!.id
+		const meLid = authState.creds.me?.lid
+		const meUserJid = jidNormalizedUser(addressingMode === 'lid' && meLid ? meLid : meId)
+
+		const pending = new Set<string>()
+		for (const jid of requestedJids) {
+			pending.add(jidNormalizedUser(jid))
+		}
+
+		const historyReceivers: string[] = []
+		const nonHistoryReceivers: string[] = []
+		for (const participant of groupData?.participants || []) {
+			const pnUserJid = participant.id ? jidNormalizedUser(participant.id) : undefined
+			const lidUserJid = participant.lid ? jidNormalizedUser(participant.lid) : undefined
+			const userJid = addressingMode === 'lid' ? lidUserJid || pnUserJid : pnUserJid
+			if (!userJid) {
+				continue
+			}
+			if (userJid === meUserJid || pnUserJid === meUserJid || lidUserJid === meUserJid) {
+				continue
+			}
+			const matched =
+				pending.delete(userJid) ||
+				(!!pnUserJid && pending.delete(pnUserJid)) ||
+				(!!lidUserJid && pending.delete(lidUserJid))
+			if (matched) {
+				historyReceivers.push(userJid)
+			} else {
+				nonHistoryReceivers.push(userJid)
+			}
+		}
+
+		const requestedSelf =
+			pending.delete(meUserJid) ||
+			pending.delete(jidNormalizedUser(meId)) ||
+			(!!meLid && pending.delete(jidNormalizedUser(meLid)))
+
+		return {
+			historyReceivers,
+			nonHistoryReceivers,
+			unknownJids: [...pending],
+			requestedSelf,
+			addressingMode,
+			meUserJid
+		}
+	}
 
 	return {
 		...sock,
@@ -1536,11 +1646,22 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				throw new Error('shareGroupHistory requires `messages` to share')
 			}
 
-			const historyReceivers = input.toJids.map(jid => jidNormalizedUser(jid))
+			const audience = await resolveGroupHistoryAudience(groupJid, input.toJids)
+			if (audience.requestedSelf) {
+				throw new Error('shareGroupHistory cannot share history with this account itself')
+			}
+			if (audience.unknownJids.length) {
+				throw new Error(
+					`shareGroupHistory recipients are not members of the group (addressing mode: ${audience.addressingMode}): ${audience.unknownJids.join(', ')}`
+				)
+			}
+			if (!audience.historyReceivers.length) {
+				throw new Error('shareGroupHistory resolved no recipients')
+			}
 
-			// encode + upload
+			// encode + upload the bundle
 			const { compressed } = await encodeGroupHistoryBundle(input.messages, input.outOfWindowPinnedMessages)
-			const mediaType = 'group-history' as any
+			const mediaType = 'group-history' as const
 			const { mediaKey, encFilePath, fileEncSha256, fileSha256 } = await encryptedStream(compressed, mediaType, {
 				logger
 			})
@@ -1549,29 +1670,44 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				fileEncSha256B64: fileEncSha256.toString('base64')
 			})
 
+			const oldestInWindow = oldestTimestampSeconds(input.messages)
+			const oldestPin = oldestTimestampSeconds(input.outOfWindowPinnedMessages)
+			const oldestInBundle =
+				oldestPin === undefined
+					? oldestInWindow
+					: oldestInWindow === undefined
+						? oldestPin
+						: Math.min(oldestInWindow, oldestPin)
 			const metadataProto: proto.Message.IMessageHistoryMetadata = {
-				historyReceivers,
-				messageCount: input.messages.length
+				historyReceivers: audience.historyReceivers,
+				nonHistoryReceivers: audience.nonHistoryReceivers,
+				messageCount: input.messages.length,
+				oldestMessageTimestampInWindow: oldestInWindow,
+				oldestMessageTimestampInBundle: oldestInBundle
 			}
 
-			// send history bundle
+			// the bundle reaches the requested members + our own devices, nobody else
 			const bundleMsgId = await relayMessage(
 				groupJid,
 				{
 					messageHistoryBundle: {
-						mimetype: 'application/protobuf',
+						mimetype: GROUP_HISTORY_BUNDLE_MIMETYPE,
 						fileSha256,
 						fileEncSha256,
 						mediaKey,
 						directPath: upload.directPath,
-						mediaKeyTimestamp: Math.floor(Date.now() / 1000),
+						mediaKeyTimestamp: unixTimestampSeconds(),
 						messageHistoryMetadata: metadataProto
 					}
 				},
-				options
+				{
+					...options,
+					restrictedGroupTargets: [...audience.historyReceivers, audience.meUserJid]
+				}
 			)
 
-			// send history notice
+			// notice addressed to the whole group so other clients can render the
+			// "history was shared" marker
 			let noticeMessageId: string | undefined
 			try {
 				noticeMessageId = await relayMessage(
@@ -1585,12 +1721,22 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				logger.warn({ error, groupJid }, 'group history notice failed after bundle delivered')
 			}
 
+			logger.debug(
+				{
+					groupJid,
+					id: bundleMsgId,
+					messagesCount: input.messages.length,
+					receiverCount: audience.historyReceivers.length
+				},
+				'shared group history'
+			)
+
 			return {
 				bundleMessageId: bundleMsgId,
 				noticeMessageId,
 				messagesCount: input.messages.length,
-				historyReceivers,
-				nonHistoryReceivers: []
+				historyReceivers: audience.historyReceivers,
+				nonHistoryReceivers: audience.nonHistoryReceivers
 			}
 		}
 	}
