@@ -16,6 +16,7 @@ import {
 import type {
 	AnyMediaMessageContent,
 	AnyMessageContent,
+	ChatThemeMessage,
 	DownloadableMessage,
 	MessageContentGenerationOptions,
 	MessageGenerationOptions,
@@ -118,6 +119,32 @@ const assertColor = async (color: any) => {
 		return assertedColor
 	}
 }
+
+// WA Web 2.3000.1049983640 replaced colorLight/colorDark (hex strings) with
+// backgroundLightArgb/backgroundDarkArgb (fixed32 ARGB); accepts hex ("#RRGGBB"/"#AARRGGBB") and raw ARGB numbers
+const hexToArgb = (hex: unknown, fallbackArgb = 0): number => {
+	if (typeof hex === 'number') {
+		return hex >>> 0
+	}
+
+	if (typeof hex !== 'string') {
+		return fallbackArgb
+	}
+
+	const h = hex.replace('#', '')
+	if (h.length !== 6 && h.length !== 8) {
+		return fallbackArgb
+	}
+
+	const parsed = parseInt(h, 16)
+	if (Number.isNaN(parsed)) {
+		return fallbackArgb
+	}
+
+	return (h.length === 6 ? 0xff000000 | parsed : parsed) >>> 0
+}
+
+const asBytes = (value?: string | Uint8Array) => (typeof value === 'string' ? Buffer.from(value, 'base64') : value)
 
 export const getPollOptionHash = (optionName: string, fileSha256?: string | Buffer | Uint8Array) => {
 	const nameHash = createHash('sha256').update(String(optionName), 'utf-8').digest('hex')
@@ -799,6 +826,91 @@ export const generateWAMessageContent = async (
 				limitSharingSettingTimestamp: Date.now(),
 				initiatedByMe: true
 			}
+		}
+	} else if ('chatTheme' in message || 'chatThemeMessage' in message) {
+		const ct: ChatThemeMessage =
+			('chatTheme' in message ? message.chatTheme : undefined) ||
+			('chatThemeMessage' in message ? message.chatThemeMessage : undefined) ||
+			{}
+		const themeSetting: proto.Message.IChatThemeSetting = {
+			settingTimestampMs: Date.now(),
+			clearTheme: ct.clear ?? false,
+			colorSchemeId: ct.colorSchemeId
+		}
+		if (ct.solidColor) {
+			const sc = ct.solidColor
+			themeSetting.solidColor = {
+				backgroundLightArgb: hexToArgb(sc.colorLight || sc.color, 0xffffffff),
+				backgroundDarkArgb: hexToArgb(sc.colorDark || sc.color, 0xff000000),
+				isDoodleEnabled: sc.isDoodleEnabled ?? false,
+				...(sc.doodleColorLight != null ? { doodleLightArgb: hexToArgb(sc.doodleColorLight) } : {}),
+				...(sc.doodleColorDark != null ? { doodleDarkArgb: hexToArgb(sc.doodleColorDark) } : {})
+			}
+		} else if (ct.stockImage) {
+			const si: { id?: string; stockImageId?: string; dimLevel?: number; opacity?: number } =
+				typeof ct.stockImage === 'object' ? ct.stockImage : {}
+			themeSetting.stockImage = {
+				stockImageId: si.id || si.stockImageId || String(ct.stockImage),
+				dimLevel: si.dimLevel ?? (si.opacity != null ? si.opacity / 100 : 1)
+			}
+		} else if (ct.defaultWallpaper) {
+			const dw = typeof ct.defaultWallpaper === 'object' ? ct.defaultWallpaper : { isDoodleEnabled: true }
+			themeSetting.defaultWallpaper = {
+				isDoodleEnabled: dw.isDoodleEnabled ?? false
+			}
+		} else if (ct.customImage) {
+			const ci = ct.customImage
+			if (ci.directPath && ci.mediaKey) {
+				themeSetting.customImage = {
+					dimLevel: ci.dimLevel ?? 0,
+					directPath: ci.directPath,
+					mediaKey: asBytes(ci.mediaKey),
+					fileSha256: asBytes(ci.fileSha256),
+					fileEncSha256: asBytes(ci.fileEncSha256)
+				}
+			} else if (ci.image) {
+				const { mediaKey, encFilePath, fileEncSha256, fileSha256 } = await encryptedStream(
+					ci.image,
+					'chat-wallpaper-image',
+					{ logger: options.logger, opts: options.options }
+				)
+				try {
+					const { directPath, mediaUrl } = await options.upload(encFilePath, {
+						fileEncSha256B64: fileEncSha256.toString('base64'),
+						mediaType: 'chat-wallpaper-image',
+						timeoutMs: options.mediaUploadTimeoutMs
+					})
+					themeSetting.customImage = {
+						dimLevel: ci.dimLevel ?? 0,
+						directPath: directPath || (mediaUrl ? new URL(mediaUrl).pathname : null),
+						mediaKey,
+						fileSha256,
+						fileEncSha256
+					}
+				} finally {
+					try {
+						await fs.unlink(encFilePath)
+					} catch (error) {
+						options.logger?.warn({ trace: (error as any).stack }, 'failed to remove tmp file')
+					}
+				}
+			} else {
+				throw new Boom('chatTheme.customImage requires "image" or directPath + mediaKey', {
+					statusCode: 400
+				})
+			}
+		} else if (ct.animatedWallpaper) {
+			const aw: { id?: string; animatedWallpaperId?: string; dimLevel?: number; opacity?: number } =
+				typeof ct.animatedWallpaper === 'object' ? ct.animatedWallpaper : {}
+			themeSetting.animatedWallpaper = {
+				animatedWallpaperId: aw.id || aw.animatedWallpaperId || String(ct.animatedWallpaper),
+				dimLevel: aw.dimLevel ?? (aw.opacity != null ? aw.opacity / 100 : 0)
+			}
+		}
+
+		m.protocolMessage = {
+			type: WAProto.Message.ProtocolMessage.Type.CHAT_THEME_SETTING,
+			chatThemeSetting: themeSetting
 		}
 	} else {
 		m = await prepareWAMessageMedia(message, options)

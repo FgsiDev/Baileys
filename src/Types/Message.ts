@@ -307,6 +307,36 @@ export type AnyRegularMessageContent = (
 ) &
 	ViewOnce
 
+export type ChatThemeSolidColor = {
+	color?: string | number
+	colorLight?: string | number
+	colorDark?: string | number
+	doodleColorLight?: string | number
+	doodleColorDark?: string | number
+	isDoodleEnabled?: boolean
+}
+
+export type ChatThemeCustomImage = {
+	/** raw wallpaper image; encrypted & uploaded as "chat-wallpaper-image" unless directPath + mediaKey are given */
+	image?: WAMediaUpload
+	directPath?: string
+	mediaKey?: string | Uint8Array
+	fileSha256?: string | Uint8Array
+	fileEncSha256?: string | Uint8Array
+	dimLevel?: number
+}
+
+export type ChatThemeMessage = {
+	/** reset the theme (clearTheme) instead of applying a wallpaper */
+	clear?: boolean
+	colorSchemeId?: string
+	solidColor?: ChatThemeSolidColor
+	stockImage?: string | { id?: string; stockImageId?: string; dimLevel?: number; opacity?: number }
+	defaultWallpaper?: boolean | { isDoodleEnabled?: boolean }
+	customImage?: ChatThemeCustomImage
+	animatedWallpaper?: string | { id?: string; animatedWallpaperId?: string; dimLevel?: number; opacity?: number }
+}
+
 export type AnyMessageContent =
 	| AnyRegularMessageContent
 	| {
@@ -322,6 +352,12 @@ export type AnyMessageContent =
 	  }
 	| {
 			limitSharing: boolean
+	  }
+	| {
+			chatTheme: ChatThemeMessage
+	  }
+	| {
+			chatThemeMessage: ChatThemeMessage
 	  }
 
 export type GroupMetadataParticipants = Pick<GroupMetadata, 'participants'>
