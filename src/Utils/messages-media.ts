@@ -33,6 +33,7 @@ import type {
 import { type BinaryNode, getBinaryNodeChild, getBinaryNodeChildBuffer, jidNormalizedUser } from '../WABinary'
 import { aesDecryptGCM, aesEncryptGCM, hkdf } from './crypto'
 import { generateMessageIDV2 } from './generics'
+import { downloadRanged } from './fetch-util'
 import type { ILogger } from './logger'
 
 const getTmpFilesDirectory = () => tmpdir()
@@ -369,13 +370,30 @@ export async function generateThumbnail(
 }
 
 export const getHttpStream = async (url: string | URL, options: RequestInit & { isStream?: true } = {}) => {
+	const headers = options.headers as HeadersInit | undefined
+	const hasRange =
+		headers instanceof Headers
+			? headers.has('range')
+			: Array.isArray(headers)
+				? headers.some(([key]) => key.toLowerCase() === 'range')
+				: !!headers && Object.keys(headers).some(key => key.toLowerCase() === 'range')
+
+	if (!hasRange) {
+		const buffer = await downloadRanged(url.toString())
+		return Readable.from(buffer)
+	}
+
 	const response = await fetch(url.toString(), {
 		dispatcher: options.dispatcher,
 		method: 'GET',
-		headers: options.headers as HeadersInit
+		headers
 	})
+
 	if (!response.ok) {
-		throw new Boom(`Failed to fetch stream from ${url}`, { statusCode: response.status, data: { url } })
+		throw new Boom(`Failed to fetch stream from ${url}`, {
+			statusCode: response.status,
+			data: { url }
+		})
 	}
 
 	// @ts-ignore Node18+ Readable.fromWeb exists

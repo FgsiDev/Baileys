@@ -584,7 +584,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 			useUserDevicesCache,
 			useCachedGroupMetadata,
 			statusJidList,
-			forceBot,
+			forceBot
 		}: MessageRelayOptions
 	) => {
 		const meId = authState.creds.me!.id
