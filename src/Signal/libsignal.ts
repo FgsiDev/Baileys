@@ -135,6 +135,28 @@ export function makeLibSignalRepository(
 			}, group)
 		},
 
+		async getSenderKeyDistributionMessage({ group, meId }) {
+			const senderName = jidToSignalSenderKeyName(group, meId)
+			const builder = new GroupSessionBuilder(storage)
+			const senderNameStr = senderName.toString()
+
+			return parsedKeys.transaction(async () => {
+				const { [senderNameStr]: senderKey } = await auth.keys.get('sender-key', [senderNameStr])
+				if (!senderKey) {
+					await storage.storeSenderKey(senderName, new SenderKeyRecord())
+				}
+
+				const senderKeyDistributionMessage = await builder.create(senderName)
+				return senderKeyDistributionMessage.serialize()
+			}, group)
+		},
+
+		async hasSenderKey({ group, meId }) {
+			const senderName = jidToSignalSenderKeyName(group, meId).toString()
+			const { [senderName]: key } = await auth.keys.get('sender-key', [senderName])
+			return !!key
+		},
+
 		async injectE2ESession({ jid, session }) {
 			logger.trace({ jid }, 'injecting E2EE session')
 			const cipher = new libsignal.SessionBuilder(storage, jidToSignalProtocolAddress(jid))

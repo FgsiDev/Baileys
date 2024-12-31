@@ -1044,16 +1044,54 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 
 			if (isRetryResend) {
 				const isParticipantLid = isLidUser(participant!.jid)
+				// A retry re-send goes straight to one device and skips the group
+				// fan-out branch, so the `addressing_mode` attribute would be lost.
+				// The server then rejects the stanza with ack error 479
+				// (SmaxInvalid) when the device is LID-addressed.
+				if (isGroup && isParticipantLid) {
+					additionalAttributes = { ...additionalAttributes, addressing_mode: 'lid' }
+				}
 				const isMe = areJidsSameUser(participant!.jid, isParticipantLid ? meLid : meId)
+
+				// The retried device failed to decrypt the group sender-key message,
+				// usually because it never got the SKDM. Attach the current SKDM to
+				// the retry so the device can also decrypt the original skmsg.
+				let messageToSend = message
+				if (isGroupOrStatus) {
+					let groupSenderIdentity: string | undefined
+					if (meLid && (await signalRepository.hasSenderKey({ group: destinationJid, meId: meLid }))) {
+						groupSenderIdentity = meLid
+					} else if (await signalRepository.hasSenderKey({ group: destinationJid, meId })) {
+						groupSenderIdentity = meId
+					}
+
+					if (groupSenderIdentity) {
+						try {
+							const skdm = await signalRepository.getSenderKeyDistributionMessage({
+								group: destinationJid,
+								meId: groupSenderIdentity
+							})
+							messageToSend = {
+								...message,
+								senderKeyDistributionMessage: {
+									groupId: destinationJid,
+									axolotlSenderKeyDistributionMessage: skdm
+								}
+							}
+						} catch (err: any) {
+							logger.warn({ err, jid: destinationJid }, 'failed to build SKDM for retry, sending without it')
+						}
+					}
+				}
 
 				const encodedMessageToSend = isMe
 					? encodeWAMessage({
 							deviceSentMessage: {
 								destinationJid,
-								message
+								message: messageToSend
 							}
 						})
-					: encodeWAMessage(message)
+					: encodeWAMessage(messageToSend)
 
 				const { type, ciphertext: encryptedContent } = await signalRepository.encryptMessage({
 					data: encodedMessageToSend,

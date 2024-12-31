@@ -63,6 +63,10 @@ export type SignalRepository = {
 		ciphertext: Uint8Array
 	}>
 	injectE2ESession(opts: E2ESessionOpts): Promise<void>
+	/** SKDM (sender key distribution) for an existing group sender key, used on retry re-sends */
+	getSenderKeyDistributionMessage(opts: { group: string; meId: string }): Promise<Uint8Array>
+	/** whether this account already has a group sender key for `group` */
+	hasSenderKey(opts: { group: string; meId: string }): Promise<boolean>
 	validateSession(jid: string): Promise<{ exists: boolean; reason?: string }>
 	jidToSignalProtocolAddress(jid: string): string
 	migrateSession(fromJid: string, toJid: string): Promise<{ migrated: number; skipped: number; total: number }>
