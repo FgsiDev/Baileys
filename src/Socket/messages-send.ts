@@ -37,14 +37,6 @@ import {
 	unixTimestampSeconds,
 	encryptedStream
 } from '../Utils'
-import {
-	encodeGroupHistoryBundle,
-	GROUP_HISTORY_BUNDLE_MIMETYPE,
-	oldestTimestampSeconds,
-	type WaGroupHistoryAudience,
-	type WaShareGroupHistoryInput,
-	type WaShareGroupHistoryResult
-} from '../Utils/group-history'
 import { setBotMessageSecret } from '../Utils/decode-wa-message'
 import { getUrlInfo } from '../Utils/link-preview'
 import { getMessageReportingToken, shouldIncludeReportingToken } from '../Utils/reporting-utils'
@@ -70,7 +62,7 @@ import {
 	S_WHATSAPP_NET
 } from '../WABinary'
 import { USyncQuery, USyncUser } from '../WAUSync'
-import { makeNewsletterSocket } from './newsletter'
+import { makeFgsiSocket } from './fgsi'
 
 export const makeMessagesSocket = (config: SocketConfig) => {
 	const {
@@ -83,7 +75,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 		enableRecentMessageCache,
 		maxMsgRetryCount
 	} = config
-	const sock = makeNewsletterSocket(config)
+	const sock = makeFgsiSocket(config, () => ({ relayMessage, waUploadToServer }))
 	const {
 		ev,
 		authState,
@@ -746,10 +738,6 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 			}
 
 			if (isGroup && !participant && restrictedGroupTargets?.length) {
-				// restricted group fanout (group history bundles): the message goes
-				// only to the named members + our own devices, encrypted per device
-				// instead of through the group sender key, so members who are not
-				// receiving it can never decrypt it
 				const groupData =
 					(useCachedGroupMetadata && cachedGroupMetadata ? await cachedGroupMetadata(jid) : undefined) ||
 					(await groupMetadata(jid))
@@ -807,12 +795,6 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				}
 				reportingMessage = patched
 
-				// A group stanza that carries only <participants> is rejected by the
-				// server with ack error 479 (smax-invalid): group messages need a
-				// top-level sender-key <enc>. Members that are not listed in
-				// historyReceivers drop the bundle on receipt
-				// (validateRecipientAuthorization), so the fanout stays scoped by
-				// the metadata while the envelope stays valid.
 				const groupSenderIdentity = groupAddressingMode === 'lid' && meLid ? meLid : meId
 				const { ciphertext: groupCiphertext } = await signalRepository.encryptGroupMessage({
 					group: destinationJid,
@@ -1374,71 +1356,6 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 
 	const waitForMsgMediaUpdate = bindWaitForEvent(ev, 'messages.media-update')
 
-	/**
-	 * Narrows the requested recipients of a group history bundle to the current
-	 * members of the group, split into the members who receive it and the ones
-	 * who do not. Every jid is written in the group's addressing mode, so a PN
-	 * request against a LID-addressed group (or the other way around) still
-	 * resolves, and requesting this account itself is reported instead of
-	 * silently dropped.
-	 */
-	const resolveGroupHistoryAudience = async (
-		groupJid: string,
-		requestedJids: string[]
-	): Promise<WaGroupHistoryAudience> => {
-		const groupData = await groupMetadata(groupJid)
-		const addressingMode: 'pn' | 'lid' =
-			groupData?.addressingMode ||
-			((groupData?.participants || []).some(participant => !!participant.id && isLidUser(participant.id))
-				? 'lid'
-				: 'pn')
-		const meId = authState.creds.me!.id
-		const meLid = authState.creds.me?.lid
-		const meUserJid = jidNormalizedUser(addressingMode === 'lid' && meLid ? meLid : meId)
-
-		const pending = new Set<string>()
-		for (const jid of requestedJids) {
-			pending.add(jidNormalizedUser(jid))
-		}
-
-		const historyReceivers: string[] = []
-		const nonHistoryReceivers: string[] = []
-		for (const participant of groupData?.participants || []) {
-			const pnUserJid = participant.id ? jidNormalizedUser(participant.id) : undefined
-			const lidUserJid = participant.lid ? jidNormalizedUser(participant.lid) : undefined
-			const userJid = addressingMode === 'lid' ? lidUserJid || pnUserJid : pnUserJid
-			if (!userJid) {
-				continue
-			}
-			if (userJid === meUserJid || pnUserJid === meUserJid || lidUserJid === meUserJid) {
-				continue
-			}
-			const matched =
-				pending.delete(userJid) ||
-				(!!pnUserJid && pending.delete(pnUserJid)) ||
-				(!!lidUserJid && pending.delete(lidUserJid))
-			if (matched) {
-				historyReceivers.push(userJid)
-			} else {
-				nonHistoryReceivers.push(userJid)
-			}
-		}
-
-		const requestedSelf =
-			pending.delete(meUserJid) ||
-			pending.delete(jidNormalizedUser(meId)) ||
-			(!!meLid && pending.delete(jidNormalizedUser(meLid)))
-
-		return {
-			historyReceivers,
-			nonHistoryReceivers,
-			unknownJids: [...pending],
-			requestedSelf,
-			addressingMode,
-			meUserJid
-		}
-	}
-
 	return {
 		...sock,
 		getPrivacyTokens,
@@ -1766,135 +1683,5 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 			setBotMessageSecret(msgId, messageSecret, jid)
 			return msgId
 		},
-		shareGroupHistory: async (
-			groupJid: string,
-			input: WaShareGroupHistoryInput,
-			options: MiscMessageGenerationOptions = {}
-		): Promise<WaShareGroupHistoryResult> => {
-			if (!isJidGroup(groupJid)) {
-				throw new Error(`shareGroupHistory requires a group jid: ${groupJid}`)
-			}
-			if (!input.toJids.length) {
-				throw new Error('shareGroupHistory requires at least one recipient')
-			}
-			if (!input.messages?.length) {
-				throw new Error('shareGroupHistory requires `messages` to share')
-			}
-
-			const audience = await resolveGroupHistoryAudience(groupJid, input.toJids)
-			if (audience.requestedSelf) {
-				throw new Error('shareGroupHistory cannot share history with this account itself')
-			}
-			if (audience.unknownJids.length) {
-				throw new Error(
-					`shareGroupHistory recipients are not members of the group (addressing mode: ${audience.addressingMode}): ${audience.unknownJids.join(', ')}`
-				)
-			}
-			if (!audience.historyReceivers.length) {
-				throw new Error('shareGroupHistory resolved no recipients')
-			}
-
-			// encode + upload the bundle
-			const { compressed } = await encodeGroupHistoryBundle(input.messages, input.outOfWindowPinnedMessages)
-			const mediaType = 'group-history' as const
-			const { mediaKey, encFilePath, fileEncSha256, fileSha256 } = await encryptedStream(compressed, mediaType, {
-				logger
-			})
-			const upload = await waUploadToServer(encFilePath, {
-				mediaType,
-				fileEncSha256B64: fileEncSha256.toString('base64'),
-				contentType: GROUP_HISTORY_BUNDLE_MIMETYPE
-			})
-
-			const oldestInWindow = oldestTimestampSeconds(input.messages)
-			const oldestPin = oldestTimestampSeconds(input.outOfWindowPinnedMessages)
-			const oldestInBundle =
-				oldestPin === undefined
-					? oldestInWindow
-					: oldestInWindow === undefined
-						? oldestPin
-						: Math.min(oldestInWindow, oldestPin)
-			// the receiver rejects the bundle when `oldestMessageTimestampInWindow`
-			// is missing or <= 0 (X/EXZ.Ci5), so fall back to "now" when the shared
-			// messages carry no timestamp at all
-			const oldestInWindowOrNow = oldestInWindow ?? unixTimestampSeconds()
-			const metadataProto: proto.Message.IMessageHistoryMetadata = {
-				historyReceivers: audience.historyReceivers,
-				nonHistoryReceivers: audience.nonHistoryReceivers,
-				messageCount: input.messages.length,
-				oldestMessageTimestampInWindow: oldestInWindowOrNow,
-				oldestMessageTimestampInBundle: oldestInBundle ?? oldestInWindowOrNow,
-				// presence-only field: X/EXZ.Ci5 uses `bitField0_ & 32` as the flag
-				// that lets X/6oq.A00 hydrate the metadata into the received
-				// FMessageGroupHistoryBundle. Without field 6 the receiver never
-				// reads historyReceivers/messageCount and the bundle can never be
-				// imported. `false` is correct: this bundle shares no chat theme.
-				includesChatTheme: input?.includesChatTheme || false
-			}
-
-			// the bundle reaches the requested members + our own devices, nobody else
-			const bundleMsgId = await relayMessage(
-				groupJid,
-				{
-					messageHistoryBundle: {
-						mimetype: GROUP_HISTORY_BUNDLE_MIMETYPE,
-						fileSha256,
-						fileEncSha256,
-						mediaKey,
-						directPath: upload.directPath,
-						mediaKeyTimestamp: unixTimestampSeconds(),
-						messageHistoryMetadata: metadataProto
-					}
-				},
-				{
-					...options,
-					// the bundle is fanned out per device to the requested members
-					// only (plus this account), never through the group sender key
-					restrictedGroupTargets: audience.historyReceivers
-				}
-			)
-
-			// notice addressed to the whole group so other clients can render the
-			// "history was shared" marker. The receiver's notice parser
-			// (X/C3847EXa) only accepts stanzas whose <meta appdata> is
-			// "group_history", so the node is mandatory.
-			let noticeMessageId: string | undefined
-			try {
-				noticeMessageId = await relayMessage(
-					groupJid,
-					{
-						messageHistoryNotice: { messageHistoryMetadata: metadataProto }
-					},
-					{
-						additionalNodes: [
-							{
-								tag: 'meta',
-								attrs: { appdata: 'group_history' }
-							} as BinaryNode
-						]
-					}
-				)
-			} catch (error: any) {
-				logger.warn({ error, groupJid }, 'group history notice failed after bundle delivered')
-			}
-
-			logger.debug(
-				{
-					groupJid,
-					id: bundleMsgId,
-					messagesCount: input.messages.length,
-					receiverCount: audience.historyReceivers.length
-				},
-				'shared group history'
-			)
-
-			return {
-				bundleMessageId: bundleMsgId,
-				noticeMessageId,
-				messagesCount: input.messages.length,
-				historyReceivers: audience.historyReceivers,
-				nonHistoryReceivers: audience.nonHistoryReceivers
-			}
-		}
 	}
 }
