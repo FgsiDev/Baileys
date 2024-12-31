@@ -735,7 +735,8 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				isNeedMetaAttrs ||
 				innerMessage?.protocolMessage?.memberLabel ||
 				innerMessage?.protocolMessage?.editedMessage ||
-				innerMessage?.protocolMessage?.mediaNotifyMessage
+				innerMessage?.protocolMessage?.mediaNotifyMessage ||
+				innerMessage?.messageHistoryNotice
 			) {
 				extraAttrs['decrypt-fail'] = 'hide' // todo: expand for reactions and other types
 			}
@@ -1730,7 +1731,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 						: Math.min(oldestInWindow, oldestPin)
 			const metadataProto: proto.Message.IMessageHistoryMetadata = {
 				historyReceivers: audience.historyReceivers,
-				nonHistoryReceivers: [],
+				nonHistoryReceivers: audience.nonHistoryReceivers,
 				messageCount: input.messages.length,
 				oldestMessageTimestampInWindow: oldestInWindow,
 				oldestMessageTimestampInBundle: oldestInBundle
@@ -1750,7 +1751,12 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 						messageHistoryMetadata: metadataProto
 					}
 				},
-				{}
+				{
+					...options,
+					// the bundle is fanned out per device to the requested members
+					// only (plus this account), never through the group sender key
+					restrictedGroupTargets: audience.historyReceivers
+				}
 			)
 
 			// notice addressed to the whole group so other clients can render the
@@ -1762,7 +1768,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 					{
 						messageHistoryNotice: { messageHistoryMetadata: metadataProto }
 					},
-					{ additionalNodes: [{ tag: 'meta', attrs: { appdata: 'group_history' }, content: undefined }] }
+					{}
 				)
 			} catch (error: any) {
 				logger.warn({ error, groupJid }, 'group history notice failed after bundle delivered')
