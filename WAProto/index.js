@@ -6921,6 +6921,18 @@ export const proto = $root.proto = (() => {
                     case 66:
                         m.capabilities[i] = 66;
                         break;
+                    case "AI_RICH_RESPONSE_ARTIFACTS_ENABLED":
+                    case 67:
+                        m.capabilities[i] = 67;
+                        break;
+                    case "AI_RICH_RESPONSE_EMAIL_CALENDAR_ENABLED":
+                    case 68:
+                        m.capabilities[i] = 68;
+                        break;
+                    case "AI_RICH_RESPONSE_REMINDERS_ENABLED":
+                    case 69:
+                        m.capabilities[i] = 69;
+                        break;
                     }
                 }
             }
@@ -7023,6 +7035,9 @@ export const proto = $root.proto = (() => {
             values[valuesById[64] = "AI_RICH_RESPONSE_MAPS_V2_ENABLED"] = 64;
             values[valuesById[65] = "AI_SUBSCRIPTION_METERING_ENABLED"] = 65;
             values[valuesById[66] = "RICH_RESPONSE_SPORTS_WIDGET_ENABLED"] = 66;
+            values[valuesById[67] = "AI_RICH_RESPONSE_ARTIFACTS_ENABLED"] = 67;
+            values[valuesById[68] = "AI_RICH_RESPONSE_EMAIL_CALENDAR_ENABLED"] = 68;
+            values[valuesById[69] = "AI_RICH_RESPONSE_REMINDERS_ENABLED"] = 69;
             return values;
         })();
 
@@ -10442,6 +10457,10 @@ export const proto = $root.proto = (() => {
             case 56:
                 m.botEntryPointOrigin = 56;
                 break;
+            case "CONTACTS_TAB":
+            case 57:
+                m.botEntryPointOrigin = 57;
+                break;
             }
             if (d.forwardScore != null) {
                 m.forwardScore = d.forwardScore >>> 0;
@@ -11295,6 +11314,7 @@ export const proto = $root.proto = (() => {
         values[valuesById[54] = "GROUP_MEMBER"] = 54;
         values[valuesById[55] = "CHATLIST_SEARCH"] = 55;
         values[valuesById[56] = "NEW_CHAT_LIST"] = 56;
+        values[valuesById[57] = "CONTACTS_TAB"] = 57;
         return values;
     })();
 
@@ -11569,6 +11589,10 @@ export const proto = $root.proto = (() => {
             case "NEW_CHAT_LIST":
             case 56:
                 m.destinationEntryPoint = 56;
+                break;
+            case "CONTACTS_TAB":
+            case 57:
+                m.destinationEntryPoint = 57;
                 break;
             }
             switch (d.threadOrigin) {
@@ -14727,6 +14751,7 @@ export const proto = $root.proto = (() => {
 
         function BotSignatureVerificationUseCaseProof(p) {
             this.certificateChain = [];
+            this.certificateChainSki = [];
             if (p)
                 for (var ks = Object.keys(p), i = 0; i < ks.length; ++i)
                     if (p[ks[i]] != null && ks[i] !== "__proto__")
@@ -14737,6 +14762,7 @@ export const proto = $root.proto = (() => {
         BotSignatureVerificationUseCaseProof.prototype.useCase = 0;
         BotSignatureVerificationUseCaseProof.prototype.signature = $util.newBuffer([]);
         BotSignatureVerificationUseCaseProof.prototype.certificateChain = $util.emptyArray;
+        BotSignatureVerificationUseCaseProof.prototype.certificateChainSki = $util.emptyArray;
 
         BotSignatureVerificationUseCaseProof.create = function create(properties) {
             return new BotSignatureVerificationUseCaseProof(properties);
@@ -14754,6 +14780,10 @@ export const proto = $root.proto = (() => {
             if (m.certificateChain != null && m.certificateChain.length) {
                 for (var i = 0; i < m.certificateChain.length; ++i)
                     w.uint32(34).bytes(m.certificateChain[i]);
+            }
+            if (m.certificateChainSki != null && m.certificateChainSki.length) {
+                for (var i = 0; i < m.certificateChainSki.length; ++i)
+                    $root.proto.BotSignatureVerificationUseCaseProof.CertificateSKI.encode(m.certificateChainSki[i], w.uint32(42).fork()).ldelim();
             }
             return w;
         };
@@ -14787,6 +14817,12 @@ export const proto = $root.proto = (() => {
                         if (!(m.certificateChain && m.certificateChain.length))
                             m.certificateChain = [];
                         m.certificateChain.push(r.bytes());
+                        break;
+                    }
+                case 5: {
+                        if (!(m.certificateChainSki && m.certificateChainSki.length))
+                            m.certificateChainSki = [];
+                        m.certificateChainSki.push($root.proto.BotSignatureVerificationUseCaseProof.CertificateSKI.decode(r, r.uint32(), undefined, n + 1));
                         break;
                     }
                 default:
@@ -14831,6 +14867,14 @@ export const proto = $root.proto = (() => {
             case 3:
                 m.useCase = 3;
                 break;
+            case "WA_WAFFLE":
+            case 4:
+                m.useCase = 4;
+                break;
+            case "WA_FEATURE_PKI":
+            case 5:
+                m.useCase = 5;
+                break;
             }
             if (d.signature != null) {
                 if (typeof d.signature === "string")
@@ -14849,6 +14893,16 @@ export const proto = $root.proto = (() => {
                         m.certificateChain[i] = d.certificateChain[i];
                 }
             }
+            if (d.certificateChainSki) {
+                if (!Array.isArray(d.certificateChainSki))
+                    throw TypeError(".proto.BotSignatureVerificationUseCaseProof.certificateChainSki: array expected");
+                m.certificateChainSki = [];
+                for (var i = 0; i < d.certificateChainSki.length; ++i) {
+                    if (typeof d.certificateChainSki[i] !== "object")
+                        throw TypeError(".proto.BotSignatureVerificationUseCaseProof.certificateChainSki: object expected");
+                    m.certificateChainSki[i] = $root.proto.BotSignatureVerificationUseCaseProof.CertificateSKI.fromObject(d.certificateChainSki[i], n + 1);
+                }
+            }
             return m;
         };
 
@@ -14858,6 +14912,7 @@ export const proto = $root.proto = (() => {
             var d = {};
             if (o.arrays || o.defaults) {
                 d.certificateChain = [];
+                d.certificateChainSki = [];
             }
             if (o.defaults) {
                 d.version = 0;
@@ -14885,6 +14940,12 @@ export const proto = $root.proto = (() => {
                     d.certificateChain[j] = o.bytes === String ? $util.base64.encode(m.certificateChain[j], 0, m.certificateChain[j].length) : o.bytes === Array ? Array.prototype.slice.call(m.certificateChain[j]) : m.certificateChain[j];
                 }
             }
+            if (m.certificateChainSki && m.certificateChainSki.length) {
+                d.certificateChainSki = [];
+                for (var j = 0; j < m.certificateChainSki.length; ++j) {
+                    d.certificateChainSki[j] = $root.proto.BotSignatureVerificationUseCaseProof.CertificateSKI.toObject(m.certificateChainSki[j], o);
+                }
+            }
             return d;
         };
 
@@ -14905,7 +14966,150 @@ export const proto = $root.proto = (() => {
             values[valuesById[1] = "WA_BOT_MSG"] = 1;
             values[valuesById[2] = "WA_TEE_BOT_MSG"] = 2;
             values[valuesById[3] = "P2P_PILLS"] = 3;
+            values[valuesById[4] = "WA_WAFFLE"] = 4;
+            values[valuesById[5] = "WA_FEATURE_PKI"] = 5;
             return values;
+        })();
+
+        BotSignatureVerificationUseCaseProof.CertificateSKI = (function() {
+
+            function CertificateSKI(p) {
+                if (p)
+                    for (var ks = Object.keys(p), i = 0; i < ks.length; ++i)
+                        if (p[ks[i]] != null && ks[i] !== "__proto__")
+                            this[ks[i]] = p[ks[i]];
+            }
+
+            CertificateSKI.prototype.useCase = 0;
+            CertificateSKI.prototype.ski = $util.newBuffer([]);
+
+            CertificateSKI.create = function create(properties) {
+                return new CertificateSKI(properties);
+            };
+
+            CertificateSKI.encode = function encode(m, w) {
+                if (!w)
+                    w = $Writer.create();
+                if (m.useCase != null && Object.hasOwnProperty.call(m, "useCase"))
+                    w.uint32(8).int32(m.useCase);
+                if (m.ski != null && Object.hasOwnProperty.call(m, "ski"))
+                    w.uint32(18).bytes(m.ski);
+                return w;
+            };
+
+            CertificateSKI.decode = function decode(r, l, e, n) {
+                if (!(r instanceof $Reader))
+                    r = $Reader.create(r);
+                if (n === undefined)
+                    n = 0;
+                if (n > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
+                var c = l === undefined ? r.len : r.pos + l, m = new $root.proto.BotSignatureVerificationUseCaseProof.CertificateSKI();
+                while (r.pos < c) {
+                    var t = r.uint32();
+                    if (t === e)
+                        break;
+                    switch (t >>> 3) {
+                    case 1: {
+                            m.useCase = r.int32();
+                            break;
+                        }
+                    case 2: {
+                            m.ski = r.bytes();
+                            break;
+                        }
+                    default:
+                        r.skipType(t & 7, n);
+                        break;
+                    }
+                }
+                return m;
+            };
+
+            CertificateSKI.fromObject = function fromObject(d, n) {
+                if (d instanceof $root.proto.BotSignatureVerificationUseCaseProof.CertificateSKI)
+                    return d;
+                if (n === undefined)
+                    n = 0;
+                if (n > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
+                var m = new $root.proto.BotSignatureVerificationUseCaseProof.CertificateSKI();
+                switch (d.useCase) {
+                default:
+                    if (typeof d.useCase === "number") {
+                        m.useCase = d.useCase;
+                        break;
+                    }
+                    break;
+                case "UNSPECIFIED":
+                case 0:
+                    m.useCase = 0;
+                    break;
+                case "WA_BOT_MSG":
+                case 1:
+                    m.useCase = 1;
+                    break;
+                case "WA_TEE_BOT_MSG":
+                case 2:
+                    m.useCase = 2;
+                    break;
+                case "P2P_PILLS":
+                case 3:
+                    m.useCase = 3;
+                    break;
+                case "WA_WAFFLE":
+                case 4:
+                    m.useCase = 4;
+                    break;
+                case "WA_FEATURE_PKI":
+                case 5:
+                    m.useCase = 5;
+                    break;
+                }
+                if (d.ski != null) {
+                    if (typeof d.ski === "string")
+                        $util.base64.decode(d.ski, m.ski = $util.newBuffer($util.base64.length(d.ski)), 0);
+                    else if (d.ski.length >= 0)
+                        m.ski = d.ski;
+                }
+                return m;
+            };
+
+            CertificateSKI.toObject = function toObject(m, o) {
+                if (!o)
+                    o = {};
+                var d = {};
+                if (o.defaults) {
+                    d.useCase = o.enums === String ? "UNSPECIFIED" : 0;
+                    if (o.bytes === String)
+                        d.ski = "";
+                    else {
+                        d.ski = [];
+                        if (o.bytes !== Array)
+                            d.ski = $util.newBuffer(d.ski);
+                    }
+                }
+                if (m.useCase != null && m.hasOwnProperty("useCase")) {
+                    d.useCase = o.enums === String ? $root.proto.BotSignatureVerificationUseCaseProof.BotSignatureUseCase[m.useCase] === undefined ? m.useCase : $root.proto.BotSignatureVerificationUseCaseProof.BotSignatureUseCase[m.useCase] : m.useCase;
+                }
+                if (m.ski != null && m.hasOwnProperty("ski")) {
+                    d.ski = o.bytes === String ? $util.base64.encode(m.ski, 0, m.ski.length) : o.bytes === Array ? Array.prototype.slice.call(m.ski) : m.ski;
+                }
+                return d;
+            };
+
+            CertificateSKI.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
+
+            CertificateSKI.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                if (typeUrlPrefix === undefined) {
+                    typeUrlPrefix = "type.googleapis.com";
+                }
+                return typeUrlPrefix + "/proto.BotSignatureVerificationUseCaseProof.CertificateSKI";
+            };
+
+            return CertificateSKI;
         })();
 
         return BotSignatureVerificationUseCaseProof;
@@ -19586,6 +19790,10 @@ export const proto = $root.proto = (() => {
                 case 37:
                     m.platform = 37;
                     break;
+                case "WAIL":
+                case 38:
+                    m.platform = 38;
+                    break;
                 }
                 if (d.appVersion != null) {
                     if (typeof d.appVersion !== "object")
@@ -19999,6 +20207,7 @@ export const proto = $root.proto = (() => {
                 values[valuesById[35] = "SMART_GLASSES"] = 35;
                 values[valuesById[36] = "BLUE_VR"] = 36;
                 values[valuesById[37] = "AR_WRIST"] = 37;
+                values[valuesById[38] = "WAIL"] = 38;
                 return values;
             })();
 
@@ -21238,6 +21447,10 @@ export const proto = $root.proto = (() => {
             case "SMARTGLASSES":
             case 24:
                 m.deviceType = 24;
+                break;
+            case "WAIL":
+            case 25:
+                m.deviceType = 25;
                 break;
             }
             if (d.ref != null) {
@@ -28096,6 +28309,10 @@ export const proto = $root.proto = (() => {
             case 24:
                 m.platformType = 24;
                 break;
+            case "WAIL":
+            case 25:
+                m.platformType = 25;
+                break;
             }
             if (d.requireFullSync != null) {
                 m.requireFullSync = Boolean(d.requireFullSync);
@@ -28760,6 +28977,7 @@ export const proto = $root.proto = (() => {
             values[valuesById[22] = "VR"] = 22;
             values[valuesById[23] = "CLOUD_API"] = 23;
             values[valuesById[24] = "SMARTGLASSES"] = 24;
+            values[valuesById[25] = "WAIL"] = 25;
             return values;
         })();
 
@@ -32297,6 +32515,10 @@ export const proto = $root.proto = (() => {
                 case 2:
                     m.pqMode = 2;
                     break;
+                case "XXKEM_EPH":
+                case 9:
+                    m.pqMode = 9;
+                    break;
                 case "WA_CLASSICAL":
                 case 3:
                     m.pqMode = 3;
@@ -32435,6 +32657,7 @@ export const proto = $root.proto = (() => {
             values[valuesById[0] = "HANDSHAKE_PQ_MODE_UNKNOWN"] = 0;
             values[valuesById[1] = "XXKEM"] = 1;
             values[valuesById[2] = "XXKEM_FS"] = 2;
+            values[valuesById[9] = "XXKEM_EPH"] = 9;
             values[valuesById[3] = "WA_CLASSICAL"] = 3;
             values[valuesById[4] = "WA_PQ"] = 4;
             values[valuesById[5] = "IKKEM"] = 5;
@@ -35955,167 +36178,6 @@ export const proto = $root.proto = (() => {
         return KeyId;
     })();
 
-    proto.LIDMigrationMapping = (function() {
-
-        function LIDMigrationMapping(p) {
-            if (p)
-                for (var ks = Object.keys(p), i = 0; i < ks.length; ++i)
-                    if (p[ks[i]] != null && ks[i] !== "__proto__")
-                        this[ks[i]] = p[ks[i]];
-        }
-
-        LIDMigrationMapping.prototype.pn = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
-        LIDMigrationMapping.prototype.assignedLid = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
-        LIDMigrationMapping.prototype.latestLid = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
-
-        LIDMigrationMapping.create = function create(properties) {
-            return new LIDMigrationMapping(properties);
-        };
-
-        LIDMigrationMapping.encode = function encode(m, w) {
-            if (!w)
-                w = $Writer.create();
-            w.uint32(8).uint64(m.pn);
-            w.uint32(16).uint64(m.assignedLid);
-            if (m.latestLid != null && Object.hasOwnProperty.call(m, "latestLid"))
-                w.uint32(24).uint64(m.latestLid);
-            return w;
-        };
-
-        LIDMigrationMapping.decode = function decode(r, l, e, n) {
-            if (!(r instanceof $Reader))
-                r = $Reader.create(r);
-            if (n === undefined)
-                n = 0;
-            if (n > $Reader.recursionLimit)
-                throw Error("maximum nesting depth exceeded");
-            var c = l === undefined ? r.len : r.pos + l, m = new $root.proto.LIDMigrationMapping();
-            while (r.pos < c) {
-                var t = r.uint32();
-                if (t === e)
-                    break;
-                switch (t >>> 3) {
-                case 1: {
-                        m.pn = r.uint64();
-                        break;
-                    }
-                case 2: {
-                        m.assignedLid = r.uint64();
-                        break;
-                    }
-                case 3: {
-                        m.latestLid = r.uint64();
-                        break;
-                    }
-                default:
-                    r.skipType(t & 7, n);
-                    break;
-                }
-            }
-            if (!m.hasOwnProperty("pn"))
-                throw $util.ProtocolError("missing required 'pn'", { instance: m });
-            if (!m.hasOwnProperty("assignedLid"))
-                throw $util.ProtocolError("missing required 'assignedLid'", { instance: m });
-            return m;
-        };
-
-        LIDMigrationMapping.fromObject = function fromObject(d, n) {
-            if (d instanceof $root.proto.LIDMigrationMapping)
-                return d;
-            if (n === undefined)
-                n = 0;
-            if (n > $util.recursionLimit)
-                throw Error("maximum nesting depth exceeded");
-            var m = new $root.proto.LIDMigrationMapping();
-            if (d.pn != null) {
-                if ($util.Long)
-                    (m.pn = $util.Long.fromValue(d.pn)).unsigned = true;
-                else if (typeof d.pn === "string")
-                    m.pn = parseInt(d.pn, 10);
-                else if (typeof d.pn === "number")
-                    m.pn = d.pn;
-                else if (typeof d.pn === "object")
-                    m.pn = new $util.LongBits(d.pn.low >>> 0, d.pn.high >>> 0).toNumber(true);
-            }
-            if (d.assignedLid != null) {
-                if ($util.Long)
-                    (m.assignedLid = $util.Long.fromValue(d.assignedLid)).unsigned = true;
-                else if (typeof d.assignedLid === "string")
-                    m.assignedLid = parseInt(d.assignedLid, 10);
-                else if (typeof d.assignedLid === "number")
-                    m.assignedLid = d.assignedLid;
-                else if (typeof d.assignedLid === "object")
-                    m.assignedLid = new $util.LongBits(d.assignedLid.low >>> 0, d.assignedLid.high >>> 0).toNumber(true);
-            }
-            if (d.latestLid != null) {
-                if ($util.Long)
-                    (m.latestLid = $util.Long.fromValue(d.latestLid)).unsigned = true;
-                else if (typeof d.latestLid === "string")
-                    m.latestLid = parseInt(d.latestLid, 10);
-                else if (typeof d.latestLid === "number")
-                    m.latestLid = d.latestLid;
-                else if (typeof d.latestLid === "object")
-                    m.latestLid = new $util.LongBits(d.latestLid.low >>> 0, d.latestLid.high >>> 0).toNumber(true);
-            }
-            return m;
-        };
-
-        LIDMigrationMapping.toObject = function toObject(m, o) {
-            if (!o)
-                o = {};
-            var d = {};
-            if (o.defaults) {
-                if ($util.Long) {
-                    var n = new $util.Long(0, 0, true);
-                    d.pn = o.longs === String ? n.toString() : o.longs === Number ? n.toNumber() : n;
-                } else
-                    d.pn = o.longs === String ? "0" : 0;
-                if ($util.Long) {
-                    var n = new $util.Long(0, 0, true);
-                    d.assignedLid = o.longs === String ? n.toString() : o.longs === Number ? n.toNumber() : n;
-                } else
-                    d.assignedLid = o.longs === String ? "0" : 0;
-                if ($util.Long) {
-                    var n = new $util.Long(0, 0, true);
-                    d.latestLid = o.longs === String ? n.toString() : o.longs === Number ? n.toNumber() : n;
-                } else
-                    d.latestLid = o.longs === String ? "0" : 0;
-            }
-            if (m.pn != null && m.hasOwnProperty("pn")) {
-                if (typeof m.pn === "number")
-                    d.pn = o.longs === String ? String(m.pn) : m.pn;
-                else
-                    d.pn = o.longs === String ? longToString(m.pn, true) : o.longs === Number ? longToNumber(m.pn, true) : m.pn;
-            }
-            if (m.assignedLid != null && m.hasOwnProperty("assignedLid")) {
-                if (typeof m.assignedLid === "number")
-                    d.assignedLid = o.longs === String ? String(m.assignedLid) : m.assignedLid;
-                else
-                    d.assignedLid = o.longs === String ? longToString(m.assignedLid, true) : o.longs === Number ? longToNumber(m.assignedLid, true) : m.assignedLid;
-            }
-            if (m.latestLid != null && m.hasOwnProperty("latestLid")) {
-                if (typeof m.latestLid === "number")
-                    d.latestLid = o.longs === String ? String(m.latestLid) : m.latestLid;
-                else
-                    d.latestLid = o.longs === String ? longToString(m.latestLid, true) : o.longs === Number ? longToNumber(m.latestLid, true) : m.latestLid;
-            }
-            return d;
-        };
-
-        LIDMigrationMapping.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        LIDMigrationMapping.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/proto.LIDMigrationMapping";
-        };
-
-        return LIDMigrationMapping;
-    })();
-
     proto.LIDMigrationMappingSyncMessage = (function() {
 
         function LIDMigrationMappingSyncMessage(p) {
@@ -36212,140 +36274,6 @@ export const proto = $root.proto = (() => {
         };
 
         return LIDMigrationMappingSyncMessage;
-    })();
-
-    proto.LIDMigrationMappingSyncPayload = (function() {
-
-        function LIDMigrationMappingSyncPayload(p) {
-            this.pnToLidMappings = [];
-            if (p)
-                for (var ks = Object.keys(p), i = 0; i < ks.length; ++i)
-                    if (p[ks[i]] != null && ks[i] !== "__proto__")
-                        this[ks[i]] = p[ks[i]];
-        }
-
-        LIDMigrationMappingSyncPayload.prototype.pnToLidMappings = $util.emptyArray;
-        LIDMigrationMappingSyncPayload.prototype.chatDbMigrationTimestamp = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
-
-        LIDMigrationMappingSyncPayload.create = function create(properties) {
-            return new LIDMigrationMappingSyncPayload(properties);
-        };
-
-        LIDMigrationMappingSyncPayload.encode = function encode(m, w) {
-            if (!w)
-                w = $Writer.create();
-            if (m.pnToLidMappings != null && m.pnToLidMappings.length) {
-                for (var i = 0; i < m.pnToLidMappings.length; ++i)
-                    $root.proto.LIDMigrationMapping.encode(m.pnToLidMappings[i], w.uint32(10).fork()).ldelim();
-            }
-            if (m.chatDbMigrationTimestamp != null && Object.hasOwnProperty.call(m, "chatDbMigrationTimestamp"))
-                w.uint32(16).uint64(m.chatDbMigrationTimestamp);
-            return w;
-        };
-
-        LIDMigrationMappingSyncPayload.decode = function decode(r, l, e, n) {
-            if (!(r instanceof $Reader))
-                r = $Reader.create(r);
-            if (n === undefined)
-                n = 0;
-            if (n > $Reader.recursionLimit)
-                throw Error("maximum nesting depth exceeded");
-            var c = l === undefined ? r.len : r.pos + l, m = new $root.proto.LIDMigrationMappingSyncPayload();
-            while (r.pos < c) {
-                var t = r.uint32();
-                if (t === e)
-                    break;
-                switch (t >>> 3) {
-                case 1: {
-                        if (!(m.pnToLidMappings && m.pnToLidMappings.length))
-                            m.pnToLidMappings = [];
-                        m.pnToLidMappings.push($root.proto.LIDMigrationMapping.decode(r, r.uint32(), undefined, n + 1));
-                        break;
-                    }
-                case 2: {
-                        m.chatDbMigrationTimestamp = r.uint64();
-                        break;
-                    }
-                default:
-                    r.skipType(t & 7, n);
-                    break;
-                }
-            }
-            return m;
-        };
-
-        LIDMigrationMappingSyncPayload.fromObject = function fromObject(d, n) {
-            if (d instanceof $root.proto.LIDMigrationMappingSyncPayload)
-                return d;
-            if (n === undefined)
-                n = 0;
-            if (n > $util.recursionLimit)
-                throw Error("maximum nesting depth exceeded");
-            var m = new $root.proto.LIDMigrationMappingSyncPayload();
-            if (d.pnToLidMappings) {
-                if (!Array.isArray(d.pnToLidMappings))
-                    throw TypeError(".proto.LIDMigrationMappingSyncPayload.pnToLidMappings: array expected");
-                m.pnToLidMappings = [];
-                for (var i = 0; i < d.pnToLidMappings.length; ++i) {
-                    if (typeof d.pnToLidMappings[i] !== "object")
-                        throw TypeError(".proto.LIDMigrationMappingSyncPayload.pnToLidMappings: object expected");
-                    m.pnToLidMappings[i] = $root.proto.LIDMigrationMapping.fromObject(d.pnToLidMappings[i], n + 1);
-                }
-            }
-            if (d.chatDbMigrationTimestamp != null) {
-                if ($util.Long)
-                    (m.chatDbMigrationTimestamp = $util.Long.fromValue(d.chatDbMigrationTimestamp)).unsigned = true;
-                else if (typeof d.chatDbMigrationTimestamp === "string")
-                    m.chatDbMigrationTimestamp = parseInt(d.chatDbMigrationTimestamp, 10);
-                else if (typeof d.chatDbMigrationTimestamp === "number")
-                    m.chatDbMigrationTimestamp = d.chatDbMigrationTimestamp;
-                else if (typeof d.chatDbMigrationTimestamp === "object")
-                    m.chatDbMigrationTimestamp = new $util.LongBits(d.chatDbMigrationTimestamp.low >>> 0, d.chatDbMigrationTimestamp.high >>> 0).toNumber(true);
-            }
-            return m;
-        };
-
-        LIDMigrationMappingSyncPayload.toObject = function toObject(m, o) {
-            if (!o)
-                o = {};
-            var d = {};
-            if (o.arrays || o.defaults) {
-                d.pnToLidMappings = [];
-            }
-            if (o.defaults) {
-                if ($util.Long) {
-                    var n = new $util.Long(0, 0, true);
-                    d.chatDbMigrationTimestamp = o.longs === String ? n.toString() : o.longs === Number ? n.toNumber() : n;
-                } else
-                    d.chatDbMigrationTimestamp = o.longs === String ? "0" : 0;
-            }
-            if (m.pnToLidMappings && m.pnToLidMappings.length) {
-                d.pnToLidMappings = [];
-                for (var j = 0; j < m.pnToLidMappings.length; ++j) {
-                    d.pnToLidMappings[j] = $root.proto.LIDMigrationMapping.toObject(m.pnToLidMappings[j], o);
-                }
-            }
-            if (m.chatDbMigrationTimestamp != null && m.hasOwnProperty("chatDbMigrationTimestamp")) {
-                if (typeof m.chatDbMigrationTimestamp === "number")
-                    d.chatDbMigrationTimestamp = o.longs === String ? String(m.chatDbMigrationTimestamp) : m.chatDbMigrationTimestamp;
-                else
-                    d.chatDbMigrationTimestamp = o.longs === String ? longToString(m.chatDbMigrationTimestamp, true) : o.longs === Number ? longToNumber(m.chatDbMigrationTimestamp, true) : m.chatDbMigrationTimestamp;
-            }
-            return d;
-        };
-
-        LIDMigrationMappingSyncPayload.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
-        };
-
-        LIDMigrationMappingSyncPayload.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
-            if (typeUrlPrefix === undefined) {
-                typeUrlPrefix = "type.googleapis.com";
-            }
-            return typeUrlPrefix + "/proto.LIDMigrationMappingSyncPayload";
-        };
-
-        return LIDMigrationMappingSyncPayload;
     })();
 
     proto.LegacyMessage = (function() {
@@ -37642,6 +37570,9 @@ export const proto = $root.proto = (() => {
         Message.prototype.newsletterAdminProfileStatusMessage = null;
         Message.prototype.rootSecretDistributeMessage = null;
         Message.prototype.splitPaymentUpdateMessage = null;
+        Message.prototype.musicMessage = null;
+        Message.prototype.statusLinkPreviewMetadata = null;
+        Message.prototype.botPlatformRegistrationSuccessMessage = null;
 
         Message.create = function create(properties) {
             return new Message(properties);
@@ -37866,6 +37797,12 @@ export const proto = $root.proto = (() => {
                 $root.proto.Message.RootSecretDistributeMessage.encode(m.rootSecretDistributeMessage, w.uint32(1018).fork()).ldelim();
             if (m.splitPaymentUpdateMessage != null && Object.hasOwnProperty.call(m, "splitPaymentUpdateMessage"))
                 $root.proto.Message.SplitPaymentUpdateMessage.encode(m.splitPaymentUpdateMessage, w.uint32(1026).fork()).ldelim();
+            if (m.musicMessage != null && Object.hasOwnProperty.call(m, "musicMessage"))
+                $root.proto.Message.MusicMessage.encode(m.musicMessage, w.uint32(1034).fork()).ldelim();
+            if (m.statusLinkPreviewMetadata != null && Object.hasOwnProperty.call(m, "statusLinkPreviewMetadata"))
+                $root.proto.Message.StatusLinkPreviewMetadata.encode(m.statusLinkPreviewMetadata, w.uint32(1042).fork()).ldelim();
+            if (m.botPlatformRegistrationSuccessMessage != null && Object.hasOwnProperty.call(m, "botPlatformRegistrationSuccessMessage"))
+                $root.proto.Message.FutureProofMessage.encode(m.botPlatformRegistrationSuccessMessage, w.uint32(1050).fork()).ldelim();
             return w;
         };
 
@@ -38312,6 +38249,18 @@ export const proto = $root.proto = (() => {
                     }
                 case 128: {
                         m.splitPaymentUpdateMessage = $root.proto.Message.SplitPaymentUpdateMessage.decode(r, r.uint32(), undefined, n + 1);
+                        break;
+                    }
+                case 129: {
+                        m.musicMessage = $root.proto.Message.MusicMessage.decode(r, r.uint32(), undefined, n + 1);
+                        break;
+                    }
+                case 130: {
+                        m.statusLinkPreviewMetadata = $root.proto.Message.StatusLinkPreviewMetadata.decode(r, r.uint32(), undefined, n + 1);
+                        break;
+                    }
+                case 131: {
+                        m.botPlatformRegistrationSuccessMessage = $root.proto.Message.FutureProofMessage.decode(r, r.uint32(), undefined, n + 1);
                         break;
                     }
                 default:
@@ -38868,6 +38817,21 @@ export const proto = $root.proto = (() => {
                     throw TypeError(".proto.Message.splitPaymentUpdateMessage: object expected");
                 m.splitPaymentUpdateMessage = $root.proto.Message.SplitPaymentUpdateMessage.fromObject(d.splitPaymentUpdateMessage, n + 1);
             }
+            if (d.musicMessage != null) {
+                if (typeof d.musicMessage !== "object")
+                    throw TypeError(".proto.Message.musicMessage: object expected");
+                m.musicMessage = $root.proto.Message.MusicMessage.fromObject(d.musicMessage, n + 1);
+            }
+            if (d.statusLinkPreviewMetadata != null) {
+                if (typeof d.statusLinkPreviewMetadata !== "object")
+                    throw TypeError(".proto.Message.statusLinkPreviewMetadata: object expected");
+                m.statusLinkPreviewMetadata = $root.proto.Message.StatusLinkPreviewMetadata.fromObject(d.statusLinkPreviewMetadata, n + 1);
+            }
+            if (d.botPlatformRegistrationSuccessMessage != null) {
+                if (typeof d.botPlatformRegistrationSuccessMessage !== "object")
+                    throw TypeError(".proto.Message.botPlatformRegistrationSuccessMessage: object expected");
+                m.botPlatformRegistrationSuccessMessage = $root.proto.Message.FutureProofMessage.fromObject(d.botPlatformRegistrationSuccessMessage, n + 1);
+            }
             return m;
         };
 
@@ -38984,6 +38948,9 @@ export const proto = $root.proto = (() => {
                 d.newsletterAdminProfileStatusMessage = null;
                 d.rootSecretDistributeMessage = null;
                 d.splitPaymentUpdateMessage = null;
+                d.musicMessage = null;
+                d.statusLinkPreviewMetadata = null;
+                d.botPlatformRegistrationSuccessMessage = null;
             }
             if (m.conversation != null && m.hasOwnProperty("conversation")) {
                 d.conversation = m.conversation;
@@ -39308,6 +39275,15 @@ export const proto = $root.proto = (() => {
             }
             if (m.splitPaymentUpdateMessage != null && m.hasOwnProperty("splitPaymentUpdateMessage")) {
                 d.splitPaymentUpdateMessage = $root.proto.Message.SplitPaymentUpdateMessage.toObject(m.splitPaymentUpdateMessage, o);
+            }
+            if (m.musicMessage != null && m.hasOwnProperty("musicMessage")) {
+                d.musicMessage = $root.proto.Message.MusicMessage.toObject(m.musicMessage, o);
+            }
+            if (m.statusLinkPreviewMetadata != null && m.hasOwnProperty("statusLinkPreviewMetadata")) {
+                d.statusLinkPreviewMetadata = $root.proto.Message.StatusLinkPreviewMetadata.toObject(m.statusLinkPreviewMetadata, o);
+            }
+            if (m.botPlatformRegistrationSuccessMessage != null && m.hasOwnProperty("botPlatformRegistrationSuccessMessage")) {
+                d.botPlatformRegistrationSuccessMessage = $root.proto.Message.FutureProofMessage.toObject(m.botPlatformRegistrationSuccessMessage, o);
             }
             return d;
         };
@@ -41787,6 +41763,7 @@ export const proto = $root.proto = (() => {
             Call.prototype.deeplinkPayload = "";
             Call.prototype.messageContextInfo = null;
             Call.prototype.callEntryPoint = 0;
+            Call.prototype.callReason = "";
 
             Call.create = function create(properties) {
                 return new Call(properties);
@@ -41817,6 +41794,8 @@ export const proto = $root.proto = (() => {
                     $root.proto.MessageContextInfo.encode(m.messageContextInfo, w.uint32(82).fork()).ldelim();
                 if (m.callEntryPoint != null && Object.hasOwnProperty.call(m, "callEntryPoint"))
                     w.uint32(88).uint32(m.callEntryPoint);
+                if (m.callReason != null && Object.hasOwnProperty.call(m, "callReason"))
+                    w.uint32(98).string(m.callReason);
                 return w;
             };
 
@@ -41875,6 +41854,10 @@ export const proto = $root.proto = (() => {
                         }
                     case 11: {
                             m.callEntryPoint = r.uint32();
+                            break;
+                        }
+                    case 12: {
+                            m.callReason = r.string();
                             break;
                         }
                     default:
@@ -41939,6 +41922,9 @@ export const proto = $root.proto = (() => {
                 if (d.callEntryPoint != null) {
                     m.callEntryPoint = d.callEntryPoint >>> 0;
                 }
+                if (d.callReason != null) {
+                    m.callReason = String(d.callReason);
+                }
                 return m;
             };
 
@@ -41976,6 +41962,7 @@ export const proto = $root.proto = (() => {
                     d.deeplinkPayload = "";
                     d.messageContextInfo = null;
                     d.callEntryPoint = 0;
+                    d.callReason = "";
                 }
                 if (m.callKey != null && m.hasOwnProperty("callKey")) {
                     d.callKey = o.bytes === String ? $util.base64.encode(m.callKey, 0, m.callKey.length) : o.bytes === Array ? Array.prototype.slice.call(m.callKey) : m.callKey;
@@ -42009,6 +41996,9 @@ export const proto = $root.proto = (() => {
                 }
                 if (m.callEntryPoint != null && m.hasOwnProperty("callEntryPoint")) {
                     d.callEntryPoint = m.callEntryPoint;
+                }
+                if (m.callReason != null && m.hasOwnProperty("callReason")) {
+                    d.callReason = m.callReason;
                 }
                 return d;
             };
@@ -54738,6 +54728,161 @@ export const proto = $root.proto = (() => {
             return MessageHistoryNotice;
         })();
 
+        Message.MusicMessage = (function() {
+
+            function MusicMessage(p) {
+                if (p)
+                    for (var ks = Object.keys(p), i = 0; i < ks.length; ++i)
+                        if (p[ks[i]] != null && ks[i] !== "__proto__")
+                            this[ks[i]] = p[ks[i]];
+            }
+
+            MusicMessage.prototype.embeddedMusic = null;
+            MusicMessage.prototype.songUri = "";
+            MusicMessage.prototype.artworkUri = "";
+            MusicMessage.prototype.style = 0;
+            MusicMessage.prototype.contextInfo = null;
+
+            MusicMessage.create = function create(properties) {
+                return new MusicMessage(properties);
+            };
+
+            MusicMessage.encode = function encode(m, w) {
+                if (!w)
+                    w = $Writer.create();
+                if (m.embeddedMusic != null && Object.hasOwnProperty.call(m, "embeddedMusic"))
+                    $root.proto.EmbeddedMusic.encode(m.embeddedMusic, w.uint32(10).fork()).ldelim();
+                if (m.songUri != null && Object.hasOwnProperty.call(m, "songUri"))
+                    w.uint32(18).string(m.songUri);
+                if (m.artworkUri != null && Object.hasOwnProperty.call(m, "artworkUri"))
+                    w.uint32(26).string(m.artworkUri);
+                if (m.style != null && Object.hasOwnProperty.call(m, "style"))
+                    w.uint32(32).int32(m.style);
+                if (m.contextInfo != null && Object.hasOwnProperty.call(m, "contextInfo"))
+                    $root.proto.ContextInfo.encode(m.contextInfo, w.uint32(42).fork()).ldelim();
+                return w;
+            };
+
+            MusicMessage.decode = function decode(r, l, e, n) {
+                if (!(r instanceof $Reader))
+                    r = $Reader.create(r);
+                if (n === undefined)
+                    n = 0;
+                if (n > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
+                var c = l === undefined ? r.len : r.pos + l, m = new $root.proto.Message.MusicMessage();
+                while (r.pos < c) {
+                    var t = r.uint32();
+                    if (t === e)
+                        break;
+                    switch (t >>> 3) {
+                    case 1: {
+                            m.embeddedMusic = $root.proto.EmbeddedMusic.decode(r, r.uint32(), undefined, n + 1);
+                            break;
+                        }
+                    case 2: {
+                            m.songUri = r.string();
+                            break;
+                        }
+                    case 3: {
+                            m.artworkUri = r.string();
+                            break;
+                        }
+                    case 4: {
+                            m.style = r.int32();
+                            break;
+                        }
+                    case 5: {
+                            m.contextInfo = $root.proto.ContextInfo.decode(r, r.uint32(), undefined, n + 1);
+                            break;
+                        }
+                    default:
+                        r.skipType(t & 7, n);
+                        break;
+                    }
+                }
+                return m;
+            };
+
+            MusicMessage.fromObject = function fromObject(d, n) {
+                if (d instanceof $root.proto.Message.MusicMessage)
+                    return d;
+                if (n === undefined)
+                    n = 0;
+                if (n > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
+                var m = new $root.proto.Message.MusicMessage();
+                if (d.embeddedMusic != null) {
+                    if (typeof d.embeddedMusic !== "object")
+                        throw TypeError(".proto.Message.MusicMessage.embeddedMusic: object expected");
+                    m.embeddedMusic = $root.proto.EmbeddedMusic.fromObject(d.embeddedMusic, n + 1);
+                }
+                if (d.songUri != null) {
+                    m.songUri = String(d.songUri);
+                }
+                if (d.artworkUri != null) {
+                    m.artworkUri = String(d.artworkUri);
+                }
+                if (d.style != null) {
+                    m.style = d.style | 0;
+                }
+                if (d.contextInfo != null) {
+                    if (typeof d.contextInfo !== "object")
+                        throw TypeError(".proto.Message.MusicMessage.contextInfo: object expected");
+                    m.contextInfo = $root.proto.ContextInfo.fromObject(d.contextInfo, n + 1);
+                }
+                return m;
+            };
+
+            MusicMessage.toObject = function toObject(m, o) {
+                if (!o)
+                    o = {};
+                var d = {};
+                if (o.defaults) {
+                    d.embeddedMusic = null;
+                    d.songUri = "";
+                    d.artworkUri = "";
+                    d.style = 0;
+                    d.contextInfo = null;
+                }
+                if (m.embeddedMusic != null && m.hasOwnProperty("embeddedMusic")) {
+                    d.embeddedMusic = $root.proto.EmbeddedMusic.toObject(m.embeddedMusic, o);
+                }
+                if (m.songUri != null && m.hasOwnProperty("songUri")) {
+                    d.songUri = m.songUri;
+                }
+                if (m.artworkUri != null && m.hasOwnProperty("artworkUri")) {
+                    d.artworkUri = m.artworkUri;
+                }
+                if (m.style != null && m.hasOwnProperty("style")) {
+                    d.style = m.style;
+                }
+                if (m.contextInfo != null && m.hasOwnProperty("contextInfo")) {
+                    d.contextInfo = $root.proto.ContextInfo.toObject(m.contextInfo, o);
+                }
+                return d;
+            };
+
+            MusicMessage.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
+
+            MusicMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                if (typeUrlPrefix === undefined) {
+                    typeUrlPrefix = "type.googleapis.com";
+                }
+                return typeUrlPrefix + "/proto.Message.MusicMessage";
+            };
+
+            MusicMessage.MusicMessageStyle = (function() {
+                const valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "UNKNOWN"] = 0;
+                return values;
+            })();
+
+            return MusicMessage;
+        })();
+
         Message.NewsletterAdminInviteMessage = (function() {
 
             function NewsletterAdminInviteMessage(p) {
@@ -55654,6 +55799,10 @@ export const proto = $root.proto = (() => {
                 case 3:
                     m.serviceType = 3;
                     break;
+                case "PIX":
+                case 4:
+                    m.serviceType = 4;
+                    break;
                 }
                 if (d.expiryTimestamp != null) {
                     if ($util.Long)
@@ -55750,6 +55899,7 @@ export const proto = $root.proto = (() => {
                 values[valuesById[1] = "FBPAY"] = 1;
                 values[valuesById[2] = "NOVI"] = 2;
                 values[valuesById[3] = "UPI"] = 3;
+                values[valuesById[4] = "PIX"] = 4;
                 return values;
             })();
 
@@ -56654,6 +56804,10 @@ export const proto = $root.proto = (() => {
                 case "BUSINESS_BROADCAST_INSIGHTS_REFRESH":
                 case 13:
                     m.peerDataOperationRequestType = 13;
+                    break;
+                case "CONTACT_REFRESH_REQUEST":
+                case 14:
+                    m.peerDataOperationRequestType = 14;
                     break;
                 }
                 if (d.requestStickerReupload) {
@@ -58263,6 +58417,10 @@ export const proto = $root.proto = (() => {
                 case 13:
                     m.peerDataOperationRequestType = 13;
                     break;
+                case "CONTACT_REFRESH_REQUEST":
+                case 14:
+                    m.peerDataOperationRequestType = 14;
+                    break;
                 }
                 if (d.stanzaId != null) {
                     m.stanzaId = String(d.stanzaId);
@@ -58338,6 +58496,7 @@ export const proto = $root.proto = (() => {
                 PeerDataOperationResult.prototype.historySyncChunkRetryResponse = null;
                 PeerDataOperationResult.prototype.flowResponsesCsvBundle = null;
                 PeerDataOperationResult.prototype.bizBroadcastInsightsContactListResponse = null;
+                PeerDataOperationResult.prototype.contactRefreshResponse = null;
 
                 PeerDataOperationResult.create = function create(properties) {
                     return new PeerDataOperationResult(properties);
@@ -58370,6 +58529,8 @@ export const proto = $root.proto = (() => {
                         $root.proto.Message.PeerDataOperationRequestResponseMessage.PeerDataOperationResult.FlowResponsesCsvBundle.encode(m.flowResponsesCsvBundle, w.uint32(90).fork()).ldelim();
                     if (m.bizBroadcastInsightsContactListResponse != null && Object.hasOwnProperty.call(m, "bizBroadcastInsightsContactListResponse"))
                         $root.proto.Message.PeerDataOperationRequestResponseMessage.PeerDataOperationResult.BizBroadcastInsightsContactListResponse.encode(m.bizBroadcastInsightsContactListResponse, w.uint32(98).fork()).ldelim();
+                    if (m.contactRefreshResponse != null && Object.hasOwnProperty.call(m, "contactRefreshResponse"))
+                        $root.proto.Message.PeerDataOperationRequestResponseMessage.PeerDataOperationResult.ContactRefreshResponse.encode(m.contactRefreshResponse, w.uint32(106).fork()).ldelim();
                     return w;
                 };
 
@@ -58432,6 +58593,10 @@ export const proto = $root.proto = (() => {
                             }
                         case 12: {
                                 m.bizBroadcastInsightsContactListResponse = $root.proto.Message.PeerDataOperationRequestResponseMessage.PeerDataOperationResult.BizBroadcastInsightsContactListResponse.decode(r, r.uint32(), undefined, n + 1);
+                                break;
+                            }
+                        case 13: {
+                                m.contactRefreshResponse = $root.proto.Message.PeerDataOperationRequestResponseMessage.PeerDataOperationResult.ContactRefreshResponse.decode(r, r.uint32(), undefined, n + 1);
                                 break;
                             }
                         default:
@@ -58529,6 +58694,11 @@ export const proto = $root.proto = (() => {
                             throw TypeError(".proto.Message.PeerDataOperationRequestResponseMessage.PeerDataOperationResult.bizBroadcastInsightsContactListResponse: object expected");
                         m.bizBroadcastInsightsContactListResponse = $root.proto.Message.PeerDataOperationRequestResponseMessage.PeerDataOperationResult.BizBroadcastInsightsContactListResponse.fromObject(d.bizBroadcastInsightsContactListResponse, n + 1);
                     }
+                    if (d.contactRefreshResponse != null) {
+                        if (typeof d.contactRefreshResponse !== "object")
+                            throw TypeError(".proto.Message.PeerDataOperationRequestResponseMessage.PeerDataOperationResult.contactRefreshResponse: object expected");
+                        m.contactRefreshResponse = $root.proto.Message.PeerDataOperationRequestResponseMessage.PeerDataOperationResult.ContactRefreshResponse.fromObject(d.contactRefreshResponse, n + 1);
+                    }
                     return m;
                 };
 
@@ -58549,6 +58719,7 @@ export const proto = $root.proto = (() => {
                         d.historySyncChunkRetryResponse = null;
                         d.flowResponsesCsvBundle = null;
                         d.bizBroadcastInsightsContactListResponse = null;
+                        d.contactRefreshResponse = null;
                     }
                     if (m.mediaUploadResult != null && m.hasOwnProperty("mediaUploadResult")) {
                         d.mediaUploadResult = o.enums === String ? $root.proto.MediaRetryNotification.ResultType[m.mediaUploadResult] === undefined ? m.mediaUploadResult : $root.proto.MediaRetryNotification.ResultType[m.mediaUploadResult] : m.mediaUploadResult;
@@ -58585,6 +58756,9 @@ export const proto = $root.proto = (() => {
                     }
                     if (m.bizBroadcastInsightsContactListResponse != null && m.hasOwnProperty("bizBroadcastInsightsContactListResponse")) {
                         d.bizBroadcastInsightsContactListResponse = $root.proto.Message.PeerDataOperationRequestResponseMessage.PeerDataOperationResult.BizBroadcastInsightsContactListResponse.toObject(m.bizBroadcastInsightsContactListResponse, o);
+                    }
+                    if (m.contactRefreshResponse != null && m.hasOwnProperty("contactRefreshResponse")) {
+                        d.contactRefreshResponse = $root.proto.Message.PeerDataOperationRequestResponseMessage.PeerDataOperationResult.ContactRefreshResponse.toObject(m.contactRefreshResponse, o);
                     }
                     return d;
                 };
@@ -59080,6 +59254,180 @@ export const proto = $root.proto = (() => {
                     };
 
                     return CompanionMetaNonceFetchResponse;
+                })();
+
+                PeerDataOperationResult.ContactRefreshResponse = (function() {
+
+                    function ContactRefreshResponse(p) {
+                        this.coveredRequestIds = [];
+                        if (p)
+                            for (var ks = Object.keys(p), i = 0; i < ks.length; ++i)
+                                if (p[ks[i]] != null && ks[i] !== "__proto__")
+                                    this[ks[i]] = p[ks[i]];
+                    }
+
+                    ContactRefreshResponse.prototype.coveredRequestIds = $util.emptyArray;
+                    ContactRefreshResponse.prototype.collectionVersion = $util.Long ? $util.Long.fromBits(0,0,true) : 0;
+                    ContactRefreshResponse.prototype.primaryDurationMs = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+                    ContactRefreshResponse.prototype.uniqueContactCount = 0;
+
+                    ContactRefreshResponse.create = function create(properties) {
+                        return new ContactRefreshResponse(properties);
+                    };
+
+                    ContactRefreshResponse.encode = function encode(m, w) {
+                        if (!w)
+                            w = $Writer.create();
+                        if (m.coveredRequestIds != null && m.coveredRequestIds.length) {
+                            for (var i = 0; i < m.coveredRequestIds.length; ++i)
+                                w.uint32(10).string(m.coveredRequestIds[i]);
+                        }
+                        if (m.collectionVersion != null && Object.hasOwnProperty.call(m, "collectionVersion"))
+                            w.uint32(16).uint64(m.collectionVersion);
+                        if (m.primaryDurationMs != null && Object.hasOwnProperty.call(m, "primaryDurationMs"))
+                            w.uint32(24).int64(m.primaryDurationMs);
+                        if (m.uniqueContactCount != null && Object.hasOwnProperty.call(m, "uniqueContactCount"))
+                            w.uint32(32).uint32(m.uniqueContactCount);
+                        return w;
+                    };
+
+                    ContactRefreshResponse.decode = function decode(r, l, e, n) {
+                        if (!(r instanceof $Reader))
+                            r = $Reader.create(r);
+                        if (n === undefined)
+                            n = 0;
+                        if (n > $Reader.recursionLimit)
+                            throw Error("maximum nesting depth exceeded");
+                        var c = l === undefined ? r.len : r.pos + l, m = new $root.proto.Message.PeerDataOperationRequestResponseMessage.PeerDataOperationResult.ContactRefreshResponse();
+                        while (r.pos < c) {
+                            var t = r.uint32();
+                            if (t === e)
+                                break;
+                            switch (t >>> 3) {
+                            case 1: {
+                                    if (!(m.coveredRequestIds && m.coveredRequestIds.length))
+                                        m.coveredRequestIds = [];
+                                    m.coveredRequestIds.push(r.string());
+                                    break;
+                                }
+                            case 2: {
+                                    m.collectionVersion = r.uint64();
+                                    break;
+                                }
+                            case 3: {
+                                    m.primaryDurationMs = r.int64();
+                                    break;
+                                }
+                            case 4: {
+                                    m.uniqueContactCount = r.uint32();
+                                    break;
+                                }
+                            default:
+                                r.skipType(t & 7, n);
+                                break;
+                            }
+                        }
+                        return m;
+                    };
+
+                    ContactRefreshResponse.fromObject = function fromObject(d, n) {
+                        if (d instanceof $root.proto.Message.PeerDataOperationRequestResponseMessage.PeerDataOperationResult.ContactRefreshResponse)
+                            return d;
+                        if (n === undefined)
+                            n = 0;
+                        if (n > $util.recursionLimit)
+                            throw Error("maximum nesting depth exceeded");
+                        var m = new $root.proto.Message.PeerDataOperationRequestResponseMessage.PeerDataOperationResult.ContactRefreshResponse();
+                        if (d.coveredRequestIds) {
+                            if (!Array.isArray(d.coveredRequestIds))
+                                throw TypeError(".proto.Message.PeerDataOperationRequestResponseMessage.PeerDataOperationResult.ContactRefreshResponse.coveredRequestIds: array expected");
+                            m.coveredRequestIds = [];
+                            for (var i = 0; i < d.coveredRequestIds.length; ++i) {
+                                m.coveredRequestIds[i] = String(d.coveredRequestIds[i]);
+                            }
+                        }
+                        if (d.collectionVersion != null) {
+                            if ($util.Long)
+                                (m.collectionVersion = $util.Long.fromValue(d.collectionVersion)).unsigned = true;
+                            else if (typeof d.collectionVersion === "string")
+                                m.collectionVersion = parseInt(d.collectionVersion, 10);
+                            else if (typeof d.collectionVersion === "number")
+                                m.collectionVersion = d.collectionVersion;
+                            else if (typeof d.collectionVersion === "object")
+                                m.collectionVersion = new $util.LongBits(d.collectionVersion.low >>> 0, d.collectionVersion.high >>> 0).toNumber(true);
+                        }
+                        if (d.primaryDurationMs != null) {
+                            if ($util.Long)
+                                (m.primaryDurationMs = $util.Long.fromValue(d.primaryDurationMs)).unsigned = false;
+                            else if (typeof d.primaryDurationMs === "string")
+                                m.primaryDurationMs = parseInt(d.primaryDurationMs, 10);
+                            else if (typeof d.primaryDurationMs === "number")
+                                m.primaryDurationMs = d.primaryDurationMs;
+                            else if (typeof d.primaryDurationMs === "object")
+                                m.primaryDurationMs = new $util.LongBits(d.primaryDurationMs.low >>> 0, d.primaryDurationMs.high >>> 0).toNumber();
+                        }
+                        if (d.uniqueContactCount != null) {
+                            m.uniqueContactCount = d.uniqueContactCount >>> 0;
+                        }
+                        return m;
+                    };
+
+                    ContactRefreshResponse.toObject = function toObject(m, o) {
+                        if (!o)
+                            o = {};
+                        var d = {};
+                        if (o.arrays || o.defaults) {
+                            d.coveredRequestIds = [];
+                        }
+                        if (o.defaults) {
+                            if ($util.Long) {
+                                var n = new $util.Long(0, 0, true);
+                                d.collectionVersion = o.longs === String ? n.toString() : o.longs === Number ? n.toNumber() : n;
+                            } else
+                                d.collectionVersion = o.longs === String ? "0" : 0;
+                            if ($util.Long) {
+                                var n = new $util.Long(0, 0, false);
+                                d.primaryDurationMs = o.longs === String ? n.toString() : o.longs === Number ? n.toNumber() : n;
+                            } else
+                                d.primaryDurationMs = o.longs === String ? "0" : 0;
+                            d.uniqueContactCount = 0;
+                        }
+                        if (m.coveredRequestIds && m.coveredRequestIds.length) {
+                            d.coveredRequestIds = [];
+                            for (var j = 0; j < m.coveredRequestIds.length; ++j) {
+                                d.coveredRequestIds[j] = m.coveredRequestIds[j];
+                            }
+                        }
+                        if (m.collectionVersion != null && m.hasOwnProperty("collectionVersion")) {
+                            if (typeof m.collectionVersion === "number")
+                                d.collectionVersion = o.longs === String ? String(m.collectionVersion) : m.collectionVersion;
+                            else
+                                d.collectionVersion = o.longs === String ? longToString(m.collectionVersion, true) : o.longs === Number ? longToNumber(m.collectionVersion, true) : m.collectionVersion;
+                        }
+                        if (m.primaryDurationMs != null && m.hasOwnProperty("primaryDurationMs")) {
+                            if (typeof m.primaryDurationMs === "number")
+                                d.primaryDurationMs = o.longs === String ? String(m.primaryDurationMs) : m.primaryDurationMs;
+                            else
+                                d.primaryDurationMs = o.longs === String ? longToString(m.primaryDurationMs) : o.longs === Number ? longToNumber(m.primaryDurationMs) : m.primaryDurationMs;
+                        }
+                        if (m.uniqueContactCount != null && m.hasOwnProperty("uniqueContactCount")) {
+                            d.uniqueContactCount = m.uniqueContactCount;
+                        }
+                        return d;
+                    };
+
+                    ContactRefreshResponse.prototype.toJSON = function toJSON() {
+                        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                    };
+
+                    ContactRefreshResponse.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                        if (typeUrlPrefix === undefined) {
+                            typeUrlPrefix = "type.googleapis.com";
+                        }
+                        return typeUrlPrefix + "/proto.Message.PeerDataOperationRequestResponseMessage.PeerDataOperationResult.ContactRefreshResponse";
+                    };
+
+                    return ContactRefreshResponse;
                 })();
 
                 PeerDataOperationResult.FlowResponsesCsvBundle = (function() {
@@ -60609,6 +60957,7 @@ export const proto = $root.proto = (() => {
             values[valuesById[11] = "GALAXY_FLOW_ACTION"] = 11;
             values[valuesById[12] = "BUSINESS_BROADCAST_INSIGHTS_DELIVERED_TO"] = 12;
             values[valuesById[13] = "BUSINESS_BROADCAST_INSIGHTS_REFRESH"] = 13;
+            values[valuesById[14] = "CONTACT_REFRESH_REQUEST"] = 14;
             return values;
         })();
 
@@ -65475,6 +65824,125 @@ export const proto = $root.proto = (() => {
             return SplitPaymentUpdateMessage;
         })();
 
+        Message.StatusLinkPreviewMetadata = (function() {
+
+            function StatusLinkPreviewMetadata(p) {
+                if (p)
+                    for (var ks = Object.keys(p), i = 0; i < ks.length; ++i)
+                        if (p[ks[i]] != null && ks[i] !== "__proto__")
+                            this[ks[i]] = p[ks[i]];
+            }
+
+            StatusLinkPreviewMetadata.prototype.style = 0;
+
+            StatusLinkPreviewMetadata.create = function create(properties) {
+                return new StatusLinkPreviewMetadata(properties);
+            };
+
+            StatusLinkPreviewMetadata.encode = function encode(m, w) {
+                if (!w)
+                    w = $Writer.create();
+                if (m.style != null && Object.hasOwnProperty.call(m, "style"))
+                    w.uint32(8).int32(m.style);
+                return w;
+            };
+
+            StatusLinkPreviewMetadata.decode = function decode(r, l, e, n) {
+                if (!(r instanceof $Reader))
+                    r = $Reader.create(r);
+                if (n === undefined)
+                    n = 0;
+                if (n > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
+                var c = l === undefined ? r.len : r.pos + l, m = new $root.proto.Message.StatusLinkPreviewMetadata();
+                while (r.pos < c) {
+                    var t = r.uint32();
+                    if (t === e)
+                        break;
+                    switch (t >>> 3) {
+                    case 1: {
+                            m.style = r.int32();
+                            break;
+                        }
+                    default:
+                        r.skipType(t & 7, n);
+                        break;
+                    }
+                }
+                return m;
+            };
+
+            StatusLinkPreviewMetadata.fromObject = function fromObject(d, n) {
+                if (d instanceof $root.proto.Message.StatusLinkPreviewMetadata)
+                    return d;
+                if (n === undefined)
+                    n = 0;
+                if (n > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
+                var m = new $root.proto.Message.StatusLinkPreviewMetadata();
+                switch (d.style) {
+                default:
+                    if (typeof d.style === "number") {
+                        m.style = d.style;
+                        break;
+                    }
+                    break;
+                case "AUTO":
+                case 0:
+                    m.style = 0;
+                    break;
+                case "COMPACT":
+                case 1:
+                    m.style = 1;
+                    break;
+                case "FULL":
+                case 2:
+                    m.style = 2;
+                    break;
+                case "IMMERSIVE":
+                case 3:
+                    m.style = 3;
+                    break;
+                }
+                return m;
+            };
+
+            StatusLinkPreviewMetadata.toObject = function toObject(m, o) {
+                if (!o)
+                    o = {};
+                var d = {};
+                if (o.defaults) {
+                    d.style = o.enums === String ? "AUTO" : 0;
+                }
+                if (m.style != null && m.hasOwnProperty("style")) {
+                    d.style = o.enums === String ? $root.proto.Message.StatusLinkPreviewMetadata.Style[m.style] === undefined ? m.style : $root.proto.Message.StatusLinkPreviewMetadata.Style[m.style] : m.style;
+                }
+                return d;
+            };
+
+            StatusLinkPreviewMetadata.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
+
+            StatusLinkPreviewMetadata.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                if (typeUrlPrefix === undefined) {
+                    typeUrlPrefix = "type.googleapis.com";
+                }
+                return typeUrlPrefix + "/proto.Message.StatusLinkPreviewMetadata";
+            };
+
+            StatusLinkPreviewMetadata.Style = (function() {
+                const valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "AUTO"] = 0;
+                values[valuesById[1] = "COMPACT"] = 1;
+                values[valuesById[2] = "FULL"] = 2;
+                values[valuesById[3] = "IMMERSIVE"] = 3;
+                return values;
+            })();
+
+            return StatusLinkPreviewMetadata;
+        })();
+
         Message.StatusNotificationMessage = (function() {
 
             function StatusNotificationMessage(p) {
@@ -65578,6 +66046,10 @@ export const proto = $root.proto = (() => {
                 case 3:
                     m.type = 3;
                     break;
+                case "STATUS_GROUP_STATUS_REPLY":
+                case 4:
+                    m.type = 4;
+                    break;
                 }
                 return m;
             };
@@ -65620,6 +66092,7 @@ export const proto = $root.proto = (() => {
                 values[valuesById[1] = "STATUS_ADD_YOURS"] = 1;
                 values[valuesById[2] = "STATUS_RESHARE"] = 2;
                 values[valuesById[3] = "STATUS_QUESTION_ANSWER_RESHARE"] = 3;
+                values[valuesById[4] = "STATUS_GROUP_STATUS_REPLY"] = 4;
                 return values;
             })();
 
@@ -72314,6 +72787,8 @@ export const proto = $root.proto = (() => {
         values[valuesById[88] = "COEX_V2_VERSION_ACTION"] = 88;
         values[valuesById[89] = "WASA_ROOT_SECRET_ACTION"] = 89;
         values[valuesById[90] = "BUBBLE_LOCK_MESSAGE_ACTION"] = 90;
+        values[valuesById[91] = "LABEL_SUBLIST_ACTION"] = 91;
+        values[valuesById[92] = "DEVICE_CAPABILITIES_V2"] = 92;
         values[valuesById[10001] = "SHARE_OWN_PN"] = 10001;
         values[valuesById[10002] = "BUSINESS_BROADCAST_ACTION"] = 10002;
         values[valuesById[10003] = "AI_THREAD_DELETE_ACTION"] = 10003;
@@ -80609,6 +81084,10 @@ export const proto = $root.proto = (() => {
             case 11:
                 m.type = 11;
                 break;
+            case "USERNAME_STATUS":
+            case 12:
+                m.type = 12;
+                break;
             }
             if (d.actionUrl != null) {
                 m.actionUrl = String(d.actionUrl);
@@ -81676,6 +82155,7 @@ export const proto = $root.proto = (() => {
             values[valuesById[9] = "NEWSLETTER_STATUS"] = 9;
             values[valuesById[10] = "STATUS_CLOSE_SHARING"] = 10;
             values[valuesById[11] = "PAID_PARTNERSHIP"] = 11;
+            values[valuesById[12] = "USERNAME_STATUS"] = 12;
             return values;
         })();
 
@@ -82472,6 +82952,8 @@ export const proto = $root.proto = (() => {
         SyncActionValue.prototype.coexV2VersionAction = null;
         SyncActionValue.prototype.wasaRootSecretAction = null;
         SyncActionValue.prototype.bubbleLockMessageAction = null;
+        SyncActionValue.prototype.labelSublistAction = null;
+        SyncActionValue.prototype.deviceCapabilitiesV2 = null;
 
         SyncActionValue.create = function create(properties) {
             return new SyncActionValue(properties);
@@ -82642,6 +83124,10 @@ export const proto = $root.proto = (() => {
                 $root.proto.SyncActionValue.WASARootSecretAction.encode(m.wasaRootSecretAction, w.uint32(714).fork()).ldelim();
             if (m.bubbleLockMessageAction != null && Object.hasOwnProperty.call(m, "bubbleLockMessageAction"))
                 $root.proto.SyncActionValue.BubbleLockMessageAction.encode(m.bubbleLockMessageAction, w.uint32(722).fork()).ldelim();
+            if (m.labelSublistAction != null && Object.hasOwnProperty.call(m, "labelSublistAction"))
+                $root.proto.SyncActionValue.LabelSublistAction.encode(m.labelSublistAction, w.uint32(730).fork()).ldelim();
+            if (m.deviceCapabilitiesV2 != null && Object.hasOwnProperty.call(m, "deviceCapabilitiesV2"))
+                $root.proto.DeviceCapabilities.encode(m.deviceCapabilitiesV2, w.uint32(738).fork()).ldelim();
             return w;
         };
 
@@ -82980,6 +83466,14 @@ export const proto = $root.proto = (() => {
                     }
                 case 90: {
                         m.bubbleLockMessageAction = $root.proto.SyncActionValue.BubbleLockMessageAction.decode(r, r.uint32(), undefined, n + 1);
+                        break;
+                    }
+                case 91: {
+                        m.labelSublistAction = $root.proto.SyncActionValue.LabelSublistAction.decode(r, r.uint32(), undefined, n + 1);
+                        break;
+                    }
+                case 92: {
+                        m.deviceCapabilitiesV2 = $root.proto.DeviceCapabilities.decode(r, r.uint32(), undefined, n + 1);
                         break;
                     }
                 default:
@@ -83408,6 +83902,16 @@ export const proto = $root.proto = (() => {
                     throw TypeError(".proto.SyncActionValue.bubbleLockMessageAction: object expected");
                 m.bubbleLockMessageAction = $root.proto.SyncActionValue.BubbleLockMessageAction.fromObject(d.bubbleLockMessageAction, n + 1);
             }
+            if (d.labelSublistAction != null) {
+                if (typeof d.labelSublistAction !== "object")
+                    throw TypeError(".proto.SyncActionValue.labelSublistAction: object expected");
+                m.labelSublistAction = $root.proto.SyncActionValue.LabelSublistAction.fromObject(d.labelSublistAction, n + 1);
+            }
+            if (d.deviceCapabilitiesV2 != null) {
+                if (typeof d.deviceCapabilitiesV2 !== "object")
+                    throw TypeError(".proto.SyncActionValue.deviceCapabilitiesV2: object expected");
+                m.deviceCapabilitiesV2 = $root.proto.DeviceCapabilities.fromObject(d.deviceCapabilitiesV2, n + 1);
+            }
             return m;
         };
 
@@ -83501,6 +84005,8 @@ export const proto = $root.proto = (() => {
                 d.coexV2VersionAction = null;
                 d.wasaRootSecretAction = null;
                 d.bubbleLockMessageAction = null;
+                d.labelSublistAction = null;
+                d.deviceCapabilitiesV2 = null;
             }
             if (m.timestamp != null && m.hasOwnProperty("timestamp")) {
                 if (typeof m.timestamp === "number")
@@ -83747,6 +84253,12 @@ export const proto = $root.proto = (() => {
             }
             if (m.bubbleLockMessageAction != null && m.hasOwnProperty("bubbleLockMessageAction")) {
                 d.bubbleLockMessageAction = $root.proto.SyncActionValue.BubbleLockMessageAction.toObject(m.bubbleLockMessageAction, o);
+            }
+            if (m.labelSublistAction != null && m.hasOwnProperty("labelSublistAction")) {
+                d.labelSublistAction = $root.proto.SyncActionValue.LabelSublistAction.toObject(m.labelSublistAction, o);
+            }
+            if (m.deviceCapabilitiesV2 != null && m.hasOwnProperty("deviceCapabilitiesV2")) {
+                d.deviceCapabilitiesV2 = $root.proto.DeviceCapabilities.toObject(m.deviceCapabilitiesV2, o);
             }
             return d;
         };
@@ -84497,6 +85009,10 @@ export const proto = $root.proto = (() => {
                 case 5:
                     m.category = 5;
                     break;
+                case "HANDOFF_REMOVAL_TIMING":
+                case 6:
+                    m.category = 6;
+                    break;
                 }
                 if (d.version != null) {
                     if ($util.Long)
@@ -84575,6 +85091,7 @@ export const proto = $root.proto = (() => {
                 values[valuesById[3] = "EXAMPLE_RESPONSES"] = 3;
                 values[valuesById[4] = "KNOWLEDGE"] = 4;
                 values[valuesById[5] = "LEAD_GEN"] = 5;
+                values[valuesById[6] = "HANDOFF_REMOVAL_TIMING"] = 6;
                 return values;
             })();
 
@@ -88100,6 +88617,10 @@ export const proto = $root.proto = (() => {
                 case 15:
                     m.type = 15;
                     break;
+                case "LEAD":
+                case 16:
+                    m.type = 16;
+                    break;
                 }
                 if (d.isImmutable != null) {
                     m.isImmutable = Boolean(d.isImmutable);
@@ -88198,6 +88719,7 @@ export const proto = $root.proto = (() => {
                 values[valuesById[13] = "LOCKED"] = 13;
                 values[valuesById[14] = "INVITES"] = 14;
                 values[valuesById[15] = "THIRD_PARTY"] = 15;
+                values[valuesById[16] = "LEAD"] = 16;
                 return values;
             })();
 
@@ -88309,6 +88831,95 @@ export const proto = $root.proto = (() => {
             };
 
             return LabelReorderingAction;
+        })();
+
+        SyncActionValue.LabelSublistAction = (function() {
+
+            function LabelSublistAction(p) {
+                if (p)
+                    for (var ks = Object.keys(p), i = 0; i < ks.length; ++i)
+                        if (p[ks[i]] != null && ks[i] !== "__proto__")
+                            this[ks[i]] = p[ks[i]];
+            }
+
+            LabelSublistAction.prototype.subListId = 0;
+
+            LabelSublistAction.create = function create(properties) {
+                return new LabelSublistAction(properties);
+            };
+
+            LabelSublistAction.encode = function encode(m, w) {
+                if (!w)
+                    w = $Writer.create();
+                if (m.subListId != null && Object.hasOwnProperty.call(m, "subListId"))
+                    w.uint32(8).int32(m.subListId);
+                return w;
+            };
+
+            LabelSublistAction.decode = function decode(r, l, e, n) {
+                if (!(r instanceof $Reader))
+                    r = $Reader.create(r);
+                if (n === undefined)
+                    n = 0;
+                if (n > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
+                var c = l === undefined ? r.len : r.pos + l, m = new $root.proto.SyncActionValue.LabelSublistAction();
+                while (r.pos < c) {
+                    var t = r.uint32();
+                    if (t === e)
+                        break;
+                    switch (t >>> 3) {
+                    case 1: {
+                            m.subListId = r.int32();
+                            break;
+                        }
+                    default:
+                        r.skipType(t & 7, n);
+                        break;
+                    }
+                }
+                return m;
+            };
+
+            LabelSublistAction.fromObject = function fromObject(d, n) {
+                if (d instanceof $root.proto.SyncActionValue.LabelSublistAction)
+                    return d;
+                if (n === undefined)
+                    n = 0;
+                if (n > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
+                var m = new $root.proto.SyncActionValue.LabelSublistAction();
+                if (d.subListId != null) {
+                    m.subListId = d.subListId | 0;
+                }
+                return m;
+            };
+
+            LabelSublistAction.toObject = function toObject(m, o) {
+                if (!o)
+                    o = {};
+                var d = {};
+                if (o.defaults) {
+                    d.subListId = 0;
+                }
+                if (m.subListId != null && m.hasOwnProperty("subListId")) {
+                    d.subListId = m.subListId;
+                }
+                return d;
+            };
+
+            LabelSublistAction.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
+
+            LabelSublistAction.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                if (typeUrlPrefix === undefined) {
+                    typeUrlPrefix = "type.googleapis.com";
+                }
+                return typeUrlPrefix + "/proto.SyncActionValue.LabelSublistAction";
+            };
+
+            return LabelSublistAction;
         })();
 
         SyncActionValue.LidContactAction = (function() {
@@ -91785,6 +92396,7 @@ export const proto = $root.proto = (() => {
             SettingsSyncAction.prototype.shouldPlaySoundForCallNotification = false;
             SettingsSyncAction.prototype.chatThemeId = "";
             SettingsSyncAction.prototype.colorSchemeId = "";
+            SettingsSyncAction.prototype.stockWallpaperImageId = "";
 
             SettingsSyncAction.create = function create(properties) {
                 return new SettingsSyncAction(properties);
@@ -91859,6 +92471,8 @@ export const proto = $root.proto = (() => {
                     w.uint32(258).string(m.chatThemeId);
                 if (m.colorSchemeId != null && Object.hasOwnProperty.call(m, "colorSchemeId"))
                     w.uint32(266).string(m.colorSchemeId);
+                if (m.stockWallpaperImageId != null && Object.hasOwnProperty.call(m, "stockWallpaperImageId"))
+                    w.uint32(274).string(m.stockWallpaperImageId);
                 return w;
             };
 
@@ -92005,6 +92619,10 @@ export const proto = $root.proto = (() => {
                         }
                     case 33: {
                             m.colorSchemeId = r.string();
+                            break;
+                        }
+                    case 34: {
+                            m.stockWallpaperImageId = r.string();
                             break;
                         }
                     default:
@@ -92181,6 +92799,9 @@ export const proto = $root.proto = (() => {
                 if (d.colorSchemeId != null) {
                     m.colorSchemeId = String(d.colorSchemeId);
                 }
+                if (d.stockWallpaperImageId != null) {
+                    m.stockWallpaperImageId = String(d.stockWallpaperImageId);
+                }
                 return m;
             };
 
@@ -92222,6 +92843,7 @@ export const proto = $root.proto = (() => {
                     d.shouldPlaySoundForCallNotification = false;
                     d.chatThemeId = "";
                     d.colorSchemeId = "";
+                    d.stockWallpaperImageId = "";
                 }
                 if (m.startAtLogin != null && m.hasOwnProperty("startAtLogin")) {
                     d.startAtLogin = m.startAtLogin;
@@ -92322,6 +92944,9 @@ export const proto = $root.proto = (() => {
                 if (m.colorSchemeId != null && m.hasOwnProperty("colorSchemeId")) {
                     d.colorSchemeId = m.colorSchemeId;
                 }
+                if (m.stockWallpaperImageId != null && m.hasOwnProperty("stockWallpaperImageId")) {
+                    d.stockWallpaperImageId = m.stockWallpaperImageId;
+                }
                 return d;
             };
 
@@ -92389,6 +93014,7 @@ export const proto = $root.proto = (() => {
                 values[valuesById[31] = "SHOULD_PLAY_SOUND_FOR_CALL_NOTIFICATION"] = 31;
                 values[valuesById[32] = "CHAT_THEME_ID"] = 32;
                 values[valuesById[33] = "COLOR_SCHEME_ID"] = 33;
+                values[valuesById[34] = "STOCK_WALLPAPER_IMAGE_ID"] = 34;
                 return values;
             })();
 
@@ -94895,6 +95521,7 @@ export const proto = $root.proto = (() => {
                 RootSecretEntry.prototype.id = "";
                 RootSecretEntry.prototype.rootSecret = $util.newBuffer([]);
                 RootSecretEntry.prototype.epoch = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+                RootSecretEntry.prototype.status = 0;
 
                 RootSecretEntry.create = function create(properties) {
                     return new RootSecretEntry(properties);
@@ -94909,6 +95536,8 @@ export const proto = $root.proto = (() => {
                         w.uint32(18).bytes(m.rootSecret);
                     if (m.epoch != null && Object.hasOwnProperty.call(m, "epoch"))
                         w.uint32(24).int64(m.epoch);
+                    if (m.status != null && Object.hasOwnProperty.call(m, "status"))
+                        w.uint32(32).int32(m.status);
                     return w;
                 };
 
@@ -94935,6 +95564,10 @@ export const proto = $root.proto = (() => {
                             }
                         case 3: {
                                 m.epoch = r.int64();
+                                break;
+                            }
+                        case 4: {
+                                m.status = r.int32();
                                 break;
                             }
                         default:
@@ -94972,6 +95605,22 @@ export const proto = $root.proto = (() => {
                         else if (typeof d.epoch === "object")
                             m.epoch = new $util.LongBits(d.epoch.low >>> 0, d.epoch.high >>> 0).toNumber();
                     }
+                    switch (d.status) {
+                    default:
+                        if (typeof d.status === "number") {
+                            m.status = d.status;
+                            break;
+                        }
+                        break;
+                    case "INACTIVE":
+                    case 0:
+                        m.status = 0;
+                        break;
+                    case "ACTIVE":
+                    case 1:
+                        m.status = 1;
+                        break;
+                    }
                     return m;
                 };
 
@@ -94993,6 +95642,7 @@ export const proto = $root.proto = (() => {
                             d.epoch = o.longs === String ? n.toString() : o.longs === Number ? n.toNumber() : n;
                         } else
                             d.epoch = o.longs === String ? "0" : 0;
+                        d.status = o.enums === String ? "INACTIVE" : 0;
                     }
                     if (m.id != null && m.hasOwnProperty("id")) {
                         d.id = m.id;
@@ -95005,6 +95655,9 @@ export const proto = $root.proto = (() => {
                             d.epoch = o.longs === String ? String(m.epoch) : m.epoch;
                         else
                             d.epoch = o.longs === String ? longToString(m.epoch) : o.longs === Number ? longToNumber(m.epoch) : m.epoch;
+                    }
+                    if (m.status != null && m.hasOwnProperty("status")) {
+                        d.status = o.enums === String ? $root.proto.SyncActionValue.WASARootSecretAction.RootSecretEntry.Status[m.status] === undefined ? m.status : $root.proto.SyncActionValue.WASARootSecretAction.RootSecretEntry.Status[m.status] : m.status;
                     }
                     return d;
                 };
@@ -95019,6 +95672,13 @@ export const proto = $root.proto = (() => {
                     }
                     return typeUrlPrefix + "/proto.SyncActionValue.WASARootSecretAction.RootSecretEntry";
                 };
+
+                RootSecretEntry.Status = (function() {
+                    const valuesById = {}, values = Object.create(valuesById);
+                    values[valuesById[0] = "INACTIVE"] = 0;
+                    values[valuesById[1] = "ACTIVE"] = 1;
+                    return values;
+                })();
 
                 return RootSecretEntry;
             })();

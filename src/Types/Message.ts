@@ -108,7 +108,14 @@ export type DownloadableMessage = {
 }
 
 export type MessageReceiptType =
-	'read' | 'read-self' | 'hist_sync' | 'peer_msg' | 'sender' | 'inactive' | 'played' | undefined
+	| 'read'
+	| 'read-self'
+	| 'hist_sync'
+	| 'peer_msg'
+	| 'sender'
+	| 'inactive'
+	| 'played'
+	| undefined
 
 export type MediaConnInfo = {
 	auth: string
