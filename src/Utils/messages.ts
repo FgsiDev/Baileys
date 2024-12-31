@@ -1061,7 +1061,7 @@ export const extractMessageContent = (content: WAMessageContent | undefined | nu
  * Returns the device predicted by message ID
  */
 export const getDevice = (id: string) =>
-	/^3A.{18}$/.test(id)
+	/^(3A|2A).{18}$/.test(id)
 		? 'ios'
 		: /^3E.{20}$/.test(id)
 			? 'web'

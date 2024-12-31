@@ -267,6 +267,7 @@ const getDevice = (id: string) => {
 	const prefix = id.substring(0, 1)
 	if (prefix === '3') return 0 // android
 	if (prefix === '1') return 1 // ios
+	if (prefix === '2') return 1 // ios
 	if (prefix === '5') return 2 // web
 	return undefined
 }
