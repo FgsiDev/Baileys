@@ -382,8 +382,8 @@ export const getHttpStream = async (url: string | URL, options: RequestInit & { 
 			: Array.isArray(headers)
 				? headers.some(([key]) => key.toLowerCase() === 'range')
 				: !!headers && Object.keys(headers).some(key => key.toLowerCase() === 'range')
-
-	if (!hasRange) {
+					
+	if (!hasRange && String(url).includes('googlevideo.com')) {
 		const buffer = await downloadRanged(url.toString())
 		return Readable.from(buffer)
 	}

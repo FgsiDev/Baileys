@@ -114,7 +114,13 @@ export const NACK_REASONS = {
 }
 
 type MessageType =
-	'chat' | 'peer_broadcast' | 'other_broadcast' | 'group' | 'direct_peer_status' | 'other_status' | 'newsletter'
+	| 'chat'
+	| 'peer_broadcast'
+	| 'other_broadcast'
+	| 'group'
+	| 'direct_peer_status'
+	| 'other_status'
+	| 'newsletter'
 
 export const extractAddressingContext = (stanza: BinaryNode) => {
 	let senderAlt: string | undefined

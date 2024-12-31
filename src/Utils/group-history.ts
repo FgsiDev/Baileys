@@ -70,7 +70,9 @@ const timestampSeconds = (message: proto.IWebMessageInfo | null | undefined): nu
  * message carries one. The sender reports it so the receiver can tell how far
  * back the shared window reaches.
  */
-export function oldestTimestampSeconds(messages: readonly proto.IWebMessageInfo[] | null | undefined): number | undefined {
+export function oldestTimestampSeconds(
+	messages: readonly proto.IWebMessageInfo[] | null | undefined
+): number | undefined {
 	let oldest: number | undefined
 	for (const message of messages || []) {
 		const seconds = timestampSeconds(message)

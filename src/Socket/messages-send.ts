@@ -740,9 +740,8 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				// instead of through the group sender key, so members who are not
 				// receiving it can never decrypt it
 				const groupData =
-					(useCachedGroupMetadata && cachedGroupMetadata
-						? await cachedGroupMetadata(jid)
-						: undefined) || (await groupMetadata(jid))
+					(useCachedGroupMetadata && cachedGroupMetadata ? await cachedGroupMetadata(jid) : undefined) ||
+					(await groupMetadata(jid))
 				additionalAttributes = {
 					...additionalAttributes,
 					addressing_mode: groupData?.addressingMode || 'lid'
@@ -895,7 +894,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				}
 
 				const { user: ownUser } = jidDecode(ownId)!
-				
+
 				if (!participant) {
 					const patchedForReporting = await patchMessageBeforeSending(message, [jid])
 					reportingMessage = Array.isArray(patchedForReporting)
@@ -1081,7 +1080,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 
 				logger.debug({ jid }, 'adding device identity')
 			}
-			
+
 			if (
 				!isNewsletter &&
 				!isRetryResend &&
@@ -1204,6 +1203,8 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 			return 'native_flow_response'
 		} else if (message.groupInviteMessage) {
 			return 'url'
+		} else if (message.messageHistoryBundle) {
+			return 'group_history'
 		}
 
 		return ''
@@ -1695,7 +1696,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 						directPath: upload.directPath,
 						mediaKeyTimestamp: unixTimestampSeconds(),
 						messageHistoryMetadata: metadataProto
-					},
+					}
 				},
 				{}
 			)
@@ -1709,11 +1710,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 					{
 						messageHistoryNotice: { messageHistoryMetadata: metadataProto }
 					},
-					{ additionalNodes: [{
-    tag: 'meta',
-    attrs: { appdata: 'group_history' },
-    content: undefined
-  }]}
+					{ additionalNodes: [{ tag: 'meta', attrs: { appdata: 'group_history' }, content: undefined }] }
 				)
 			} catch (error: any) {
 				logger.warn({ error, groupJid }, 'group history notice failed after bundle delivered')
