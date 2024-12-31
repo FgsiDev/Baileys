@@ -1678,7 +1678,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 						: Math.min(oldestInWindow, oldestPin)
 			const metadataProto: proto.Message.IMessageHistoryMetadata = {
 				historyReceivers: audience.historyReceivers,
-				nonHistoryReceivers: audience.nonHistoryReceivers,
+				nonHistoryReceivers: [],
 				messageCount: input.messages.length,
 				oldestMessageTimestampInWindow: oldestInWindow,
 				oldestMessageTimestampInBundle: oldestInBundle
