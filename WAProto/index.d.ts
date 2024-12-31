@@ -5123,6 +5123,48 @@ export namespace proto {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
+    interface IUnCountedAssociatedMessageList {
+        key?: (proto.IMessageKey|null);
+        messageKeys?: (proto.IMessageKey[]|null);
+        contextId?: (string|null);
+    }
+
+    class UnCountedAssociatedMessageList implements IUnCountedAssociatedMessageList {
+        constructor(p?: proto.IUnCountedAssociatedMessageList);
+        public key?: (proto.IMessageKey|null);
+        public messageKeys: proto.IMessageKey[];
+        public contextId: string;
+        public static create(properties?: proto.IUnCountedAssociatedMessageList): proto.UnCountedAssociatedMessageList;
+        public static encode(m: proto.IUnCountedAssociatedMessageList, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.UnCountedAssociatedMessageList;
+        public static fromObject(d: { [k: string]: any }): proto.UnCountedAssociatedMessageList;
+        public static toObject(m: proto.UnCountedAssociatedMessageList, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IGroupHistory {
+        messages?: (proto.IWebMessageInfo[]|null);
+        uncountedAssociatedMessageLists?: (proto.IUnCountedAssociatedMessageList[]|null);
+        commentMessages?: (proto.IWebMessageInfo[]|null);
+        outOfWindowPinnedMessages?: (proto.IWebMessageInfo[]|null);
+    }
+
+    class GroupHistory implements IGroupHistory {
+        constructor(p?: proto.IGroupHistory);
+        public messages: proto.IWebMessageInfo[];
+        public uncountedAssociatedMessageLists: proto.IUnCountedAssociatedMessageList[];
+        public commentMessages: proto.IWebMessageInfo[];
+        public outOfWindowPinnedMessages: proto.IWebMessageInfo[];
+        public static create(properties?: proto.IGroupHistory): proto.GroupHistory;
+        public static encode(m: proto.IGroupHistory, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.GroupHistory;
+        public static fromObject(d: { [k: string]: any }): proto.GroupHistory;
+        public static toObject(m: proto.GroupHistory, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
     interface IGroupMention {
         groupJid?: (string|null);
         groupSubject?: (string|null);

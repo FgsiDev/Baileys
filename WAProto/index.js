@@ -31517,6 +31517,333 @@ export const proto = $root.proto = (() => {
         return GroupHistoryIndividualMessageInfo;
     })();
 
+    proto.UnCountedAssociatedMessageList = (function() {
+
+        function UnCountedAssociatedMessageList(p) {
+            this.messageKeys = [];
+            if (p)
+                for (var ks = Object.keys(p), i = 0; i < ks.length; ++i)
+                    if (p[ks[i]] != null && ks[i] !== "__proto__")
+                        this[ks[i]] = p[ks[i]];
+        }
+
+        UnCountedAssociatedMessageList.prototype.key = null;
+        UnCountedAssociatedMessageList.prototype.messageKeys = $util.emptyArray;
+        UnCountedAssociatedMessageList.prototype.contextId = "";
+
+        UnCountedAssociatedMessageList.create = function create(properties) {
+            return new UnCountedAssociatedMessageList(properties);
+        };
+
+        UnCountedAssociatedMessageList.encode = function encode(m, w) {
+            if (!w)
+                w = $Writer.create();
+            if (m.key != null && Object.hasOwnProperty.call(m, "key"))
+                $root.proto.MessageKey.encode(m.key, w.uint32(10).fork()).ldelim();
+            if (m.messageKeys != null && m.messageKeys.length) {
+                for (var i = 0; i < m.messageKeys.length; ++i)
+                    $root.proto.MessageKey.encode(m.messageKeys[i], w.uint32(18).fork()).ldelim();
+            }
+            if (m.contextId != null && Object.hasOwnProperty.call(m, "contextId"))
+                w.uint32(26).string(m.contextId);
+            return w;
+        };
+
+        UnCountedAssociatedMessageList.decode = function decode(r, l, e, n) {
+            if (!(r instanceof $Reader))
+                r = $Reader.create(r);
+            if (n === undefined)
+                n = 0;
+            if (n > $Reader.recursionLimit)
+                throw Error("maximum nesting depth exceeded");
+            var c = l === undefined ? r.len : r.pos + l, m = new $root.proto.UnCountedAssociatedMessageList();
+            while (r.pos < c) {
+                var t = r.uint32();
+                if (t === e)
+                    break;
+                switch (t >>> 3) {
+                case 1: {
+                        m.key = $root.proto.MessageKey.decode(r, r.uint32(), undefined, n + 1);
+                        break;
+                    }
+                case 2: {
+                        if (!(m.messageKeys && m.messageKeys.length))
+                            m.messageKeys = [];
+                        m.messageKeys.push($root.proto.MessageKey.decode(r, r.uint32(), undefined, n + 1));
+                        break;
+                    }
+                case 3: {
+                        m.contextId = r.string();
+                        break;
+                    }
+                default:
+                    r.skipType(t & 7, n);
+                    break;
+                }
+            }
+            return m;
+        };
+
+        UnCountedAssociatedMessageList.fromObject = function fromObject(d, n) {
+            if (d instanceof $root.proto.UnCountedAssociatedMessageList)
+                return d;
+            if (n === undefined)
+                n = 0;
+            if (n > $util.recursionLimit)
+                throw Error("maximum nesting depth exceeded");
+            var m = new $root.proto.UnCountedAssociatedMessageList();
+            if (d.key != null) {
+                if (typeof d.key !== "object")
+                    throw TypeError(".proto.UnCountedAssociatedMessageList.key: object expected");
+                m.key = $root.proto.MessageKey.fromObject(d.key, n + 1);
+            }
+            if (d.messageKeys) {
+                if (!Array.isArray(d.messageKeys))
+                    throw TypeError(".proto.UnCountedAssociatedMessageList.messageKeys: array expected");
+                m.messageKeys = [];
+                for (var i = 0; i < d.messageKeys.length; ++i) {
+                    if (typeof d.messageKeys[i] !== "object")
+                        throw TypeError(".proto.UnCountedAssociatedMessageList.messageKeys: object expected");
+                    m.messageKeys[i] = $root.proto.MessageKey.fromObject(d.messageKeys[i], n + 1);
+                }
+            }
+            if (d.contextId != null) {
+                m.contextId = String(d.contextId);
+            }
+            return m;
+        };
+
+        UnCountedAssociatedMessageList.toObject = function toObject(m, o) {
+            if (!o)
+                o = {};
+            var d = {};
+            if (o.arrays || o.defaults) {
+                d.messageKeys = [];
+            }
+            if (o.defaults) {
+                d.key = null;
+                d.contextId = "";
+            }
+            if (m.key != null && m.hasOwnProperty("key")) {
+                d.key = $root.proto.MessageKey.toObject(m.key, o);
+            }
+            if (m.messageKeys && m.messageKeys.length) {
+                d.messageKeys = [];
+                for (var j = 0; j < m.messageKeys.length; ++j) {
+                    d.messageKeys[j] = $root.proto.MessageKey.toObject(m.messageKeys[j], o);
+                }
+            }
+            if (m.contextId != null && m.hasOwnProperty("contextId")) {
+                d.contextId = m.contextId;
+            }
+            return d;
+        };
+
+        UnCountedAssociatedMessageList.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        UnCountedAssociatedMessageList.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/proto.UnCountedAssociatedMessageList";
+        };
+
+        return UnCountedAssociatedMessageList;
+    })();
+
+    proto.GroupHistory = (function() {
+
+        function GroupHistory(p) {
+            this.messages = [];
+            this.uncountedAssociatedMessageLists = [];
+            this.commentMessages = [];
+            this.outOfWindowPinnedMessages = [];
+            if (p)
+                for (var ks = Object.keys(p), i = 0; i < ks.length; ++i)
+                    if (p[ks[i]] != null && ks[i] !== "__proto__")
+                        this[ks[i]] = p[ks[i]];
+        }
+
+        GroupHistory.prototype.messages = $util.emptyArray;
+        GroupHistory.prototype.uncountedAssociatedMessageLists = $util.emptyArray;
+        GroupHistory.prototype.commentMessages = $util.emptyArray;
+        GroupHistory.prototype.outOfWindowPinnedMessages = $util.emptyArray;
+
+        GroupHistory.create = function create(properties) {
+            return new GroupHistory(properties);
+        };
+
+        GroupHistory.encode = function encode(m, w) {
+            if (!w)
+                w = $Writer.create();
+            if (m.messages != null && m.messages.length) {
+                for (var i = 0; i < m.messages.length; ++i)
+                    $root.proto.WebMessageInfo.encode(m.messages[i], w.uint32(10).fork()).ldelim();
+            }
+            if (m.uncountedAssociatedMessageLists != null && m.uncountedAssociatedMessageLists.length) {
+                for (var i = 0; i < m.uncountedAssociatedMessageLists.length; ++i)
+                    $root.proto.UnCountedAssociatedMessageList.encode(m.uncountedAssociatedMessageLists[i], w.uint32(18).fork()).ldelim();
+            }
+            if (m.commentMessages != null && m.commentMessages.length) {
+                for (var i = 0; i < m.commentMessages.length; ++i)
+                    $root.proto.WebMessageInfo.encode(m.commentMessages[i], w.uint32(26).fork()).ldelim();
+            }
+            if (m.outOfWindowPinnedMessages != null && m.outOfWindowPinnedMessages.length) {
+                for (var i = 0; i < m.outOfWindowPinnedMessages.length; ++i)
+                    $root.proto.WebMessageInfo.encode(m.outOfWindowPinnedMessages[i], w.uint32(34).fork()).ldelim();
+            }
+            return w;
+        };
+
+        GroupHistory.decode = function decode(r, l, e, n) {
+            if (!(r instanceof $Reader))
+                r = $Reader.create(r);
+            if (n === undefined)
+                n = 0;
+            if (n > $Reader.recursionLimit)
+                throw Error("maximum nesting depth exceeded");
+            var c = l === undefined ? r.len : r.pos + l, m = new $root.proto.GroupHistory();
+            while (r.pos < c) {
+                var t = r.uint32();
+                if (t === e)
+                    break;
+                switch (t >>> 3) {
+                case 1: {
+                        if (!(m.messages && m.messages.length))
+                            m.messages = [];
+                        m.messages.push($root.proto.WebMessageInfo.decode(r, r.uint32(), undefined, n + 1));
+                        break;
+                    }
+                case 2: {
+                        if (!(m.uncountedAssociatedMessageLists && m.uncountedAssociatedMessageLists.length))
+                            m.uncountedAssociatedMessageLists = [];
+                        m.uncountedAssociatedMessageLists.push($root.proto.UnCountedAssociatedMessageList.decode(r, r.uint32(), undefined, n + 1));
+                        break;
+                    }
+                case 3: {
+                        if (!(m.commentMessages && m.commentMessages.length))
+                            m.commentMessages = [];
+                        m.commentMessages.push($root.proto.WebMessageInfo.decode(r, r.uint32(), undefined, n + 1));
+                        break;
+                    }
+                case 4: {
+                        if (!(m.outOfWindowPinnedMessages && m.outOfWindowPinnedMessages.length))
+                            m.outOfWindowPinnedMessages = [];
+                        m.outOfWindowPinnedMessages.push($root.proto.WebMessageInfo.decode(r, r.uint32(), undefined, n + 1));
+                        break;
+                    }
+                default:
+                    r.skipType(t & 7, n);
+                    break;
+                }
+            }
+            return m;
+        };
+
+        GroupHistory.fromObject = function fromObject(d, n) {
+            if (d instanceof $root.proto.GroupHistory)
+                return d;
+            if (n === undefined)
+                n = 0;
+            if (n > $util.recursionLimit)
+                throw Error("maximum nesting depth exceeded");
+            var m = new $root.proto.GroupHistory();
+            if (d.messages) {
+                if (!Array.isArray(d.messages))
+                    throw TypeError(".proto.GroupHistory.messages: array expected");
+                m.messages = [];
+                for (var i = 0; i < d.messages.length; ++i) {
+                    if (typeof d.messages[i] !== "object")
+                        throw TypeError(".proto.GroupHistory.messages: object expected");
+                    m.messages[i] = $root.proto.WebMessageInfo.fromObject(d.messages[i], n + 1);
+                }
+            }
+            if (d.uncountedAssociatedMessageLists) {
+                if (!Array.isArray(d.uncountedAssociatedMessageLists))
+                    throw TypeError(".proto.GroupHistory.uncountedAssociatedMessageLists: array expected");
+                m.uncountedAssociatedMessageLists = [];
+                for (var i = 0; i < d.uncountedAssociatedMessageLists.length; ++i) {
+                    if (typeof d.uncountedAssociatedMessageLists[i] !== "object")
+                        throw TypeError(".proto.GroupHistory.uncountedAssociatedMessageLists: object expected");
+                    m.uncountedAssociatedMessageLists[i] = $root.proto.UnCountedAssociatedMessageList.fromObject(d.uncountedAssociatedMessageLists[i], n + 1);
+                }
+            }
+            if (d.commentMessages) {
+                if (!Array.isArray(d.commentMessages))
+                    throw TypeError(".proto.GroupHistory.commentMessages: array expected");
+                m.commentMessages = [];
+                for (var i = 0; i < d.commentMessages.length; ++i) {
+                    if (typeof d.commentMessages[i] !== "object")
+                        throw TypeError(".proto.GroupHistory.commentMessages: object expected");
+                    m.commentMessages[i] = $root.proto.WebMessageInfo.fromObject(d.commentMessages[i], n + 1);
+                }
+            }
+            if (d.outOfWindowPinnedMessages) {
+                if (!Array.isArray(d.outOfWindowPinnedMessages))
+                    throw TypeError(".proto.GroupHistory.outOfWindowPinnedMessages: array expected");
+                m.outOfWindowPinnedMessages = [];
+                for (var i = 0; i < d.outOfWindowPinnedMessages.length; ++i) {
+                    if (typeof d.outOfWindowPinnedMessages[i] !== "object")
+                        throw TypeError(".proto.GroupHistory.outOfWindowPinnedMessages: object expected");
+                    m.outOfWindowPinnedMessages[i] = $root.proto.WebMessageInfo.fromObject(d.outOfWindowPinnedMessages[i], n + 1);
+                }
+            }
+            return m;
+        };
+
+        GroupHistory.toObject = function toObject(m, o) {
+            if (!o)
+                o = {};
+            var d = {};
+            if (o.arrays || o.defaults) {
+                d.messages = [];
+                d.uncountedAssociatedMessageLists = [];
+                d.commentMessages = [];
+                d.outOfWindowPinnedMessages = [];
+            }
+            if (m.messages && m.messages.length) {
+                d.messages = [];
+                for (var j = 0; j < m.messages.length; ++j) {
+                    d.messages[j] = $root.proto.WebMessageInfo.toObject(m.messages[j], o);
+                }
+            }
+            if (m.uncountedAssociatedMessageLists && m.uncountedAssociatedMessageLists.length) {
+                d.uncountedAssociatedMessageLists = [];
+                for (var j = 0; j < m.uncountedAssociatedMessageLists.length; ++j) {
+                    d.uncountedAssociatedMessageLists[j] = $root.proto.UnCountedAssociatedMessageList.toObject(m.uncountedAssociatedMessageLists[j], o);
+                }
+            }
+            if (m.commentMessages && m.commentMessages.length) {
+                d.commentMessages = [];
+                for (var j = 0; j < m.commentMessages.length; ++j) {
+                    d.commentMessages[j] = $root.proto.WebMessageInfo.toObject(m.commentMessages[j], o);
+                }
+            }
+            if (m.outOfWindowPinnedMessages && m.outOfWindowPinnedMessages.length) {
+                d.outOfWindowPinnedMessages = [];
+                for (var j = 0; j < m.outOfWindowPinnedMessages.length; ++j) {
+                    d.outOfWindowPinnedMessages[j] = $root.proto.WebMessageInfo.toObject(m.outOfWindowPinnedMessages[j], o);
+                }
+            }
+            return d;
+        };
+
+        GroupHistory.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        GroupHistory.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/proto.GroupHistory";
+        };
+
+        return GroupHistory;
+    })();
+
     proto.GroupMention = (function() {
 
         function GroupMention(p) {

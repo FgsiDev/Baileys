@@ -2083,6 +2083,19 @@ message GroupHistoryIndividualMessageInfo {
     optional bool editedAfterReceivedAsHistory = 2;
 }
 
+message UnCountedAssociatedMessageList {
+    optional MessageKey key = 1;
+    repeated MessageKey messageKeys = 2;
+    optional string contextId = 3;
+}
+
+message GroupHistory {
+    repeated WebMessageInfo messages = 1;
+    repeated UnCountedAssociatedMessageList uncountedAssociatedMessageLists = 2;
+    repeated WebMessageInfo commentMessages = 3;
+    repeated WebMessageInfo outOfWindowPinnedMessages = 4;
+}
+
 message GroupMention {
     optional string groupJid = 1;
     optional string groupSubject = 2;

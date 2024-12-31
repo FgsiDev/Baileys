@@ -32,8 +32,15 @@ import {
 	MessageRetryManager,
 	normalizeMessageContent,
 	parseAndInjectE2ESessions,
-	unixTimestampSeconds
+	unixTimestampSeconds,
+	encryptedStream
 } from '../Utils'
+import {
+	encodeGroupHistoryBundle,
+	type WaGroupHistoryAudience,
+	type WaShareGroupHistoryInput,
+	type WaShareGroupHistoryResult
+} from '../Utils/group-history'
 import { setBotMessageSecret } from '../Utils/decode-wa-message'
 import { getUrlInfo } from '../Utils/link-preview'
 import { makeKeyedMutex } from '../Utils/make-mutex'
@@ -1343,6 +1350,69 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 			// decrypted even if they arrive before our own message echo comes back.
 			setBotMessageSecret(msgId, messageSecret, jid)
 			return msgId
+		},
+		shareGroupHistory: async (
+			groupJid: string,
+			input: WaShareGroupHistoryInput
+		): Promise<WaShareGroupHistoryResult> => {
+			if (!isJidGroup(groupJid)) {
+				throw new Error(`shareGroupHistory requires a group jid: ${groupJid}`)
+			}
+			if (!input.toJids.length) {
+				throw new Error('shareGroupHistory requires at least one recipient')
+			}
+			if (!input.messages?.length) {
+				throw new Error('shareGroupHistory requires `messages` to share')
+			}
+
+			const historyReceivers = input.toJids.map(jid => jidNormalizedUser(jid))
+
+			// encode + upload
+			const { compressed } = await encodeGroupHistoryBundle(input.messages, input.outOfWindowPinnedMessages)
+			const mediaType = 'md-msg-hist' as any
+			const { mediaKey, encFilePath, fileEncSha256, fileSha256 } = await encryptedStream(compressed, mediaType, {
+				logger
+			})
+			const upload = await waUploadToServer(encFilePath, {
+				mediaType,
+				fileEncSha256B64: fileEncSha256.toString('base64')
+			})
+
+			const metadataProto: proto.Message.IMessageHistoryMetadata = {
+				historyReceivers,
+				messageCount: input.messages.length
+			}
+
+			// send history bundle
+			const bundleMsgId = await relayMessage(groupJid, {
+				messageHistoryBundle: {
+					mimetype: 'application/protobuf',
+					fileSha256,
+					fileEncSha256,
+					mediaKey,
+					directPath: upload.directPath,
+					mediaKeyTimestamp: Math.floor(Date.now() / 1000),
+					messageHistoryMetadata: metadataProto
+				}
+			})
+
+			// send history notice
+			let noticeMessageId: string | undefined
+			try {
+				noticeMessageId = await relayMessage(groupJid, {
+					messageHistoryNotice: { messageHistoryMetadata: metadataProto }
+				})
+			} catch (error: any) {
+				logger.warn({ error, groupJid }, 'group history notice failed after bundle delivered')
+			}
+
+			return {
+				bundleMessageId: bundleMsgId,
+				noticeMessageId,
+				messagesCount: input.messages.length,
+				historyReceivers,
+				nonHistoryReceivers: []
+			}
 		}
 	}
 }
