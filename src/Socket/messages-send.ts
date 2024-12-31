@@ -1000,9 +1000,6 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 			message.pollCreationMessage ||
 			message.pollCreationMessageV2 ||
 			message.pollCreationMessageV3 ||
-			message.pollCreationMessageV4 ||
-			message.pollCreationMessageV5 ||
-			message.pollCreationMessageV6 ||
 			message.pollUpdateMessage
 		) {
 			return 'poll'
@@ -1032,9 +1029,10 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 			return 'document'
 		} else if (message.contactsArrayMessage) {
 			return 'contact_array'
-		} else if (message.liveLocationMessage) {
-			return 'livelocation'
 		} else if (message.stickerMessage) {
+			/*if (message.liveLocationMessage) {
+	    		return 'livelocation'
+	      	} else*/
 			return message.stickerMessage.isLottie
 				? '1p_sticker'
 				: message.stickerMessage.isAvatar
@@ -1236,7 +1234,10 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				// required for delete
 				if (isDeleteMsg) {
 					// if the chat is a group, and I am not the author, then delete the message as an admin
-					if (isJidGroup(content.delete?.remoteJid as string) && !content.delete?.fromMe) {
+					if (
+						(isJidGroup(content.delete?.remoteJid as string) && !content.delete?.fromMe) ||
+						(isNewsletter && content.delete?.fromMe)
+					) {
 						additionalAttributes.edit = '8'
 					} else {
 						additionalAttributes.edit = '7'
