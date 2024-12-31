@@ -598,8 +598,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 			useUserDevicesCache,
 			useCachedGroupMetadata,
 			statusJidList,
-			restrictedGroupTargets,
-			forceBot
+			restrictedGroupTargets
 		}: MessageRelayOptions
 	) => {
 		const meId = authState.creds.me!.id
@@ -959,17 +958,10 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 								: jidEncode(jidDecode(meId)?.user!, 's.whatsapp.net', undefined)
 
 						// Enumerate devices for sender and target with consistent addressing
+						// (Meta AI / @bot device 0 is injected by getUSyncDevices itself)
 						const sessionDevices = await getUSyncDevices([senderIdentity, jid], true, false)
 						devices.push(...sessionDevices)
 
-						// For bot JIDs, add bot device directly since getUSyncDevices doesnt resolve @bot
-						if (isJidMetaAI(jid) || forceBot) {
-							devices.push({
-								user,
-								device: 0,
-								jid: jidEncode(user, 'bot', 0)
-							})
-						}
 						logger.debug(
 							{
 								deviceCount: devices.length,
