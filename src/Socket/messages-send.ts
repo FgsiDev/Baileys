@@ -1353,7 +1353,8 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 		},
 		shareGroupHistory: async (
 			groupJid: string,
-			input: WaShareGroupHistoryInput
+			input: WaShareGroupHistoryInput,
+			options: MiscMessageGenerationOptions = {}
 		): Promise<WaShareGroupHistoryResult> => {
 			if (!isJidGroup(groupJid)) {
 				throw new Error(`shareGroupHistory requires a group jid: ${groupJid}`)
@@ -1384,24 +1385,32 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 			}
 
 			// send history bundle
-			const bundleMsgId = await relayMessage(groupJid, {
-				messageHistoryBundle: {
-					mimetype: 'application/protobuf',
-					fileSha256,
-					fileEncSha256,
-					mediaKey,
-					directPath: upload.directPath,
-					mediaKeyTimestamp: Math.floor(Date.now() / 1000),
-					messageHistoryMetadata: metadataProto
-				}
-			})
+			const bundleMsgId = await relayMessage(
+				groupJid,
+				{
+					messageHistoryBundle: {
+						mimetype: 'application/protobuf',
+						fileSha256,
+						fileEncSha256,
+						mediaKey,
+						directPath: upload.directPath,
+						mediaKeyTimestamp: Math.floor(Date.now() / 1000),
+						messageHistoryMetadata: metadataProto
+					}
+				},
+				options
+			)
 
 			// send history notice
 			let noticeMessageId: string | undefined
 			try {
-				noticeMessageId = await relayMessage(groupJid, {
-					messageHistoryNotice: { messageHistoryMetadata: metadataProto }
-				})
+				noticeMessageId = await relayMessage(
+					groupJid,
+					{
+						messageHistoryNotice: { messageHistoryMetadata: metadataProto }
+					},
+					options
+				)
 			} catch (error: any) {
 				logger.warn({ error, groupJid }, 'group history notice failed after bundle delivered')
 			}
