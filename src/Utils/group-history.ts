@@ -43,6 +43,7 @@ export interface WaGroupHistoryAudience {
 export interface WaShareGroupHistoryInput {
 	toJids?: string[]
 	forceSkip?: boolean
+	sendNotice?: boolean
 	count?: number
 	sinceMs?: number
 	messages?: proto.IWebMessageInfo[]

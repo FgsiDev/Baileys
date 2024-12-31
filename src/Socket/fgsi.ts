@@ -254,23 +254,25 @@ export const makeFgsiSocket = (config: SocketConfig) => {
 			)
 
 			let noticeMessageId: string | undefined
-			try {
-				noticeMessageId = await relayMessage(
-					groupJid,
-					{
-						messageHistoryNotice: { messageHistoryMetadata: metadataProto }
-					},
-					{
-						additionalNodes: [
-							{
-								tag: 'meta',
-								attrs: { appdata: 'group_history' }
-							} as BinaryNode
-						]
-					}
-				)
-			} catch (error: any) {
-				logger.warn({ error, groupJid }, 'group history notice failed after bundle delivered')
+			if (input.sendNotice !== false) {
+				try {
+					noticeMessageId = await relayMessage(
+						groupJid,
+						{
+							messageHistoryNotice: { messageHistoryMetadata: metadataProto }
+						},
+						{
+							additionalNodes: [
+								{
+									tag: 'meta',
+									attrs: { appdata: 'group_history' }
+								} as BinaryNode
+							]
+						}
+					)
+				} catch (error: any) {
+					logger.warn({ error, groupJid }, 'group history notice failed after bundle delivered')
+				}
 			}
 
 			logger.debug(
