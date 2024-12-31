@@ -125,8 +125,8 @@ export const isRealMessage = (message: WAMessage) => {
 export const shouldIncrementChatUnread = (message: WAMessage) => !message.key.fromMe && !message.messageStubType
 
 /**
- * Get the ID of the chat from the given key.  
- * Typically -- that'll be the remoteJid, but for broadcasts, it'll be the participant  
+ * Get the ID of the chat from the given key.
+ * Typically -- that'll be the remoteJid, but for broadcasts, it'll be the participant
  */
 export const getChatId = ({ remoteJid, participant, fromMe }: WAMessageKey) => {
 	if (isJidBroadcast(remoteJid!) && !isJidStatusBroadcast(remoteJid!) && !fromMe) {
@@ -187,10 +187,10 @@ type MessageKeyWithAlt = WAMessageKey & {
 }
 
 /**
- * Decrypt a poll vote  
- * @param vote encrypted vote  
- * @param ctx additional info about the poll required for decryption  
- * @returns list of SHA256 options  
+ * Decrypt a poll vote
+ * @param vote encrypted vote
+ * @param ctx additional info about the poll required for decryption
+ * @returns list of SHA256 options
  */
 export function decryptPollVote(
 	{ encPayload, encIv }: proto.Message.IPollEncValue,
@@ -217,10 +217,10 @@ export function decryptPollVote(
 }
 
 /**
- * Decrypt an event response  
- * @param response encrypted event response  
- * @param ctx additional info about the event required for decryption  
- * @returns event response message  
+ * Decrypt an event response
+ * @param response encrypted event response
+ * @param ctx additional info about the event required for decryption
+ * @returns event response message
  */
 export function decryptEventResponse(
 	{ encPayload, encIv }: proto.Message.IPollEncValue,
@@ -247,10 +247,10 @@ export function decryptEventResponse(
 }
 
 /**
- * Decrypt a message edit  
- * @param message encrypted message edit payload  
- * @param ctx additional info required for decryption  
- * @returns decrypted message  
+ * Decrypt a message edit
+ * @param message encrypted message edit payload
+ * @param ctx additional info required for decryption
+ * @returns decrypted message
  */
 export function decryptMessageEdit(
 	{ encPayload, encIv }: proto.Message.IPollEncValue,

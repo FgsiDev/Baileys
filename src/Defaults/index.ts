@@ -161,7 +161,8 @@ export const MEDIA_HKDF_KEY_MAPPING: Record<string, string> = {
 	db: 'Document',
 	'biz-flows': 'Image',
 	'wamo-image': 'Image',
-	'wamo-video': 'Video'
+	'wamo-video': 'Video',
+	'voip-token': 'Voip Token'
 }
 
 export type MediaType = keyof typeof MEDIA_HKDF_KEY_MAPPING
