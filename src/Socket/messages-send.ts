@@ -1820,7 +1820,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 			const oldestInWindowOrNow = oldestInWindow ?? unixTimestampSeconds()
 			const metadataProto: proto.Message.IMessageHistoryMetadata = {
 				historyReceivers: audience.historyReceivers,
-				nonHistoryReceivers: audience.nonHistoryReceivers,
+				nonHistoryReceivers: [], //audience.nonHistoryReceivers,
 				messageCount: input.messages.length,
 				oldestMessageTimestampInWindow: oldestInWindowOrNow,
 				oldestMessageTimestampInBundle: oldestInBundle ?? oldestInWindowOrNow,
