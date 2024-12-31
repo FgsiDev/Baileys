@@ -5,11 +5,11 @@ here because `lib/Voip/` runs that engine to place and join calls; nothing in
 this directory was written, generated, minified, packed or encrypted by this
 project.
 
-| File                | Size        | SHA-256                                                            |
-| ------------------- | ----------- | ------------------------------------------------------------------ |
-| `whatsapp.wasm`     | 9 819 554 B | `5f1350997c0bf3213782a7bdd3c846529d328552bfa7b87f10224f021346ce35` |
-| `loader.js`         | 155 436 B   | `f26ed41f30313d790b3022476b7e88c6d99941909c30d0a35c15619d98826bad` |
-| `worker-modules.js` | 826 071 B   | `4f52cd02c8310a19820176362d292687b02c4a9cf81cc78fbf8e5cc4a28f4e99` |
+| File | Size | SHA-256 |
+|---|---|---|
+| `whatsapp.wasm` | 9 819 554 B | `5f1350997c0bf3213782a7bdd3c846529d328552bfa7b87f10224f021346ce35` |
+| `loader.js` | 155 436 B | `f26ed41f30313d790b3022476b7e88c6d99941909c30d0a35c15619d98826bad` |
+| `worker-modules.js` | 826 071 B | `4f52cd02c8310a19820176362d292687b02c4a9cf81cc78fbf8e5cc4a28f4e99` |
 
 Verify with `sha256sum lib/assets/wasm/*`.
 
@@ -29,7 +29,7 @@ checkable:
   legal links (`emscripten.org`, `facebook.com/legal/...`).
 - **The WASM cannot reach the network.** Its imports are 216 `env` callbacks
   and 7 `wasi_snapshot_preview1` entries. The two that carry traffic —
-  `sendSignalingXMPP_js_sync` and `call_sendto` — are calls _into_ JavaScript:
+  `sendSignalingXMPP_js_sync` and `call_sendto` — are calls *into* JavaScript:
   the module hands bytes to `lib/Voip/signaling.js` and
   `lib/Voip/relay-transport.js`, which send them over the WhatsApp socket the
   bot already authenticated. The module opens no socket itself.
