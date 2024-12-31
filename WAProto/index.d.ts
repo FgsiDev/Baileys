@@ -2,6 +2,28 @@ import * as $protobuf from "protobufjs";
 import Long = require("long");
 export namespace proto {
 
+    interface IACP2Setting {
+        enabled?: (boolean|null);
+        trigger?: (proto.LimitSharing.TriggerType|null);
+        settingTimestamp?: (number|Long|null);
+        initiatedByMe?: (boolean|null);
+    }
+
+    class ACP2Setting implements IACP2Setting {
+        constructor(p?: proto.IACP2Setting);
+        public enabled: boolean;
+        public trigger: proto.LimitSharing.TriggerType;
+        public settingTimestamp: (number|Long);
+        public initiatedByMe: boolean;
+        public static create(properties?: proto.IACP2Setting): proto.ACP2Setting;
+        public static encode(m: proto.IACP2Setting, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.ACP2Setting;
+        public static fromObject(d: { [k: string]: any }): proto.ACP2Setting;
+        public static toObject(m: proto.ACP2Setting, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
     interface IADVDeviceIdentity {
         rawId?: (number|null);
         timestamp?: (number|Long|null);
@@ -223,11 +245,13 @@ export namespace proto {
 
     interface IAIMetadataOperation {
         hatchMetadataSync?: (proto.IHatchMetadataSync|null);
+        bizAiMetadataSync?: (proto.IBizAIMetadataSync|null);
     }
 
     class AIMetadataOperation implements IAIMetadataOperation {
         constructor(p?: proto.IAIMetadataOperation);
         public hatchMetadataSync?: (proto.IHatchMetadataSync|null);
+        public bizAiMetadataSync?: (proto.IBizAIMetadataSync|null);
         public static create(properties?: proto.IAIMetadataOperation): proto.AIMetadataOperation;
         public static encode(m: proto.IAIMetadataOperation, w?: $protobuf.Writer): $protobuf.Writer;
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.AIMetadataOperation;
@@ -638,6 +662,7 @@ export namespace proto {
         submessages?: (proto.IAIRichResponseSubMessage[]|null);
         unifiedResponse?: (proto.IAIRichResponseUnifiedResponse|null);
         contextInfo?: (proto.IContextInfo|null);
+        originalRecipientMetadata?: (proto.IAIRichResponseUnifiedResponse|null);
     }
 
     class AIRichResponseMessage implements IAIRichResponseMessage {
@@ -646,6 +671,7 @@ export namespace proto {
         public submessages: proto.IAIRichResponseSubMessage[];
         public unifiedResponse?: (proto.IAIRichResponseUnifiedResponse|null);
         public contextInfo?: (proto.IContextInfo|null);
+        public originalRecipientMetadata?: (proto.IAIRichResponseUnifiedResponse|null);
         public static create(properties?: proto.IAIRichResponseMessage): proto.AIRichResponseMessage;
         public static encode(m: proto.IAIRichResponseMessage, w?: $protobuf.Writer): $protobuf.Writer;
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.AIRichResponseMessage;
@@ -829,7 +855,8 @@ export namespace proto {
                 UNKNOWN = 0,
                 DEFAULT = 1,
                 INCOGNITO = 2,
-                SIDE_CHAT = 3
+                SIDE_CHAT = 3,
+                PRIVATE_SEARCH_CHAT = 4
             }
         }
 
@@ -868,6 +895,28 @@ export namespace proto {
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.Account;
         public static fromObject(d: { [k: string]: any }): proto.Account;
         public static toObject(m: proto.Account, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IAccountLinkingOpaqueData {
+        accesstoken?: (string|null);
+        fbid?: (string|null);
+        nonce?: (string|null);
+        encryptedPassword?: (string|null);
+    }
+
+    class AccountLinkingOpaqueData implements IAccountLinkingOpaqueData {
+        constructor(p?: proto.IAccountLinkingOpaqueData);
+        public accesstoken: string;
+        public fbid: string;
+        public nonce: string;
+        public encryptedPassword: string;
+        public static create(properties?: proto.IAccountLinkingOpaqueData): proto.AccountLinkingOpaqueData;
+        public static encode(m: proto.IAccountLinkingOpaqueData, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.AccountLinkingOpaqueData;
+        public static fromObject(d: { [k: string]: any }): proto.AccountLinkingOpaqueData;
+        public static toObject(m: proto.AccountLinkingOpaqueData, o?: $protobuf.IConversionOptions): { [k: string]: any };
         public toJSON(): { [k: string]: any };
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
@@ -928,6 +977,69 @@ export namespace proto {
         public static toObject(m: proto.AvatarUserSettings, o?: $protobuf.IConversionOptions): { [k: string]: any };
         public toJSON(): { [k: string]: any };
         public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IBizAIMetadataSync {
+        serverEvent?: (proto.BizAIMetadataSync.IServerEvent|null);
+    }
+
+    class BizAIMetadataSync implements IBizAIMetadataSync {
+        constructor(p?: proto.IBizAIMetadataSync);
+        public serverEvent?: (proto.BizAIMetadataSync.IServerEvent|null);
+        public operation?: "serverEvent";
+        public static create(properties?: proto.IBizAIMetadataSync): proto.BizAIMetadataSync;
+        public static encode(m: proto.IBizAIMetadataSync, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.BizAIMetadataSync;
+        public static fromObject(d: { [k: string]: any }): proto.BizAIMetadataSync;
+        public static toObject(m: proto.BizAIMetadataSync, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    namespace BizAIMetadataSync {
+
+        interface IServerEvent {
+            protocolEvent?: (proto.BizAIMetadataSync.ServerEvent.ProtocolEvent|null);
+            agentOnboardingStarted?: (proto.BizAIMetadataSync.ServerEvent.IAgentOnboardingStarted|null);
+        }
+
+        class ServerEvent implements IServerEvent {
+            constructor(p?: proto.BizAIMetadataSync.IServerEvent);
+            public protocolEvent?: (proto.BizAIMetadataSync.ServerEvent.ProtocolEvent|null);
+            public agentOnboardingStarted?: (proto.BizAIMetadataSync.ServerEvent.IAgentOnboardingStarted|null);
+            public event?: ("protocolEvent"|"agentOnboardingStarted");
+            public static create(properties?: proto.BizAIMetadataSync.IServerEvent): proto.BizAIMetadataSync.ServerEvent;
+            public static encode(m: proto.BizAIMetadataSync.IServerEvent, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.BizAIMetadataSync.ServerEvent;
+            public static fromObject(d: { [k: string]: any }): proto.BizAIMetadataSync.ServerEvent;
+            public static toObject(m: proto.BizAIMetadataSync.ServerEvent, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        namespace ServerEvent {
+
+            interface IAgentOnboardingStarted {
+                composerBlockDurationSecs?: (number|Long|null);
+            }
+
+            class AgentOnboardingStarted implements IAgentOnboardingStarted {
+                constructor(p?: proto.BizAIMetadataSync.ServerEvent.IAgentOnboardingStarted);
+                public composerBlockDurationSecs: (number|Long);
+                public static create(properties?: proto.BizAIMetadataSync.ServerEvent.IAgentOnboardingStarted): proto.BizAIMetadataSync.ServerEvent.AgentOnboardingStarted;
+                public static encode(m: proto.BizAIMetadataSync.ServerEvent.IAgentOnboardingStarted, w?: $protobuf.Writer): $protobuf.Writer;
+                public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.BizAIMetadataSync.ServerEvent.AgentOnboardingStarted;
+                public static fromObject(d: { [k: string]: any }): proto.BizAIMetadataSync.ServerEvent.AgentOnboardingStarted;
+                public static toObject(m: proto.BizAIMetadataSync.ServerEvent.AgentOnboardingStarted, o?: $protobuf.IConversionOptions): { [k: string]: any };
+                public toJSON(): { [k: string]: any };
+                public static getTypeUrl(typeUrlPrefix?: string): string;
+            }
+
+            enum ProtocolEvent {
+                UNSPECIFIED = 0,
+                AGENT_CHAT_READY = 1
+            }
+        }
     }
 
     interface IBizAccountLinkInfo {
@@ -1183,7 +1295,19 @@ export namespace proto {
             RICH_RESPONSE_SPORTS_WIDGET_ENABLED = 66,
             AI_RICH_RESPONSE_ARTIFACTS_ENABLED = 67,
             AI_RICH_RESPONSE_EMAIL_CALENDAR_ENABLED = 68,
-            AI_RICH_RESPONSE_REMINDERS_ENABLED = 69
+            AI_RICH_RESPONSE_REMINDERS_ENABLED = 69,
+            AI_STOP_GENERATION_ENABLED = 70,
+            AI_RICH_RESPONSE_3P_LINKING_CARD_ENABLED = 71,
+            HATCH_NOTIFICATION_METADATA_EVENT_ENABLED = 72,
+            AI_SUGGESTED_REPLIES_ENABLED = 73,
+            RICH_RESPONSE_IN_APP_SURVEY_BLOKS = 74,
+            RICH_RESPONSE_IMAGE_SOURCE_ATTRIBUTION = 75,
+            HATCH_CONNECTOR_ACTION_CARD_ENABLED = 76,
+            HATCH_SECURE_CREDENTIAL_CARD_ENABLED = 77,
+            HATCH_BROWSER_TASK_CARD_ENABLED = 78,
+            HATCH_ARTIFACT_CARD_ENABLED = 79,
+            AI_STUDY_CENTER_ENABLED = 80,
+            AI_MUSE_JARVIS_SCHEMA_ENABLED = 81
         }
     }
 
@@ -1812,6 +1936,7 @@ export namespace proto {
         subscriptionUpsellMetadata?: (proto.IAISubscriptionUpsellMetadata|null);
         pttPromptMetadata?: (proto.IBotPttPromptMetadata|null);
         botHistoryShareMetadata?: (proto.IBotHistoryShareMetadata|null);
+        responseStoppedByUser?: (boolean|null);
         internalMetadata?: (Uint8Array|null);
     }
 
@@ -1859,6 +1984,7 @@ export namespace proto {
         public subscriptionUpsellMetadata?: (proto.IAISubscriptionUpsellMetadata|null);
         public pttPromptMetadata?: (proto.IBotPttPromptMetadata|null);
         public botHistoryShareMetadata?: (proto.IBotHistoryShareMetadata|null);
+        public responseStoppedByUser: boolean;
         public internalMetadata: Uint8Array;
         public static create(properties?: proto.IBotMetadata): proto.BotMetadata;
         public static encode(m: proto.IBotMetadata, w?: $protobuf.Writer): $protobuf.Writer;
@@ -1918,7 +2044,8 @@ export namespace proto {
         GROUP_MEMBER = 54,
         CHATLIST_SEARCH = 55,
         NEW_CHAT_LIST = 56,
-        CONTACTS_TAB = 57
+        CONTACTS_TAB = 57,
+        NEW_3P_AGENT_CREATION = 58
     }
 
     interface IBotMetricsMetadata {
@@ -2681,6 +2808,13 @@ export namespace proto {
         }
     }
 
+    enum COMMAND_COMMAND_TYPE {
+        EVERYONE = 1,
+        SILENT = 2,
+        AI = 3,
+        AI_IMAGINE = 4
+    }
+
     interface ICallLogRecord {
         callResult?: (proto.CallLogRecord.CallResult|null);
         isDndMode?: (boolean|null);
@@ -2747,15 +2881,33 @@ export namespace proto {
             VOICE_CHAT = 2
         }
 
+        interface IGuestInfo {
+            pushName?: (string|null);
+        }
+
+        class GuestInfo implements IGuestInfo {
+            constructor(p?: proto.CallLogRecord.IGuestInfo);
+            public pushName: string;
+            public static create(properties?: proto.CallLogRecord.IGuestInfo): proto.CallLogRecord.GuestInfo;
+            public static encode(m: proto.CallLogRecord.IGuestInfo, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.CallLogRecord.GuestInfo;
+            public static fromObject(d: { [k: string]: any }): proto.CallLogRecord.GuestInfo;
+            public static toObject(m: proto.CallLogRecord.GuestInfo, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
         interface IParticipantInfo {
             userJid?: (string|null);
             callResult?: (proto.CallLogRecord.CallResult|null);
+            guestInfo?: (proto.CallLogRecord.IGuestInfo|null);
         }
 
         class ParticipantInfo implements IParticipantInfo {
             constructor(p?: proto.CallLogRecord.IParticipantInfo);
             public userJid: string;
             public callResult: proto.CallLogRecord.CallResult;
+            public guestInfo?: (proto.CallLogRecord.IGuestInfo|null);
             public static create(properties?: proto.CallLogRecord.IParticipantInfo): proto.CallLogRecord.ParticipantInfo;
             public static encode(m: proto.CallLogRecord.IParticipantInfo, w?: $protobuf.Writer): $protobuf.Writer;
             public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.CallLogRecord.ParticipantInfo;
@@ -3000,6 +3152,7 @@ export namespace proto {
         isSyncdSnapshotRecoveryEnabled?: (boolean|null);
         isHsThumbnailSyncEnabled?: (boolean|null);
         subscriptionSyncPayload?: (Uint8Array|null);
+        isBotJidDbMigrated?: (boolean|null);
     }
 
     class ClientPairingProps implements IClientPairingProps {
@@ -3009,6 +3162,7 @@ export namespace proto {
         public isSyncdSnapshotRecoveryEnabled: boolean;
         public isHsThumbnailSyncEnabled: boolean;
         public subscriptionSyncPayload: Uint8Array;
+        public isBotJidDbMigrated: boolean;
         public static create(properties?: proto.IClientPairingProps): proto.ClientPairingProps;
         public static encode(m: proto.IClientPairingProps, w?: $protobuf.Writer): $protobuf.Writer;
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.ClientPairingProps;
@@ -3055,6 +3209,7 @@ export namespace proto {
         processingQueueSize?: (number|null);
         pairedPeripherals?: (string[]|null);
         testIsolationId?: (Uint8Array|null);
+        messageSts?: (number|Long|null);
     }
 
     class ClientPayload implements IClientPayload {
@@ -3095,6 +3250,7 @@ export namespace proto {
         public processingQueueSize: number;
         public pairedPeripherals: string[];
         public testIsolationId: Uint8Array;
+        public messageSts: (number|Long);
         public static create(properties?: proto.IClientPayload): proto.ClientPayload;
         public static encode(m: proto.IClientPayload, w?: $protobuf.Writer): $protobuf.Writer;
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.ClientPayload;
@@ -3368,7 +3524,9 @@ export namespace proto {
                 SMART_GLASSES = 35,
                 BLUE_VR = 36,
                 AR_WRIST = 37,
-                WAIL = 38
+                WAIL = 38,
+                WORK_ANDROID = 39,
+                WORK_IOS = 40
             }
 
             enum ReleaseChannel {
@@ -3522,6 +3680,48 @@ export namespace proto {
         CRITICAL_UNBLOCK_LOW = 5
     }
 
+    interface ICombinedFingerprint {
+        version?: (number|null);
+        localFingerprint?: (proto.IFingerprintData|null);
+        remoteFingerprint?: (proto.IFingerprintData|null);
+    }
+
+    class CombinedFingerprint implements ICombinedFingerprint {
+        constructor(p?: proto.ICombinedFingerprint);
+        public version: number;
+        public localFingerprint?: (proto.IFingerprintData|null);
+        public remoteFingerprint?: (proto.IFingerprintData|null);
+        public static create(properties?: proto.ICombinedFingerprint): proto.CombinedFingerprint;
+        public static encode(m: proto.ICombinedFingerprint, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.CombinedFingerprint;
+        public static fromObject(d: { [k: string]: any }): proto.CombinedFingerprint;
+        public static toObject(m: proto.CombinedFingerprint, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface ICommand {
+        commandType?: (proto.COMMAND_COMMAND_TYPE|null);
+        offset?: (number|null);
+        length?: (number|null);
+        validationToken?: (string|null);
+    }
+
+    class Command implements ICommand {
+        constructor(p?: proto.ICommand);
+        public commandType: proto.COMMAND_COMMAND_TYPE;
+        public offset: number;
+        public length: number;
+        public validationToken: string;
+        public static create(properties?: proto.ICommand): proto.Command;
+        public static encode(m: proto.ICommand, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.Command;
+        public static fromObject(d: { [k: string]: any }): proto.Command;
+        public static toObject(m: proto.Command, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
     interface ICommentMetadata {
         commentParentKey?: (proto.IMessageKey|null);
         replyCount?: (number|null);
@@ -3659,6 +3859,8 @@ export namespace proto {
         posterStatusId?: (string|null);
         instagramThreadLink?: (proto.ContextInfo.IInstagramThreadLink|null);
         aiProvenance?: (proto.IAIProvenance|null);
+        experienceIds?: (number[]|null);
+        partnerDeepLinkToken?: (string|null);
     }
 
     class ContextInfo implements IContextInfo {
@@ -3727,6 +3929,8 @@ export namespace proto {
         public posterStatusId: string;
         public instagramThreadLink?: (proto.ContextInfo.IInstagramThreadLink|null);
         public aiProvenance?: (proto.IAIProvenance|null);
+        public experienceIds: number[];
+        public partnerDeepLinkToken: string;
         public static create(properties?: proto.IContextInfo): proto.ContextInfo;
         public static encode(m: proto.IContextInfo, w?: $protobuf.Writer): $protobuf.Writer;
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.ContextInfo;
@@ -3990,6 +4194,15 @@ export namespace proto {
             agmTitleStrategy?: (number|null);
             agmSubtitleStrategy?: (number|null);
             agmHeaderInteractionStrategy?: (number|null);
+            containsCtwaFlowsAutoLabel?: (boolean|null);
+            productId?: (string|null);
+            containsCtwaPromo?: (boolean|null);
+            ctwaPromoResponseId?: (string|null);
+            ctwaPromoOfferId?: (string|null);
+            ctwaPromoAdEntryId?: (string|null);
+            ctwaPromoResponseExpiresAtSeconds?: (number|Long|null);
+            ctwaPromoSchemaVersion?: (number|null);
+            ctwaPromoAdgroupId?: (string|null);
         }
 
         class ExternalAdReplyInfo implements IExternalAdReplyInfo {
@@ -4026,6 +4239,15 @@ export namespace proto {
             public agmTitleStrategy: number;
             public agmSubtitleStrategy: number;
             public agmHeaderInteractionStrategy: number;
+            public containsCtwaFlowsAutoLabel: boolean;
+            public productId: string;
+            public containsCtwaPromo: boolean;
+            public ctwaPromoResponseId: string;
+            public ctwaPromoOfferId: string;
+            public ctwaPromoAdEntryId: string;
+            public ctwaPromoResponseExpiresAtSeconds: (number|Long);
+            public ctwaPromoSchemaVersion: number;
+            public ctwaPromoAdgroupId: string;
             public static create(properties?: proto.ContextInfo.IExternalAdReplyInfo): proto.ContextInfo.ExternalAdReplyInfo;
             public static encode(m: proto.ContextInfo.IExternalAdReplyInfo, w?: $protobuf.Writer): $protobuf.Writer;
             public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.ContextInfo.ExternalAdReplyInfo;
@@ -4142,7 +4364,11 @@ export namespace proto {
             MOTION_PHOTO_PARENT = 5,
             MOTION_PHOTO_CHILD = 6,
             HEVC_VIDEO_PARENT = 7,
-            HEVC_VIDEO_CHILD = 8
+            HEVC_VIDEO_CHILD = 8,
+            AV1_VIDEO_PARENT = 9,
+            AV1_VIDEO_CHILD = 10,
+            STREAMED_VIDEO_PARENT = 11,
+            STREAMED_VIDEO_CHILD = 12
         }
 
         interface IPartiallySelectedContent {
@@ -4314,6 +4540,8 @@ export namespace proto {
         authAgentParentCompanyName?: (string|null);
         authAgentObaPhoneNumber?: (string|null);
         identityVerification?: (proto.IIdentityVerificationState|null);
+        acp2Setting?: (proto.IACP2Setting|null);
+        acp2HistoryWithheld?: (boolean|null);
     }
 
     class Conversation implements IConversation {
@@ -4381,6 +4609,8 @@ export namespace proto {
         public authAgentParentCompanyName: string;
         public authAgentObaPhoneNumber: string;
         public identityVerification?: (proto.IIdentityVerificationState|null);
+        public acp2Setting?: (proto.IACP2Setting|null);
+        public acp2HistoryWithheld: boolean;
         public static create(properties?: proto.IConversation): proto.Conversation;
         public static encode(m: proto.IConversation, w?: $protobuf.Writer): $protobuf.Writer;
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.Conversation;
@@ -4407,6 +4637,490 @@ export namespace proto {
         }
     }
 
+    interface IDecryptMekForDistributionFromTransportSenderInput {
+        mekDistribution: proto.DecryptMekForDistributionFromTransportSenderInput.ITransportSenderMEKDistributionSingleRecipient;
+        mekId: Uint8Array;
+        rosterHash: Uint8Array;
+        recipientEncSk: Uint8Array;
+        version: (number|Long);
+        conf?: (proto.IMinosClientConfig|null);
+    }
+
+    class DecryptMekForDistributionFromTransportSenderInput implements IDecryptMekForDistributionFromTransportSenderInput {
+        constructor(p?: proto.IDecryptMekForDistributionFromTransportSenderInput);
+        public mekDistribution: proto.DecryptMekForDistributionFromTransportSenderInput.ITransportSenderMEKDistributionSingleRecipient;
+        public mekId: Uint8Array;
+        public rosterHash: Uint8Array;
+        public recipientEncSk: Uint8Array;
+        public version: (number|Long);
+        public conf?: (proto.IMinosClientConfig|null);
+        public static create(properties?: proto.IDecryptMekForDistributionFromTransportSenderInput): proto.DecryptMekForDistributionFromTransportSenderInput;
+        public static encode(m: proto.IDecryptMekForDistributionFromTransportSenderInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DecryptMekForDistributionFromTransportSenderInput;
+        public static fromObject(d: { [k: string]: any }): proto.DecryptMekForDistributionFromTransportSenderInput;
+        public static toObject(m: proto.DecryptMekForDistributionFromTransportSenderInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    namespace DecryptMekForDistributionFromTransportSenderInput {
+
+        interface ITransportSenderMEKDistributionSingleRecipient {
+            encryptedMek: Uint8Array;
+            ephemeralEncryptionPk: Uint8Array;
+            signingPk: Uint8Array;
+            signature: Uint8Array;
+            recipientEpochHead?: (Uint8Array|null);
+        }
+
+        class TransportSenderMEKDistributionSingleRecipient implements ITransportSenderMEKDistributionSingleRecipient {
+            constructor(p?: proto.DecryptMekForDistributionFromTransportSenderInput.ITransportSenderMEKDistributionSingleRecipient);
+            public encryptedMek: Uint8Array;
+            public ephemeralEncryptionPk: Uint8Array;
+            public signingPk: Uint8Array;
+            public signature: Uint8Array;
+            public recipientEpochHead: Uint8Array;
+            public static create(properties?: proto.DecryptMekForDistributionFromTransportSenderInput.ITransportSenderMEKDistributionSingleRecipient): proto.DecryptMekForDistributionFromTransportSenderInput.TransportSenderMEKDistributionSingleRecipient;
+            public static encode(m: proto.DecryptMekForDistributionFromTransportSenderInput.ITransportSenderMEKDistributionSingleRecipient, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DecryptMekForDistributionFromTransportSenderInput.TransportSenderMEKDistributionSingleRecipient;
+            public static fromObject(d: { [k: string]: any }): proto.DecryptMekForDistributionFromTransportSenderInput.TransportSenderMEKDistributionSingleRecipient;
+            public static toObject(m: proto.DecryptMekForDistributionFromTransportSenderInput.TransportSenderMEKDistributionSingleRecipient, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+    }
+
+    interface IDecryptMekForDistributionFromTransportSenderResult {
+        success?: (proto.IDecryptMekForDistributionFromTransportSenderSuccess|null);
+        errorMessage?: (string|null);
+    }
+
+    class DecryptMekForDistributionFromTransportSenderResult implements IDecryptMekForDistributionFromTransportSenderResult {
+        constructor(p?: proto.IDecryptMekForDistributionFromTransportSenderResult);
+        public success?: (proto.IDecryptMekForDistributionFromTransportSenderSuccess|null);
+        public errorMessage?: (string|null);
+        public result?: ("success"|"errorMessage");
+        public static create(properties?: proto.IDecryptMekForDistributionFromTransportSenderResult): proto.DecryptMekForDistributionFromTransportSenderResult;
+        public static encode(m: proto.IDecryptMekForDistributionFromTransportSenderResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DecryptMekForDistributionFromTransportSenderResult;
+        public static fromObject(d: { [k: string]: any }): proto.DecryptMekForDistributionFromTransportSenderResult;
+        public static toObject(m: proto.DecryptMekForDistributionFromTransportSenderResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IDecryptMekForDistributionFromTransportSenderSuccess {
+        mek: Uint8Array;
+    }
+
+    class DecryptMekForDistributionFromTransportSenderSuccess implements IDecryptMekForDistributionFromTransportSenderSuccess {
+        constructor(p?: proto.IDecryptMekForDistributionFromTransportSenderSuccess);
+        public mek: Uint8Array;
+        public static create(properties?: proto.IDecryptMekForDistributionFromTransportSenderSuccess): proto.DecryptMekForDistributionFromTransportSenderSuccess;
+        public static encode(m: proto.IDecryptMekForDistributionFromTransportSenderSuccess, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DecryptMekForDistributionFromTransportSenderSuccess;
+        public static fromObject(d: { [k: string]: any }): proto.DecryptMekForDistributionFromTransportSenderSuccess;
+        public static toObject(m: proto.DecryptMekForDistributionFromTransportSenderSuccess, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IDecryptMekForDistributionInput {
+        toMailboxSk: Uint8Array;
+        fromPk: Uint8Array;
+        mekId: Uint8Array;
+        senderEpochHead: Uint8Array;
+        rosterHash: Uint8Array;
+        ciphertext: Uint8Array;
+        toEpochHead?: (Uint8Array|null);
+        mekEncryptionVersion?: (number|null);
+        conf?: (proto.IMinosClientConfig|null);
+    }
+
+    class DecryptMekForDistributionInput implements IDecryptMekForDistributionInput {
+        constructor(p?: proto.IDecryptMekForDistributionInput);
+        public toMailboxSk: Uint8Array;
+        public fromPk: Uint8Array;
+        public mekId: Uint8Array;
+        public senderEpochHead: Uint8Array;
+        public rosterHash: Uint8Array;
+        public ciphertext: Uint8Array;
+        public toEpochHead: Uint8Array;
+        public mekEncryptionVersion: number;
+        public conf?: (proto.IMinosClientConfig|null);
+        public static create(properties?: proto.IDecryptMekForDistributionInput): proto.DecryptMekForDistributionInput;
+        public static encode(m: proto.IDecryptMekForDistributionInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DecryptMekForDistributionInput;
+        public static fromObject(d: { [k: string]: any }): proto.DecryptMekForDistributionInput;
+        public static toObject(m: proto.DecryptMekForDistributionInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IDecryptMekForDistributionResult {
+        success?: (proto.IDecryptMekForDistributionSuccess|null);
+        errorMessage?: (string|null);
+    }
+
+    class DecryptMekForDistributionResult implements IDecryptMekForDistributionResult {
+        constructor(p?: proto.IDecryptMekForDistributionResult);
+        public success?: (proto.IDecryptMekForDistributionSuccess|null);
+        public errorMessage?: (string|null);
+        public result?: ("success"|"errorMessage");
+        public static create(properties?: proto.IDecryptMekForDistributionResult): proto.DecryptMekForDistributionResult;
+        public static encode(m: proto.IDecryptMekForDistributionResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DecryptMekForDistributionResult;
+        public static fromObject(d: { [k: string]: any }): proto.DecryptMekForDistributionResult;
+        public static toObject(m: proto.DecryptMekForDistributionResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IDecryptMekForDistributionSuccess {
+        mek: Uint8Array;
+    }
+
+    class DecryptMekForDistributionSuccess implements IDecryptMekForDistributionSuccess {
+        constructor(p?: proto.IDecryptMekForDistributionSuccess);
+        public mek: Uint8Array;
+        public static create(properties?: proto.IDecryptMekForDistributionSuccess): proto.DecryptMekForDistributionSuccess;
+        public static encode(m: proto.IDecryptMekForDistributionSuccess, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DecryptMekForDistributionSuccess;
+        public static fromObject(d: { [k: string]: any }): proto.DecryptMekForDistributionSuccess;
+        public static toObject(m: proto.DecryptMekForDistributionSuccess, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IDecryptSelfMmkDistributionInput {
+        encryptedMmk: Uint8Array;
+        exportRootKey: Uint8Array;
+        mmkPublicData: proto.IMessagingMailboxPublicData;
+    }
+
+    class DecryptSelfMmkDistributionInput implements IDecryptSelfMmkDistributionInput {
+        constructor(p?: proto.IDecryptSelfMmkDistributionInput);
+        public encryptedMmk: Uint8Array;
+        public exportRootKey: Uint8Array;
+        public mmkPublicData: proto.IMessagingMailboxPublicData;
+        public static create(properties?: proto.IDecryptSelfMmkDistributionInput): proto.DecryptSelfMmkDistributionInput;
+        public static encode(m: proto.IDecryptSelfMmkDistributionInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DecryptSelfMmkDistributionInput;
+        public static fromObject(d: { [k: string]: any }): proto.DecryptSelfMmkDistributionInput;
+        public static toObject(m: proto.DecryptSelfMmkDistributionInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IDecryptSelfMmkDistributionResult {
+        success?: (proto.IDecryptSelfMmkDistributionSuccess|null);
+        errorMessage?: (string|null);
+    }
+
+    class DecryptSelfMmkDistributionResult implements IDecryptSelfMmkDistributionResult {
+        constructor(p?: proto.IDecryptSelfMmkDistributionResult);
+        public success?: (proto.IDecryptSelfMmkDistributionSuccess|null);
+        public errorMessage?: (string|null);
+        public result?: ("success"|"errorMessage");
+        public static create(properties?: proto.IDecryptSelfMmkDistributionResult): proto.DecryptSelfMmkDistributionResult;
+        public static encode(m: proto.IDecryptSelfMmkDistributionResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DecryptSelfMmkDistributionResult;
+        public static fromObject(d: { [k: string]: any }): proto.DecryptSelfMmkDistributionResult;
+        public static toObject(m: proto.DecryptSelfMmkDistributionResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IDecryptSelfMmkDistributionSuccess {
+        mmkSeed: Uint8Array;
+    }
+
+    class DecryptSelfMmkDistributionSuccess implements IDecryptSelfMmkDistributionSuccess {
+        constructor(p?: proto.IDecryptSelfMmkDistributionSuccess);
+        public mmkSeed: Uint8Array;
+        public static create(properties?: proto.IDecryptSelfMmkDistributionSuccess): proto.DecryptSelfMmkDistributionSuccess;
+        public static encode(m: proto.IDecryptSelfMmkDistributionSuccess, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DecryptSelfMmkDistributionSuccess;
+        public static fromObject(d: { [k: string]: any }): proto.DecryptSelfMmkDistributionSuccess;
+        public static toObject(m: proto.DecryptSelfMmkDistributionSuccess, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IDeriveAttachmentAccessTokenSecretInput {
+        mediaKey: Uint8Array;
+    }
+
+    class DeriveAttachmentAccessTokenSecretInput implements IDeriveAttachmentAccessTokenSecretInput {
+        constructor(p?: proto.IDeriveAttachmentAccessTokenSecretInput);
+        public mediaKey: Uint8Array;
+        public static create(properties?: proto.IDeriveAttachmentAccessTokenSecretInput): proto.DeriveAttachmentAccessTokenSecretInput;
+        public static encode(m: proto.IDeriveAttachmentAccessTokenSecretInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeriveAttachmentAccessTokenSecretInput;
+        public static fromObject(d: { [k: string]: any }): proto.DeriveAttachmentAccessTokenSecretInput;
+        public static toObject(m: proto.DeriveAttachmentAccessTokenSecretInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IDeriveAttachmentAccessTokenSecretResult {
+        attachmentAccessTokenSecret: Uint8Array;
+    }
+
+    class DeriveAttachmentAccessTokenSecretResult implements IDeriveAttachmentAccessTokenSecretResult {
+        constructor(p?: proto.IDeriveAttachmentAccessTokenSecretResult);
+        public attachmentAccessTokenSecret: Uint8Array;
+        public static create(properties?: proto.IDeriveAttachmentAccessTokenSecretResult): proto.DeriveAttachmentAccessTokenSecretResult;
+        public static encode(m: proto.IDeriveAttachmentAccessTokenSecretResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeriveAttachmentAccessTokenSecretResult;
+        public static fromObject(d: { [k: string]: any }): proto.DeriveAttachmentAccessTokenSecretResult;
+        public static toObject(m: proto.DeriveAttachmentAccessTokenSecretResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IDeriveAttachmentPrimaryKeySecretInput {
+        mediaKey: Uint8Array;
+    }
+
+    class DeriveAttachmentPrimaryKeySecretInput implements IDeriveAttachmentPrimaryKeySecretInput {
+        constructor(p?: proto.IDeriveAttachmentPrimaryKeySecretInput);
+        public mediaKey: Uint8Array;
+        public static create(properties?: proto.IDeriveAttachmentPrimaryKeySecretInput): proto.DeriveAttachmentPrimaryKeySecretInput;
+        public static encode(m: proto.IDeriveAttachmentPrimaryKeySecretInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeriveAttachmentPrimaryKeySecretInput;
+        public static fromObject(d: { [k: string]: any }): proto.DeriveAttachmentPrimaryKeySecretInput;
+        public static toObject(m: proto.DeriveAttachmentPrimaryKeySecretInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IDeriveAttachmentPrimaryKeySecretResult {
+        attachmentPrimaryKeySecret: Uint8Array;
+    }
+
+    class DeriveAttachmentPrimaryKeySecretResult implements IDeriveAttachmentPrimaryKeySecretResult {
+        constructor(p?: proto.IDeriveAttachmentPrimaryKeySecretResult);
+        public attachmentPrimaryKeySecret: Uint8Array;
+        public static create(properties?: proto.IDeriveAttachmentPrimaryKeySecretResult): proto.DeriveAttachmentPrimaryKeySecretResult;
+        public static encode(m: proto.IDeriveAttachmentPrimaryKeySecretResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeriveAttachmentPrimaryKeySecretResult;
+        public static fromObject(d: { [k: string]: any }): proto.DeriveAttachmentPrimaryKeySecretResult;
+        public static toObject(m: proto.DeriveAttachmentPrimaryKeySecretResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IDeriveMailboxAuthKeypairInput {
+        exportRootKey: Uint8Array;
+        epochNumber: (number|Long);
+    }
+
+    class DeriveMailboxAuthKeypairInput implements IDeriveMailboxAuthKeypairInput {
+        constructor(p?: proto.IDeriveMailboxAuthKeypairInput);
+        public exportRootKey: Uint8Array;
+        public epochNumber: (number|Long);
+        public static create(properties?: proto.IDeriveMailboxAuthKeypairInput): proto.DeriveMailboxAuthKeypairInput;
+        public static encode(m: proto.IDeriveMailboxAuthKeypairInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeriveMailboxAuthKeypairInput;
+        public static fromObject(d: { [k: string]: any }): proto.DeriveMailboxAuthKeypairInput;
+        public static toObject(m: proto.DeriveMailboxAuthKeypairInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IDeriveMailboxAuthKeypairResult {
+        mailboxAuthPublicKey: Uint8Array;
+        mailboxAuthPrivateKey: Uint8Array;
+    }
+
+    class DeriveMailboxAuthKeypairResult implements IDeriveMailboxAuthKeypairResult {
+        constructor(p?: proto.IDeriveMailboxAuthKeypairResult);
+        public mailboxAuthPublicKey: Uint8Array;
+        public mailboxAuthPrivateKey: Uint8Array;
+        public static create(properties?: proto.IDeriveMailboxAuthKeypairResult): proto.DeriveMailboxAuthKeypairResult;
+        public static encode(m: proto.IDeriveMailboxAuthKeypairResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeriveMailboxAuthKeypairResult;
+        public static fromObject(d: { [k: string]: any }): proto.DeriveMailboxAuthKeypairResult;
+        public static toObject(m: proto.DeriveMailboxAuthKeypairResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IDeriveMailboxEncryptionKeypairInput {
+        exportRootKey: Uint8Array;
+        epochNumber: (number|Long);
+    }
+
+    class DeriveMailboxEncryptionKeypairInput implements IDeriveMailboxEncryptionKeypairInput {
+        constructor(p?: proto.IDeriveMailboxEncryptionKeypairInput);
+        public exportRootKey: Uint8Array;
+        public epochNumber: (number|Long);
+        public static create(properties?: proto.IDeriveMailboxEncryptionKeypairInput): proto.DeriveMailboxEncryptionKeypairInput;
+        public static encode(m: proto.IDeriveMailboxEncryptionKeypairInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeriveMailboxEncryptionKeypairInput;
+        public static fromObject(d: { [k: string]: any }): proto.DeriveMailboxEncryptionKeypairInput;
+        public static toObject(m: proto.DeriveMailboxEncryptionKeypairInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IDeriveMailboxEncryptionKeypairResult {
+        mailboxEncryptionPublicKey: Uint8Array;
+        mailboxEncryptionPrivateKey: Uint8Array;
+    }
+
+    class DeriveMailboxEncryptionKeypairResult implements IDeriveMailboxEncryptionKeypairResult {
+        constructor(p?: proto.IDeriveMailboxEncryptionKeypairResult);
+        public mailboxEncryptionPublicKey: Uint8Array;
+        public mailboxEncryptionPrivateKey: Uint8Array;
+        public static create(properties?: proto.IDeriveMailboxEncryptionKeypairResult): proto.DeriveMailboxEncryptionKeypairResult;
+        public static encode(m: proto.IDeriveMailboxEncryptionKeypairResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeriveMailboxEncryptionKeypairResult;
+        public static fromObject(d: { [k: string]: any }): proto.DeriveMailboxEncryptionKeypairResult;
+        public static toObject(m: proto.DeriveMailboxEncryptionKeypairResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IDeriveMailboxSigningKeypairInput {
+        exportRootKey: Uint8Array;
+        epochNumber: (number|Long);
+    }
+
+    class DeriveMailboxSigningKeypairInput implements IDeriveMailboxSigningKeypairInput {
+        constructor(p?: proto.IDeriveMailboxSigningKeypairInput);
+        public exportRootKey: Uint8Array;
+        public epochNumber: (number|Long);
+        public static create(properties?: proto.IDeriveMailboxSigningKeypairInput): proto.DeriveMailboxSigningKeypairInput;
+        public static encode(m: proto.IDeriveMailboxSigningKeypairInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeriveMailboxSigningKeypairInput;
+        public static fromObject(d: { [k: string]: any }): proto.DeriveMailboxSigningKeypairInput;
+        public static toObject(m: proto.DeriveMailboxSigningKeypairInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IDeriveMailboxSigningKeypairResult {
+        success?: (proto.IDeriveMailboxSigningKeypairSuccess|null);
+        errorMessage?: (string|null);
+    }
+
+    class DeriveMailboxSigningKeypairResult implements IDeriveMailboxSigningKeypairResult {
+        constructor(p?: proto.IDeriveMailboxSigningKeypairResult);
+        public success?: (proto.IDeriveMailboxSigningKeypairSuccess|null);
+        public errorMessage?: (string|null);
+        public result?: ("success"|"errorMessage");
+        public static create(properties?: proto.IDeriveMailboxSigningKeypairResult): proto.DeriveMailboxSigningKeypairResult;
+        public static encode(m: proto.IDeriveMailboxSigningKeypairResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeriveMailboxSigningKeypairResult;
+        public static fromObject(d: { [k: string]: any }): proto.DeriveMailboxSigningKeypairResult;
+        public static toObject(m: proto.DeriveMailboxSigningKeypairResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IDeriveMailboxSigningKeypairSuccess {
+        mailboxSigningPublicKey: Uint8Array;
+        mailboxSigningPrivateKey: Uint8Array;
+    }
+
+    class DeriveMailboxSigningKeypairSuccess implements IDeriveMailboxSigningKeypairSuccess {
+        constructor(p?: proto.IDeriveMailboxSigningKeypairSuccess);
+        public mailboxSigningPublicKey: Uint8Array;
+        public mailboxSigningPrivateKey: Uint8Array;
+        public static create(properties?: proto.IDeriveMailboxSigningKeypairSuccess): proto.DeriveMailboxSigningKeypairSuccess;
+        public static encode(m: proto.IDeriveMailboxSigningKeypairSuccess, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeriveMailboxSigningKeypairSuccess;
+        public static fromObject(d: { [k: string]: any }): proto.DeriveMailboxSigningKeypairSuccess;
+        public static toObject(m: proto.DeriveMailboxSigningKeypairSuccess, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IDeriveMessagingMailboxKeypairsInput {
+        mmkSeed: Uint8Array;
+    }
+
+    class DeriveMessagingMailboxKeypairsInput implements IDeriveMessagingMailboxKeypairsInput {
+        constructor(p?: proto.IDeriveMessagingMailboxKeypairsInput);
+        public mmkSeed: Uint8Array;
+        public static create(properties?: proto.IDeriveMessagingMailboxKeypairsInput): proto.DeriveMessagingMailboxKeypairsInput;
+        public static encode(m: proto.IDeriveMessagingMailboxKeypairsInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeriveMessagingMailboxKeypairsInput;
+        public static fromObject(d: { [k: string]: any }): proto.DeriveMessagingMailboxKeypairsInput;
+        public static toObject(m: proto.DeriveMessagingMailboxKeypairsInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IDeriveMessagingMailboxKeypairsResult {
+        success?: (proto.IDeriveMessagingMailboxKeypairsSuccess|null);
+        errorMessage?: (string|null);
+    }
+
+    class DeriveMessagingMailboxKeypairsResult implements IDeriveMessagingMailboxKeypairsResult {
+        constructor(p?: proto.IDeriveMessagingMailboxKeypairsResult);
+        public success?: (proto.IDeriveMessagingMailboxKeypairsSuccess|null);
+        public errorMessage?: (string|null);
+        public result?: ("success"|"errorMessage");
+        public static create(properties?: proto.IDeriveMessagingMailboxKeypairsResult): proto.DeriveMessagingMailboxKeypairsResult;
+        public static encode(m: proto.IDeriveMessagingMailboxKeypairsResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeriveMessagingMailboxKeypairsResult;
+        public static fromObject(d: { [k: string]: any }): proto.DeriveMessagingMailboxKeypairsResult;
+        public static toObject(m: proto.DeriveMessagingMailboxKeypairsResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IDeriveMessagingMailboxKeypairsSuccess {
+        encSk: Uint8Array;
+        encPk: Uint8Array;
+        authSk?: (Uint8Array|null);
+        authPk?: (Uint8Array|null);
+    }
+
+    class DeriveMessagingMailboxKeypairsSuccess implements IDeriveMessagingMailboxKeypairsSuccess {
+        constructor(p?: proto.IDeriveMessagingMailboxKeypairsSuccess);
+        public encSk: Uint8Array;
+        public encPk: Uint8Array;
+        public authSk: Uint8Array;
+        public authPk: Uint8Array;
+        public static create(properties?: proto.IDeriveMessagingMailboxKeypairsSuccess): proto.DeriveMessagingMailboxKeypairsSuccess;
+        public static encode(m: proto.IDeriveMessagingMailboxKeypairsSuccess, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeriveMessagingMailboxKeypairsSuccess;
+        public static fromObject(d: { [k: string]: any }): proto.DeriveMessagingMailboxKeypairsSuccess;
+        public static toObject(m: proto.DeriveMessagingMailboxKeypairsSuccess, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IDetachedDevicePublicData {
+        deviceId: (number|Long);
+        name: Uint8Array;
+        sigPk: Uint8Array;
+        authPk: Uint8Array;
+        encPk: Uint8Array;
+        signature: Uint8Array;
+    }
+
+    class DetachedDevicePublicData implements IDetachedDevicePublicData {
+        constructor(p?: proto.IDetachedDevicePublicData);
+        public deviceId: (number|Long);
+        public name: Uint8Array;
+        public sigPk: Uint8Array;
+        public authPk: Uint8Array;
+        public encPk: Uint8Array;
+        public signature: Uint8Array;
+        public static create(properties?: proto.IDetachedDevicePublicData): proto.DetachedDevicePublicData;
+        public static encode(m: proto.IDetachedDevicePublicData, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DetachedDevicePublicData;
+        public static fromObject(d: { [k: string]: any }): proto.DetachedDevicePublicData;
+        public static toObject(m: proto.DetachedDevicePublicData, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
     interface IDeviceCapabilities {
         chatLockSupportLevel?: (proto.DeviceCapabilities.ChatLockSupportLevel|null);
         lidMigration?: (proto.DeviceCapabilities.ILIDMigration|null);
@@ -4415,6 +5129,10 @@ export namespace proto {
         memberNameTagPrimarySupport?: (proto.DeviceCapabilities.MemberNameTagPrimarySupport|null);
         aiThread?: (proto.DeviceCapabilities.IAiThread|null);
         aiFbidMigration?: (proto.DeviceCapabilities.IAiFbidMigration|null);
+        bizAiSettingsSync?: (proto.DeviceCapabilities.IBizAiSettingsSync|null);
+        contactRefresh?: (proto.DeviceCapabilities.IContactRefresh|null);
+        reverseHistorySync?: (proto.DeviceCapabilities.IReverseHistorySync|null);
+        newsletterChatsMigration?: (proto.DeviceCapabilities.INewsletterChatsMigration|null);
     }
 
     class DeviceCapabilities implements IDeviceCapabilities {
@@ -4426,6 +5144,10 @@ export namespace proto {
         public memberNameTagPrimarySupport: proto.DeviceCapabilities.MemberNameTagPrimarySupport;
         public aiThread?: (proto.DeviceCapabilities.IAiThread|null);
         public aiFbidMigration?: (proto.DeviceCapabilities.IAiFbidMigration|null);
+        public bizAiSettingsSync?: (proto.DeviceCapabilities.IBizAiSettingsSync|null);
+        public contactRefresh?: (proto.DeviceCapabilities.IContactRefresh|null);
+        public reverseHistorySync?: (proto.DeviceCapabilities.IReverseHistorySync|null);
+        public newsletterChatsMigration?: (proto.DeviceCapabilities.INewsletterChatsMigration|null);
         public static create(properties?: proto.IDeviceCapabilities): proto.DeviceCapabilities;
         public static encode(m: proto.IDeviceCapabilities, w?: $protobuf.Writer): $protobuf.Writer;
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeviceCapabilities;
@@ -4439,11 +5161,13 @@ export namespace proto {
 
         interface IAiFbidMigration {
             chatDbMigrationTimestamp?: (number|Long|null);
+            supportVersion?: (number|null);
         }
 
         class AiFbidMigration implements IAiFbidMigration {
             constructor(p?: proto.DeviceCapabilities.IAiFbidMigration);
             public chatDbMigrationTimestamp: (number|Long);
+            public supportVersion: number;
             public static create(properties?: proto.DeviceCapabilities.IAiFbidMigration): proto.DeviceCapabilities.AiFbidMigration;
             public static encode(m: proto.DeviceCapabilities.IAiFbidMigration, w?: $protobuf.Writer): $protobuf.Writer;
             public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeviceCapabilities.AiFbidMigration;
@@ -4478,12 +5202,29 @@ export namespace proto {
             }
         }
 
+        interface IBizAiSettingsSync {
+            handoffRemovalTimingEnabled?: (boolean|null);
+        }
+
+        class BizAiSettingsSync implements IBizAiSettingsSync {
+            constructor(p?: proto.DeviceCapabilities.IBizAiSettingsSync);
+            public handoffRemovalTimingEnabled: boolean;
+            public static create(properties?: proto.DeviceCapabilities.IBizAiSettingsSync): proto.DeviceCapabilities.BizAiSettingsSync;
+            public static encode(m: proto.DeviceCapabilities.IBizAiSettingsSync, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeviceCapabilities.BizAiSettingsSync;
+            public static fromObject(d: { [k: string]: any }): proto.DeviceCapabilities.BizAiSettingsSync;
+            public static toObject(m: proto.DeviceCapabilities.BizAiSettingsSync, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
         interface IBusinessBroadcast {
             importListEnabled?: (boolean|null);
             companionSupportEnabled?: (boolean|null);
             campaignSyncEnabled?: (boolean|null);
             insightsSyncEnabled?: (boolean|null);
             recipientLimit?: (number|null);
+            proCompanionSupportEnabled?: (boolean|null);
         }
 
         class BusinessBroadcast implements IBusinessBroadcast {
@@ -4493,6 +5234,7 @@ export namespace proto {
             public campaignSyncEnabled: boolean;
             public insightsSyncEnabled: boolean;
             public recipientLimit: number;
+            public proCompanionSupportEnabled: boolean;
             public static create(properties?: proto.DeviceCapabilities.IBusinessBroadcast): proto.DeviceCapabilities.BusinessBroadcast;
             public static encode(m: proto.DeviceCapabilities.IBusinessBroadcast, w?: $protobuf.Writer): $protobuf.Writer;
             public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeviceCapabilities.BusinessBroadcast;
@@ -4506,6 +5248,22 @@ export namespace proto {
             NONE = 0,
             MINIMAL = 1,
             FULL = 2
+        }
+
+        interface IContactRefresh {
+            refreshSupported?: (boolean|null);
+        }
+
+        class ContactRefresh implements IContactRefresh {
+            constructor(p?: proto.DeviceCapabilities.IContactRefresh);
+            public refreshSupported: boolean;
+            public static create(properties?: proto.DeviceCapabilities.IContactRefresh): proto.DeviceCapabilities.ContactRefresh;
+            public static encode(m: proto.DeviceCapabilities.IContactRefresh, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeviceCapabilities.ContactRefresh;
+            public static fromObject(d: { [k: string]: any }): proto.DeviceCapabilities.ContactRefresh;
+            public static toObject(m: proto.DeviceCapabilities.ContactRefresh, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
         }
 
         interface ILIDMigration {
@@ -4528,6 +5286,50 @@ export namespace proto {
             DISABLED = 0,
             RECEIVER_ENABLED = 1,
             SENDER_ENABLED = 2
+        }
+
+        interface INewsletterChatsMigration {
+            effectiveMigrated?: (boolean|null);
+            countdownEndsAt?: (number|Long|null);
+            rolledBack?: (boolean|null);
+        }
+
+        class NewsletterChatsMigration implements INewsletterChatsMigration {
+            constructor(p?: proto.DeviceCapabilities.INewsletterChatsMigration);
+            public effectiveMigrated: boolean;
+            public countdownEndsAt: (number|Long);
+            public rolledBack: boolean;
+            public static create(properties?: proto.DeviceCapabilities.INewsletterChatsMigration): proto.DeviceCapabilities.NewsletterChatsMigration;
+            public static encode(m: proto.DeviceCapabilities.INewsletterChatsMigration, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeviceCapabilities.NewsletterChatsMigration;
+            public static fromObject(d: { [k: string]: any }): proto.DeviceCapabilities.NewsletterChatsMigration;
+            public static toObject(m: proto.DeviceCapabilities.NewsletterChatsMigration, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        interface IReverseHistorySync {
+            enabledProducts?: (proto.DeviceCapabilities.ReverseHistorySync.Product[]|null);
+        }
+
+        class ReverseHistorySync implements IReverseHistorySync {
+            constructor(p?: proto.DeviceCapabilities.IReverseHistorySync);
+            public enabledProducts: proto.DeviceCapabilities.ReverseHistorySync.Product[];
+            public static create(properties?: proto.DeviceCapabilities.IReverseHistorySync): proto.DeviceCapabilities.ReverseHistorySync;
+            public static encode(m: proto.DeviceCapabilities.IReverseHistorySync, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeviceCapabilities.ReverseHistorySync;
+            public static fromObject(d: { [k: string]: any }): proto.DeviceCapabilities.ReverseHistorySync;
+            public static toObject(m: proto.DeviceCapabilities.ReverseHistorySync, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        namespace ReverseHistorySync {
+
+            enum Product {
+                PRODUCT_UNSPECIFIED = 0,
+                HATCH = 1
+            }
         }
 
         interface IUserHasAvatar {
@@ -4671,6 +5473,8 @@ export namespace proto {
             supportedBotChannelFbids?: (string[]|null);
             supportInlineContacts?: (boolean|null);
             supportNewsletter?: (boolean|null);
+            supportUniversalReachChat?: (boolean|null);
+            supportOmittedConversationIndex?: (boolean|null);
         }
 
         class HistorySyncConfig implements IHistorySyncConfig {
@@ -4700,6 +5504,8 @@ export namespace proto {
             public supportedBotChannelFbids: string[];
             public supportInlineContacts: boolean;
             public supportNewsletter: boolean;
+            public supportUniversalReachChat: boolean;
+            public supportOmittedConversationIndex: boolean;
             public static create(properties?: proto.DeviceProps.IHistorySyncConfig): proto.DeviceProps.HistorySyncConfig;
             public static encode(m: proto.DeviceProps.IHistorySyncConfig, w?: $protobuf.Writer): $protobuf.Writer;
             public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeviceProps.HistorySyncConfig;
@@ -4735,7 +5541,11 @@ export namespace proto {
             VR = 22,
             CLOUD_API = 23,
             SMARTGLASSES = 24,
-            WAIL = 25
+            WAIL = 25,
+            WASS = 26,
+            BUSINESS_BACK_OFFICE = 27,
+            WAIL_WAI = 28,
+            WAIL_ALEXA = 29
         }
     }
 
@@ -4778,6 +5588,124 @@ export namespace proto {
             BIZ_SUPPORTS_FB_HOSTING = 4,
             UNKNOWN_GROUPS = 5
         }
+    }
+
+    enum EXTENDED_CONTENT_MESSAGE_CTA_BUTTON_TYPE {
+        OPEN_NATIVE = 11
+    }
+
+    enum EXTENDED_CONTENT_MESSAGE_EXTENDED_CONTENT_TYPE {
+        UNSUPPORTED = -1,
+        IG_STORY_PHOTO_MENTION = 4,
+        IG_SINGLE_IMAGE_POST_SHARE = 9,
+        IG_MULTIPOST_SHARE = 10,
+        IG_SINGLE_VIDEO_POST_SHARE = 11,
+        IG_STORY_PHOTO_SHARE = 12,
+        IG_STORY_VIDEO_SHARE = 13,
+        IG_CLIPS_SHARE = 14,
+        IG_IGTV_SHARE = 15,
+        IG_SHOP_SHARE = 16,
+        IG_PROFILE_SHARE = 19,
+        IG_STORY_PHOTO_HIGHLIGHT_SHARE = 20,
+        IG_STORY_VIDEO_HIGHLIGHT_SHARE = 21,
+        IG_STORY_REPLY = 22,
+        IG_STORY_REACTION = 23,
+        IG_STORY_VIDEO_MENTION = 24,
+        IG_STORY_HIGHLIGHT_REPLY = 25,
+        IG_STORY_HIGHLIGHT_REACTION = 26,
+        IG_EXTERNAL_LINK = 27,
+        IG_RECEIVER_FETCH = 28,
+        FB_FEED_SHARE = 1000,
+        FB_STORY_REPLY = 1001,
+        FB_STORY_SHARE = 1002,
+        FB_STORY_MENTION = 1003,
+        FB_FEED_VIDEO_SHARE = 1004,
+        FB_GAMING_CUSTOM_UPDATE = 1005,
+        FB_PRODUCER_STORY_REPLY = 1006,
+        FB_EVENT = 1007,
+        FB_FEED_POST_PRIVATE_REPLY = 1008,
+        FB_SHORT = 1009,
+        FB_COMMENT_MENTION_SHARE = 1010,
+        FB_POST_MENTION = 1011,
+        FB_PROFILE_DIRECTORY_ITEM = 1013,
+        FB_FEED_POST_REACTION_REPLY = 1014,
+        FB_QUICKSNAP_REPLY = 1015,
+        MSG_EXTERNAL_LINK_SHARE = 2000,
+        MSG_P2P_PAYMENT = 2001,
+        MSG_LOCATION_SHARING = 2002,
+        MSG_LOCATION_SHARING_V2 = 2003,
+        MSG_HIGHLIGHTS_TAB_FRIEND_UPDATES_REPLY = 2004,
+        MSG_HIGHLIGHTS_TAB_LOCAL_EVENT_REPLY = 2005,
+        MSG_RECEIVER_FETCH = 2006,
+        MSG_IG_MEDIA_SHARE = 2007,
+        MSG_GEN_AI_SEARCH_PLUGIN_RESPONSE = 2008,
+        MSG_REELS_LIST = 2009,
+        MSG_CONTACT = 2010,
+        MSG_THREADS_POST_SHARE = 2011,
+        MSG_FILE = 2012,
+        MSG_AVATAR_DETAILS = 2013,
+        MSG_AI_CONTACT = 2014,
+        MSG_MEMORIES_SHARE = 2015,
+        MSG_SHARED_ALBUM_REPLY = 2016,
+        MSG_SHARED_ALBUM = 2017,
+        MSG_OCCAMADILLO_XMA = 2018,
+        MSG_GEN_AI_SUBSCRIPTION = 2021,
+        MSG_GEN_AI_REMINDER = 2022,
+        MSG_GEN_AI_MEMU_ONBOARDING_RESPONSE = 2023,
+        MSG_NOTE_REPLY = 2024,
+        MSG_NOTE_MENTION = 2025,
+        GEN_AI_ENTITY = 2026,
+        MSG_OPG_P2P_PAYMENT = 2027,
+        GEN_AI_RICH_RESPONSE = 2028,
+        MSG_MUSIC_STICKER = 2029,
+        MSG_PHONE_NUMBER = 2030,
+        AI_ACTIVITY_SHARE = 2031,
+        MSG_PRIVATE_XMA = 2032,
+        MSG_SOCIAL_CUE_MEMORIES = 2033,
+        MSG_MANUS_GROWTH_REFERRAL = 2060,
+        MSG_MOMENT_LINK = 2061,
+        MSG_HORIZON_WEEL = 2062,
+        MSG_MOMENT_ADDED = 2063,
+        RTC_AUDIO_CALL = 3000,
+        RTC_VIDEO_CALL = 3001,
+        RTC_MISSED_AUDIO_CALL = 3002,
+        RTC_MISSED_VIDEO_CALL = 3003,
+        RTC_GROUP_AUDIO_CALL = 3004,
+        RTC_GROUP_VIDEO_CALL = 3005,
+        RTC_MISSED_GROUP_AUDIO_CALL = 3006,
+        RTC_MISSED_GROUP_VIDEO_CALL = 3007,
+        RTC_ONGOING_AUDIO_CALL = 3008,
+        RTC_ONGOING_VIDEO_CALL = 3009,
+        MSG_RECEIVER_FETCH_FALLBACK = 3025,
+        DATACLASS_SENDER_COPY = 4000
+    }
+
+    enum EXTENDED_CONTENT_MESSAGE_OVERLAY_ICON_GLYPH {
+        INFO = 0,
+        EYE_OFF = 1,
+        NEWS_OFF = 2,
+        WARNING = 3,
+        PRIVATE = 4,
+        NONE = 5,
+        MEDIA_LABEL = 6,
+        POST_COVER = 7,
+        POST_LABEL = 8,
+        WARNING_SCREENS = 9
+    }
+
+    enum EXTENDED_CONTENT_MESSAGE_XMA_DATACLASS_TYPE {
+        SENDER_COPY = 0,
+        SERVER = 1,
+        SIGNED_CLIENT = 2
+    }
+
+    enum EXTENDED_CONTENT_MESSAGE_XMA_LAYOUT_TYPE {
+        SINGLE = 0,
+        HSCROLL = 1,
+        PORTRAIT = 3,
+        STANDARD_DXMA = 12,
+        LIST_DXMA = 15,
+        GRID = 16
     }
 
     interface IEmbeddedContent {
@@ -4859,6 +5787,140 @@ export namespace proto {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
+    interface IEncryptMekForDistributionInput {
+        senderEpochHead: Uint8Array;
+        toMailboxPk: Uint8Array;
+        fromKeypair: proto.EncryptMekForDistributionInput.IMailboxAuthKP;
+        mek: proto.IMekBundle;
+        toEpochHead?: (Uint8Array|null);
+        conf?: (proto.IMinosClientConfig|null);
+    }
+
+    class EncryptMekForDistributionInput implements IEncryptMekForDistributionInput {
+        constructor(p?: proto.IEncryptMekForDistributionInput);
+        public senderEpochHead: Uint8Array;
+        public toMailboxPk: Uint8Array;
+        public fromKeypair: proto.EncryptMekForDistributionInput.IMailboxAuthKP;
+        public mek: proto.IMekBundle;
+        public toEpochHead: Uint8Array;
+        public conf?: (proto.IMinosClientConfig|null);
+        public static create(properties?: proto.IEncryptMekForDistributionInput): proto.EncryptMekForDistributionInput;
+        public static encode(m: proto.IEncryptMekForDistributionInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.EncryptMekForDistributionInput;
+        public static fromObject(d: { [k: string]: any }): proto.EncryptMekForDistributionInput;
+        public static toObject(m: proto.EncryptMekForDistributionInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    namespace EncryptMekForDistributionInput {
+
+        interface IMailboxAuthKP {
+            sk: Uint8Array;
+            pk: Uint8Array;
+        }
+
+        class MailboxAuthKP implements IMailboxAuthKP {
+            constructor(p?: proto.EncryptMekForDistributionInput.IMailboxAuthKP);
+            public sk: Uint8Array;
+            public pk: Uint8Array;
+            public static create(properties?: proto.EncryptMekForDistributionInput.IMailboxAuthKP): proto.EncryptMekForDistributionInput.MailboxAuthKP;
+            public static encode(m: proto.EncryptMekForDistributionInput.IMailboxAuthKP, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.EncryptMekForDistributionInput.MailboxAuthKP;
+            public static fromObject(d: { [k: string]: any }): proto.EncryptMekForDistributionInput.MailboxAuthKP;
+            public static toObject(m: proto.EncryptMekForDistributionInput.MailboxAuthKP, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+    }
+
+    interface IEncryptMekForDistributionResult {
+        ciphertext: Uint8Array;
+        version: (number|Long);
+    }
+
+    class EncryptMekForDistributionResult implements IEncryptMekForDistributionResult {
+        constructor(p?: proto.IEncryptMekForDistributionResult);
+        public ciphertext: Uint8Array;
+        public version: (number|Long);
+        public static create(properties?: proto.IEncryptMekForDistributionResult): proto.EncryptMekForDistributionResult;
+        public static encode(m: proto.IEncryptMekForDistributionResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.EncryptMekForDistributionResult;
+        public static fromObject(d: { [k: string]: any }): proto.EncryptMekForDistributionResult;
+        public static toObject(m: proto.EncryptMekForDistributionResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IEncryptMeksForDistributionFromTransportSenderInput {
+        mek: proto.IMekBundle;
+        transportSigningKp: proto.EncryptMeksForDistributionFromTransportSenderInput.ITransportSigningKP;
+        recipientMailboxEncryptionPks?: (Uint8Array[]|null);
+        recipientEpochHeads?: (Uint8Array[]|null);
+        conf?: (proto.IMinosClientConfig|null);
+    }
+
+    class EncryptMeksForDistributionFromTransportSenderInput implements IEncryptMeksForDistributionFromTransportSenderInput {
+        constructor(p?: proto.IEncryptMeksForDistributionFromTransportSenderInput);
+        public mek: proto.IMekBundle;
+        public transportSigningKp: proto.EncryptMeksForDistributionFromTransportSenderInput.ITransportSigningKP;
+        public recipientMailboxEncryptionPks: Uint8Array[];
+        public recipientEpochHeads: Uint8Array[];
+        public conf?: (proto.IMinosClientConfig|null);
+        public static create(properties?: proto.IEncryptMeksForDistributionFromTransportSenderInput): proto.EncryptMeksForDistributionFromTransportSenderInput;
+        public static encode(m: proto.IEncryptMeksForDistributionFromTransportSenderInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.EncryptMeksForDistributionFromTransportSenderInput;
+        public static fromObject(d: { [k: string]: any }): proto.EncryptMeksForDistributionFromTransportSenderInput;
+        public static toObject(m: proto.EncryptMeksForDistributionFromTransportSenderInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    namespace EncryptMeksForDistributionFromTransportSenderInput {
+
+        interface ITransportSigningKP {
+            sk: Uint8Array;
+            pk: Uint8Array;
+        }
+
+        class TransportSigningKP implements ITransportSigningKP {
+            constructor(p?: proto.EncryptMeksForDistributionFromTransportSenderInput.ITransportSigningKP);
+            public sk: Uint8Array;
+            public pk: Uint8Array;
+            public static create(properties?: proto.EncryptMeksForDistributionFromTransportSenderInput.ITransportSigningKP): proto.EncryptMeksForDistributionFromTransportSenderInput.TransportSigningKP;
+            public static encode(m: proto.EncryptMeksForDistributionFromTransportSenderInput.ITransportSigningKP, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.EncryptMeksForDistributionFromTransportSenderInput.TransportSigningKP;
+            public static fromObject(d: { [k: string]: any }): proto.EncryptMeksForDistributionFromTransportSenderInput.TransportSigningKP;
+            public static toObject(m: proto.EncryptMeksForDistributionFromTransportSenderInput.TransportSigningKP, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+    }
+
+    interface IEncryptMeksForDistributionFromTransportSenderResult {
+        encryptedMeks?: (Uint8Array[]|null);
+        ephemeralEncryptionPk: Uint8Array;
+        signingPk: Uint8Array;
+        signature: Uint8Array;
+        version: (number|Long);
+    }
+
+    class EncryptMeksForDistributionFromTransportSenderResult implements IEncryptMeksForDistributionFromTransportSenderResult {
+        constructor(p?: proto.IEncryptMeksForDistributionFromTransportSenderResult);
+        public encryptedMeks: Uint8Array[];
+        public ephemeralEncryptionPk: Uint8Array;
+        public signingPk: Uint8Array;
+        public signature: Uint8Array;
+        public version: (number|Long);
+        public static create(properties?: proto.IEncryptMeksForDistributionFromTransportSenderResult): proto.EncryptMeksForDistributionFromTransportSenderResult;
+        public static encode(m: proto.IEncryptMeksForDistributionFromTransportSenderResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.EncryptMeksForDistributionFromTransportSenderResult;
+        public static fromObject(d: { [k: string]: any }): proto.EncryptMeksForDistributionFromTransportSenderResult;
+        public static toObject(m: proto.EncryptMeksForDistributionFromTransportSenderResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
     interface IEncryptedPairingRequest {
         encryptedPayload?: (Uint8Array|null);
         iv?: (Uint8Array|null);
@@ -4895,6 +5957,50 @@ export namespace proto {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
+    interface IEpochPublicData {
+        epochNumber: (number|Long);
+        userFbid: string;
+        mailboxSigningPk: Uint8Array;
+        mailboxEncryptionPk: Uint8Array;
+        mailboxAuthPk: Uint8Array;
+        previousEpochHead?: (Uint8Array|null);
+    }
+
+    class EpochPublicData implements IEpochPublicData {
+        constructor(p?: proto.IEpochPublicData);
+        public epochNumber: (number|Long);
+        public userFbid: string;
+        public mailboxSigningPk: Uint8Array;
+        public mailboxEncryptionPk: Uint8Array;
+        public mailboxAuthPk: Uint8Array;
+        public previousEpochHead: Uint8Array;
+        public static create(properties?: proto.IEpochPublicData): proto.EpochPublicData;
+        public static encode(m: proto.IEpochPublicData, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.EpochPublicData;
+        public static fromObject(d: { [k: string]: any }): proto.EpochPublicData;
+        public static toObject(m: proto.EpochPublicData, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IEpochSignatures {
+        selfSignature: Uint8Array;
+        prevSignature?: (Uint8Array|null);
+    }
+
+    class EpochSignatures implements IEpochSignatures {
+        constructor(p?: proto.IEpochSignatures);
+        public selfSignature: Uint8Array;
+        public prevSignature: Uint8Array;
+        public static create(properties?: proto.IEpochSignatures): proto.EpochSignatures;
+        public static encode(m: proto.IEpochSignatures, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.EpochSignatures;
+        public static fromObject(d: { [k: string]: any }): proto.EpochSignatures;
+        public static toObject(m: proto.EpochSignatures, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
     interface IEventAdditionalMetadata {
         isStale?: (boolean|null);
     }
@@ -4907,6 +6013,22 @@ export namespace proto {
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.EventAdditionalMetadata;
         public static fromObject(d: { [k: string]: any }): proto.EventAdditionalMetadata;
         public static toObject(m: proto.EventAdditionalMetadata, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IEventInviteAdditionalMetadata {
+        isUpdated?: (boolean|null);
+    }
+
+    class EventInviteAdditionalMetadata implements IEventInviteAdditionalMetadata {
+        constructor(p?: proto.IEventInviteAdditionalMetadata);
+        public isUpdated: boolean;
+        public static create(properties?: proto.IEventInviteAdditionalMetadata): proto.EventInviteAdditionalMetadata;
+        public static encode(m: proto.IEventInviteAdditionalMetadata, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.EventInviteAdditionalMetadata;
+        public static fromObject(d: { [k: string]: any }): proto.EventInviteAdditionalMetadata;
+        public static toObject(m: proto.EventInviteAdditionalMetadata, o?: $protobuf.IConversionOptions): { [k: string]: any };
         public toJSON(): { [k: string]: any };
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
@@ -4951,6 +6073,107 @@ export namespace proto {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
+    interface IExtendedContentMessage {
+        associatedMessage?: (proto.ISubProtocol|null);
+        targetType?: (proto.EXTENDED_CONTENT_MESSAGE_EXTENDED_CONTENT_TYPE|null);
+        targetUsername?: (string|null);
+        targetId?: (string|null);
+        targetExpiringAtSec?: (number|Long|null);
+        xmaLayoutType?: (proto.EXTENDED_CONTENT_MESSAGE_XMA_LAYOUT_TYPE|null);
+        ctas?: (proto.ExtendedContentMessage.ICTA[]|null);
+        previews?: (proto.ISubProtocol[]|null);
+        titleText?: (string|null);
+        subtitleText?: (string|null);
+        maxTitleNumOfLines?: (number|null);
+        maxSubtitleNumOfLines?: (number|null);
+        favicon?: (proto.ISubProtocol|null);
+        headerImage?: (proto.ISubProtocol|null);
+        headerTitle?: (string|null);
+        overlayIconGlyph?: (proto.EXTENDED_CONTENT_MESSAGE_OVERLAY_ICON_GLYPH|null);
+        overlayTitle?: (string|null);
+        overlayDescription?: (string|null);
+        sentWithMessageId?: (string|null);
+        messageText?: (string|null);
+        headerSubtitle?: (string|null);
+        xmaDataclass?: (string|null);
+        contentRef?: (string|null);
+        mentionedJid?: (string[]|null);
+        commands?: (proto.ICommand[]|null);
+        mentions?: (proto.IMention[]|null);
+        xmaDataclassType?: (proto.EXTENDED_CONTENT_MESSAGE_XMA_DATACLASS_TYPE|null);
+        signedXmaDataclassValidation?: (string|null);
+        featureSharedSessionId?: (string|null);
+    }
+
+    class ExtendedContentMessage implements IExtendedContentMessage {
+        constructor(p?: proto.IExtendedContentMessage);
+        public associatedMessage?: (proto.ISubProtocol|null);
+        public targetType: proto.EXTENDED_CONTENT_MESSAGE_EXTENDED_CONTENT_TYPE;
+        public targetUsername: string;
+        public targetId: string;
+        public targetExpiringAtSec: (number|Long);
+        public xmaLayoutType: proto.EXTENDED_CONTENT_MESSAGE_XMA_LAYOUT_TYPE;
+        public ctas: proto.ExtendedContentMessage.ICTA[];
+        public previews: proto.ISubProtocol[];
+        public titleText: string;
+        public subtitleText: string;
+        public maxTitleNumOfLines: number;
+        public maxSubtitleNumOfLines: number;
+        public favicon?: (proto.ISubProtocol|null);
+        public headerImage?: (proto.ISubProtocol|null);
+        public headerTitle: string;
+        public overlayIconGlyph: proto.EXTENDED_CONTENT_MESSAGE_OVERLAY_ICON_GLYPH;
+        public overlayTitle: string;
+        public overlayDescription: string;
+        public sentWithMessageId: string;
+        public messageText: string;
+        public headerSubtitle: string;
+        public xmaDataclass: string;
+        public contentRef: string;
+        public mentionedJid: string[];
+        public commands: proto.ICommand[];
+        public mentions: proto.IMention[];
+        public xmaDataclassType: proto.EXTENDED_CONTENT_MESSAGE_XMA_DATACLASS_TYPE;
+        public signedXmaDataclassValidation: string;
+        public featureSharedSessionId: string;
+        public static create(properties?: proto.IExtendedContentMessage): proto.ExtendedContentMessage;
+        public static encode(m: proto.IExtendedContentMessage, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.ExtendedContentMessage;
+        public static fromObject(d: { [k: string]: any }): proto.ExtendedContentMessage;
+        public static toObject(m: proto.ExtendedContentMessage, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    namespace ExtendedContentMessage {
+
+        interface ICTA {
+            buttonType?: (proto.EXTENDED_CONTENT_MESSAGE_CTA_BUTTON_TYPE|null);
+            title?: (string|null);
+            actionUrl?: (string|null);
+            nativeUrl?: (string|null);
+            ctaType?: (string|null);
+            actionContentBlob?: (string|null);
+        }
+
+        class CTA implements ICTA {
+            constructor(p?: proto.ExtendedContentMessage.ICTA);
+            public buttonType: proto.EXTENDED_CONTENT_MESSAGE_CTA_BUTTON_TYPE;
+            public title: string;
+            public actionUrl: string;
+            public nativeUrl: string;
+            public ctaType: string;
+            public actionContentBlob: string;
+            public static create(properties?: proto.ExtendedContentMessage.ICTA): proto.ExtendedContentMessage.CTA;
+            public static encode(m: proto.ExtendedContentMessage.ICTA, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.ExtendedContentMessage.CTA;
+            public static fromObject(d: { [k: string]: any }): proto.ExtendedContentMessage.CTA;
+            public static toObject(m: proto.ExtendedContentMessage.CTA, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+    }
+
     interface IExternalBlobReference {
         mediaKey?: (Uint8Array|null);
         directPath?: (string|null);
@@ -4977,6 +6200,12 @@ export namespace proto {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
+    enum FUTURE_PROOF_BEHAVIOR {
+        PLACEHOLDER = 0,
+        NO_PLACEHOLDER = 1,
+        IGNORE = 2
+    }
+
     interface IField {
         minVersion?: (number|null);
         maxVersion?: (number|null);
@@ -5001,6 +6230,32 @@ export namespace proto {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
+    interface IFingerprintData {
+        publicKey?: (Uint8Array|null);
+        pnIdentifier?: (Uint8Array|null);
+        lidIdentifier?: (Uint8Array|null);
+        usernameIdentifier?: (Uint8Array|null);
+        hostedState?: (proto.HostedState|null);
+        hashedPublicKey?: (Uint8Array|null);
+    }
+
+    class FingerprintData implements IFingerprintData {
+        constructor(p?: proto.IFingerprintData);
+        public publicKey: Uint8Array;
+        public pnIdentifier: Uint8Array;
+        public lidIdentifier: Uint8Array;
+        public usernameIdentifier: Uint8Array;
+        public hostedState: proto.HostedState;
+        public hashedPublicKey: Uint8Array;
+        public static create(properties?: proto.IFingerprintData): proto.FingerprintData;
+        public static encode(m: proto.IFingerprintData, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.FingerprintData;
+        public static fromObject(d: { [k: string]: any }): proto.FingerprintData;
+        public static toObject(m: proto.FingerprintData, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
     interface IForwardedAIBotMessageInfo {
         botName?: (string|null);
         botJid?: (string|null);
@@ -5017,6 +6272,70 @@ export namespace proto {
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.ForwardedAIBotMessageInfo;
         public static fromObject(d: { [k: string]: any }): proto.ForwardedAIBotMessageInfo;
         public static toObject(m: proto.ForwardedAIBotMessageInfo, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IGenerateMekInput {
+        epochHeads?: (Uint8Array[]|null);
+    }
+
+    class GenerateMekInput implements IGenerateMekInput {
+        constructor(p?: proto.IGenerateMekInput);
+        public epochHeads: Uint8Array[];
+        public static create(properties?: proto.IGenerateMekInput): proto.GenerateMekInput;
+        public static encode(m: proto.IGenerateMekInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.GenerateMekInput;
+        public static fromObject(d: { [k: string]: any }): proto.GenerateMekInput;
+        public static toObject(m: proto.GenerateMekInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IGenerateMekResult {
+        mek: proto.IMekBundle;
+    }
+
+    class GenerateMekResult implements IGenerateMekResult {
+        constructor(p?: proto.IGenerateMekResult);
+        public mek: proto.IMekBundle;
+        public static create(properties?: proto.IGenerateMekResult): proto.GenerateMekResult;
+        public static encode(m: proto.IGenerateMekResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.GenerateMekResult;
+        public static fromObject(d: { [k: string]: any }): proto.GenerateMekResult;
+        public static toObject(m: proto.GenerateMekResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IGenerateMekRosterHashInput {
+        epochHeads?: (Uint8Array[]|null);
+    }
+
+    class GenerateMekRosterHashInput implements IGenerateMekRosterHashInput {
+        constructor(p?: proto.IGenerateMekRosterHashInput);
+        public epochHeads: Uint8Array[];
+        public static create(properties?: proto.IGenerateMekRosterHashInput): proto.GenerateMekRosterHashInput;
+        public static encode(m: proto.IGenerateMekRosterHashInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.GenerateMekRosterHashInput;
+        public static fromObject(d: { [k: string]: any }): proto.GenerateMekRosterHashInput;
+        public static toObject(m: proto.GenerateMekRosterHashInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IGenerateMekRosterHashResult {
+        rosterHash: Uint8Array;
+    }
+
+    class GenerateMekRosterHashResult implements IGenerateMekRosterHashResult {
+        constructor(p?: proto.IGenerateMekRosterHashResult);
+        public rosterHash: Uint8Array;
+        public static create(properties?: proto.IGenerateMekRosterHashResult): proto.GenerateMekRosterHashResult;
+        public static encode(m: proto.IGenerateMekRosterHashResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.GenerateMekRosterHashResult;
+        public static fromObject(d: { [k: string]: any }): proto.GenerateMekRosterHashResult;
+        public static toObject(m: proto.GenerateMekRosterHashResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
         public toJSON(): { [k: string]: any };
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
@@ -5075,6 +6394,30 @@ export namespace proto {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
+    interface IGroupHistory {
+        messages?: (proto.IWebMessageInfo[]|null);
+        uncountedAssociatedMessageLists?: (proto.IUnCountedAssociatedMessageList[]|null);
+        commentMessages?: (proto.IWebMessageInfo[]|null);
+        outOfWindowPinnedMessages?: (proto.IWebMessageInfo[]|null);
+        themeMessage?: (proto.IWebMessageInfo|null);
+    }
+
+    class GroupHistory implements IGroupHistory {
+        constructor(p?: proto.IGroupHistory);
+        public messages: proto.IWebMessageInfo[];
+        public uncountedAssociatedMessageLists: proto.IUnCountedAssociatedMessageList[];
+        public commentMessages: proto.IWebMessageInfo[];
+        public outOfWindowPinnedMessages: proto.IWebMessageInfo[];
+        public themeMessage?: (proto.IWebMessageInfo|null);
+        public static create(properties?: proto.IGroupHistory): proto.GroupHistory;
+        public static encode(m: proto.IGroupHistory, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.GroupHistory;
+        public static fromObject(d: { [k: string]: any }): proto.GroupHistory;
+        public static toObject(m: proto.GroupHistory, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
     interface IGroupHistoryBundleInfo {
         deprecatedMessageHistoryBundle?: (proto.Message.IMessageHistoryBundle|null);
         processState?: (proto.GroupHistoryBundleInfo.ProcessState|null);
@@ -5123,44 +6466,26 @@ export namespace proto {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
-    interface IUnCountedAssociatedMessageList {
-        key?: (proto.IMessageKey|null);
-        messageKeys?: (proto.IMessageKey[]|null);
-        contextId?: (string|null);
+    interface IGroupHistoryWithMessageBytes {
+        messages?: (proto.IWebMessageInfoWithMessageBytes[]|null);
+        uncountedAssociatedMessageLists?: (proto.IUnCountedAssociatedMessageListWithMessageBytes[]|null);
+        commentMessages?: (proto.IWebMessageInfoWithMessageBytes[]|null);
+        outOfWindowPinnedMessages?: (proto.IWebMessageInfoWithMessageBytes[]|null);
+        themeMessage?: (proto.IWebMessageInfoWithMessageBytes|null);
     }
 
-    class UnCountedAssociatedMessageList implements IUnCountedAssociatedMessageList {
-        constructor(p?: proto.IUnCountedAssociatedMessageList);
-        public key?: (proto.IMessageKey|null);
-        public messageKeys: proto.IMessageKey[];
-        public contextId: string;
-        public static create(properties?: proto.IUnCountedAssociatedMessageList): proto.UnCountedAssociatedMessageList;
-        public static encode(m: proto.IUnCountedAssociatedMessageList, w?: $protobuf.Writer): $protobuf.Writer;
-        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.UnCountedAssociatedMessageList;
-        public static fromObject(d: { [k: string]: any }): proto.UnCountedAssociatedMessageList;
-        public static toObject(m: proto.UnCountedAssociatedMessageList, o?: $protobuf.IConversionOptions): { [k: string]: any };
-        public toJSON(): { [k: string]: any };
-        public static getTypeUrl(typeUrlPrefix?: string): string;
-    }
-
-    interface IGroupHistory {
-        messages?: (proto.IWebMessageInfo[]|null);
-        uncountedAssociatedMessageLists?: (proto.IUnCountedAssociatedMessageList[]|null);
-        commentMessages?: (proto.IWebMessageInfo[]|null);
-        outOfWindowPinnedMessages?: (proto.IWebMessageInfo[]|null);
-    }
-
-    class GroupHistory implements IGroupHistory {
-        constructor(p?: proto.IGroupHistory);
-        public messages: proto.IWebMessageInfo[];
-        public uncountedAssociatedMessageLists: proto.IUnCountedAssociatedMessageList[];
-        public commentMessages: proto.IWebMessageInfo[];
-        public outOfWindowPinnedMessages: proto.IWebMessageInfo[];
-        public static create(properties?: proto.IGroupHistory): proto.GroupHistory;
-        public static encode(m: proto.IGroupHistory, w?: $protobuf.Writer): $protobuf.Writer;
-        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.GroupHistory;
-        public static fromObject(d: { [k: string]: any }): proto.GroupHistory;
-        public static toObject(m: proto.GroupHistory, o?: $protobuf.IConversionOptions): { [k: string]: any };
+    class GroupHistoryWithMessageBytes implements IGroupHistoryWithMessageBytes {
+        constructor(p?: proto.IGroupHistoryWithMessageBytes);
+        public messages: proto.IWebMessageInfoWithMessageBytes[];
+        public uncountedAssociatedMessageLists: proto.IUnCountedAssociatedMessageListWithMessageBytes[];
+        public commentMessages: proto.IWebMessageInfoWithMessageBytes[];
+        public outOfWindowPinnedMessages: proto.IWebMessageInfoWithMessageBytes[];
+        public themeMessage?: (proto.IWebMessageInfoWithMessageBytes|null);
+        public static create(properties?: proto.IGroupHistoryWithMessageBytes): proto.GroupHistoryWithMessageBytes;
+        public static encode(m: proto.IGroupHistoryWithMessageBytes, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.GroupHistoryWithMessageBytes;
+        public static fromObject(d: { [k: string]: any }): proto.GroupHistoryWithMessageBytes;
+        public static toObject(m: proto.GroupHistoryWithMessageBytes, o?: $protobuf.IConversionOptions): { [k: string]: any };
         public toJSON(): { [k: string]: any };
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
@@ -5411,6 +6736,9 @@ export namespace proto {
         nctSalt?: (Uint8Array|null);
         inlineContacts?: (proto.IInlineContact[]|null);
         inlineContactsProvided?: (boolean|null);
+        favoriteStickers?: (proto.IStickerMetadata[]|null);
+        omittedConversations?: (proto.IRecoverableHistoryConversation[]|null);
+        omittedConversationsProvided?: (boolean|null);
     }
 
     class HistorySync implements IHistorySync {
@@ -5435,6 +6763,9 @@ export namespace proto {
         public nctSalt: Uint8Array;
         public inlineContacts: proto.IInlineContact[];
         public inlineContactsProvided: boolean;
+        public favoriteStickers: proto.IStickerMetadata[];
+        public omittedConversations: proto.IRecoverableHistoryConversation[];
+        public omittedConversationsProvided: boolean;
         public static create(properties?: proto.IHistorySync): proto.HistorySync;
         public static encode(m: proto.IHistorySync, w?: $protobuf.Writer): $protobuf.Writer;
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.HistorySync;
@@ -5478,6 +6809,11 @@ export namespace proto {
         public static toObject(m: proto.HistorySyncMsg, o?: $protobuf.IConversionOptions): { [k: string]: any };
         public toJSON(): { [k: string]: any };
         public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    enum HostedState {
+        E2EE = 0,
+        HOSTED = 1
     }
 
     interface IHydratedTemplateButton {
@@ -5872,26 +7208,6 @@ export namespace proto {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
-    interface ILIDMigrationMapping {
-        pn: (number|Long);
-        assignedLid: (number|Long);
-        latestLid?: (number|Long|null);
-    }
-
-    class LIDMigrationMapping implements ILIDMigrationMapping {
-        constructor(p?: proto.ILIDMigrationMapping);
-        public pn: (number|Long);
-        public assignedLid: (number|Long);
-        public latestLid: (number|Long);
-        public static create(properties?: proto.ILIDMigrationMapping): proto.LIDMigrationMapping;
-        public static encode(m: proto.ILIDMigrationMapping, w?: $protobuf.Writer): $protobuf.Writer;
-        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.LIDMigrationMapping;
-        public static fromObject(d: { [k: string]: any }): proto.LIDMigrationMapping;
-        public static toObject(m: proto.LIDMigrationMapping, o?: $protobuf.IConversionOptions): { [k: string]: any };
-        public toJSON(): { [k: string]: any };
-        public static getTypeUrl(typeUrlPrefix?: string): string;
-    }
-
     interface ILIDMigrationMappingSyncMessage {
         encodedMappingPayload?: (Uint8Array|null);
     }
@@ -5904,24 +7220,6 @@ export namespace proto {
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.LIDMigrationMappingSyncMessage;
         public static fromObject(d: { [k: string]: any }): proto.LIDMigrationMappingSyncMessage;
         public static toObject(m: proto.LIDMigrationMappingSyncMessage, o?: $protobuf.IConversionOptions): { [k: string]: any };
-        public toJSON(): { [k: string]: any };
-        public static getTypeUrl(typeUrlPrefix?: string): string;
-    }
-
-    interface ILIDMigrationMappingSyncPayload {
-        pnToLidMappings?: (proto.ILIDMigrationMapping[]|null);
-        chatDbMigrationTimestamp?: (number|Long|null);
-    }
-
-    class LIDMigrationMappingSyncPayload implements ILIDMigrationMappingSyncPayload {
-        constructor(p?: proto.ILIDMigrationMappingSyncPayload);
-        public pnToLidMappings: proto.ILIDMigrationMapping[];
-        public chatDbMigrationTimestamp: (number|Long);
-        public static create(properties?: proto.ILIDMigrationMappingSyncPayload): proto.LIDMigrationMappingSyncPayload;
-        public static encode(m: proto.ILIDMigrationMappingSyncPayload, w?: $protobuf.Writer): $protobuf.Writer;
-        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.LIDMigrationMappingSyncPayload;
-        public static fromObject(d: { [k: string]: any }): proto.LIDMigrationMappingSyncPayload;
-        public static toObject(m: proto.LIDMigrationMappingSyncPayload, o?: $protobuf.IConversionOptions): { [k: string]: any };
         public toJSON(): { [k: string]: any };
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
@@ -6016,6 +7314,545 @@ export namespace proto {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
+    enum MENTION_MENTION_TYPE {
+        PROFILE = 0
+    }
+
+    interface IMandrakeDecryptMekInput {
+        encryptedMek: Uint8Array;
+        recipientsHash: Uint8Array;
+        recipientEncSk: Uint8Array;
+        mekEncryptionVersion?: (number|Long|null);
+        conf?: (proto.IMinosClientConfig|null);
+        recipientMmk: proto.IMessagingMailboxPublicData;
+        mekId?: (Uint8Array|null);
+        recipientMembershipProof?: (proto.IMerkleMembershipProof|null);
+        mmkSender?: (proto.MandrakeDecryptMekInput.IMmkSenderPublicData|null);
+        epochSender?: (proto.MandrakeDecryptMekInput.IEpochSenderPublicData|null);
+        precomputedEpochSender?: (proto.MandrakeDecryptMekInput.IPrecomputedEpochSenderPublicData|null);
+    }
+
+    class MandrakeDecryptMekInput implements IMandrakeDecryptMekInput {
+        constructor(p?: proto.IMandrakeDecryptMekInput);
+        public encryptedMek: Uint8Array;
+        public recipientsHash: Uint8Array;
+        public recipientEncSk: Uint8Array;
+        public mekEncryptionVersion: (number|Long);
+        public conf?: (proto.IMinosClientConfig|null);
+        public recipientMmk: proto.IMessagingMailboxPublicData;
+        public mekId: Uint8Array;
+        public recipientMembershipProof?: (proto.IMerkleMembershipProof|null);
+        public mmkSender?: (proto.MandrakeDecryptMekInput.IMmkSenderPublicData|null);
+        public epochSender?: (proto.MandrakeDecryptMekInput.IEpochSenderPublicData|null);
+        public precomputedEpochSender?: (proto.MandrakeDecryptMekInput.IPrecomputedEpochSenderPublicData|null);
+        public senderPublicData?: ("mmkSender"|"epochSender"|"precomputedEpochSender");
+        public static create(properties?: proto.IMandrakeDecryptMekInput): proto.MandrakeDecryptMekInput;
+        public static encode(m: proto.IMandrakeDecryptMekInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeDecryptMekInput;
+        public static fromObject(d: { [k: string]: any }): proto.MandrakeDecryptMekInput;
+        public static toObject(m: proto.MandrakeDecryptMekInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    namespace MandrakeDecryptMekInput {
+
+        interface IEpochSenderPublicData {
+            epochPublicData: proto.IEpochPublicData;
+        }
+
+        class EpochSenderPublicData implements IEpochSenderPublicData {
+            constructor(p?: proto.MandrakeDecryptMekInput.IEpochSenderPublicData);
+            public epochPublicData: proto.IEpochPublicData;
+            public static create(properties?: proto.MandrakeDecryptMekInput.IEpochSenderPublicData): proto.MandrakeDecryptMekInput.EpochSenderPublicData;
+            public static encode(m: proto.MandrakeDecryptMekInput.IEpochSenderPublicData, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeDecryptMekInput.EpochSenderPublicData;
+            public static fromObject(d: { [k: string]: any }): proto.MandrakeDecryptMekInput.EpochSenderPublicData;
+            public static toObject(m: proto.MandrakeDecryptMekInput.EpochSenderPublicData, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        interface IMmkSenderPublicData {
+            mmkPublicData: proto.IMessagingMailboxPublicData;
+        }
+
+        class MmkSenderPublicData implements IMmkSenderPublicData {
+            constructor(p?: proto.MandrakeDecryptMekInput.IMmkSenderPublicData);
+            public mmkPublicData: proto.IMessagingMailboxPublicData;
+            public static create(properties?: proto.MandrakeDecryptMekInput.IMmkSenderPublicData): proto.MandrakeDecryptMekInput.MmkSenderPublicData;
+            public static encode(m: proto.MandrakeDecryptMekInput.IMmkSenderPublicData, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeDecryptMekInput.MmkSenderPublicData;
+            public static fromObject(d: { [k: string]: any }): proto.MandrakeDecryptMekInput.MmkSenderPublicData;
+            public static toObject(m: proto.MandrakeDecryptMekInput.MmkSenderPublicData, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        interface IPrecomputedEpochSenderPublicData {
+            authPk: Uint8Array;
+            epochHead: Uint8Array;
+        }
+
+        class PrecomputedEpochSenderPublicData implements IPrecomputedEpochSenderPublicData {
+            constructor(p?: proto.MandrakeDecryptMekInput.IPrecomputedEpochSenderPublicData);
+            public authPk: Uint8Array;
+            public epochHead: Uint8Array;
+            public static create(properties?: proto.MandrakeDecryptMekInput.IPrecomputedEpochSenderPublicData): proto.MandrakeDecryptMekInput.PrecomputedEpochSenderPublicData;
+            public static encode(m: proto.MandrakeDecryptMekInput.IPrecomputedEpochSenderPublicData, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeDecryptMekInput.PrecomputedEpochSenderPublicData;
+            public static fromObject(d: { [k: string]: any }): proto.MandrakeDecryptMekInput.PrecomputedEpochSenderPublicData;
+            public static toObject(m: proto.MandrakeDecryptMekInput.PrecomputedEpochSenderPublicData, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+    }
+
+    interface IMandrakeDecryptMekResult {
+        success?: (proto.IMandrakeDecryptMekSuccess|null);
+        errorMessage?: (string|null);
+    }
+
+    class MandrakeDecryptMekResult implements IMandrakeDecryptMekResult {
+        constructor(p?: proto.IMandrakeDecryptMekResult);
+        public success?: (proto.IMandrakeDecryptMekSuccess|null);
+        public errorMessage?: (string|null);
+        public result?: ("success"|"errorMessage");
+        public static create(properties?: proto.IMandrakeDecryptMekResult): proto.MandrakeDecryptMekResult;
+        public static encode(m: proto.IMandrakeDecryptMekResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeDecryptMekResult;
+        public static fromObject(d: { [k: string]: any }): proto.MandrakeDecryptMekResult;
+        public static toObject(m: proto.MandrakeDecryptMekResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMandrakeDecryptMekSuccess {
+        mek: Uint8Array;
+    }
+
+    class MandrakeDecryptMekSuccess implements IMandrakeDecryptMekSuccess {
+        constructor(p?: proto.IMandrakeDecryptMekSuccess);
+        public mek: Uint8Array;
+        public static create(properties?: proto.IMandrakeDecryptMekSuccess): proto.MandrakeDecryptMekSuccess;
+        public static encode(m: proto.IMandrakeDecryptMekSuccess, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeDecryptMekSuccess;
+        public static fromObject(d: { [k: string]: any }): proto.MandrakeDecryptMekSuccess;
+        public static toObject(m: proto.MandrakeDecryptMekSuccess, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMandrakeEncryptMekInput {
+        mek: proto.IMandrakeMekBundle;
+        recipients?: (proto.IMessagingMailboxPublicData[]|null);
+        conf?: (proto.IMinosClientConfig|null);
+        mmkSender?: (proto.MandrakeEncryptMekInput.IMmkSender|null);
+        epochSender?: (proto.MandrakeEncryptMekInput.IEpochSender|null);
+        detachedDeviceSender?: (proto.MandrakeEncryptMekInput.IDetachedDeviceSender|null);
+    }
+
+    class MandrakeEncryptMekInput implements IMandrakeEncryptMekInput {
+        constructor(p?: proto.IMandrakeEncryptMekInput);
+        public mek: proto.IMandrakeMekBundle;
+        public recipients: proto.IMessagingMailboxPublicData[];
+        public conf?: (proto.IMinosClientConfig|null);
+        public mmkSender?: (proto.MandrakeEncryptMekInput.IMmkSender|null);
+        public epochSender?: (proto.MandrakeEncryptMekInput.IEpochSender|null);
+        public detachedDeviceSender?: (proto.MandrakeEncryptMekInput.IDetachedDeviceSender|null);
+        public sender?: ("mmkSender"|"epochSender"|"detachedDeviceSender");
+        public static create(properties?: proto.IMandrakeEncryptMekInput): proto.MandrakeEncryptMekInput;
+        public static encode(m: proto.IMandrakeEncryptMekInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeEncryptMekInput;
+        public static fromObject(d: { [k: string]: any }): proto.MandrakeEncryptMekInput;
+        public static toObject(m: proto.MandrakeEncryptMekInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    namespace MandrakeEncryptMekInput {
+
+        interface IDetachedDeviceSender {
+            detachedDevicePublicData: proto.IDetachedDevicePublicData;
+            authSk: Uint8Array;
+            authPk: Uint8Array;
+        }
+
+        class DetachedDeviceSender implements IDetachedDeviceSender {
+            constructor(p?: proto.MandrakeEncryptMekInput.IDetachedDeviceSender);
+            public detachedDevicePublicData: proto.IDetachedDevicePublicData;
+            public authSk: Uint8Array;
+            public authPk: Uint8Array;
+            public static create(properties?: proto.MandrakeEncryptMekInput.IDetachedDeviceSender): proto.MandrakeEncryptMekInput.DetachedDeviceSender;
+            public static encode(m: proto.MandrakeEncryptMekInput.IDetachedDeviceSender, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeEncryptMekInput.DetachedDeviceSender;
+            public static fromObject(d: { [k: string]: any }): proto.MandrakeEncryptMekInput.DetachedDeviceSender;
+            public static toObject(m: proto.MandrakeEncryptMekInput.DetachedDeviceSender, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        interface IEpochSender {
+            epochPublicData: proto.IEpochPublicData;
+            authSk: Uint8Array;
+            authPk: Uint8Array;
+        }
+
+        class EpochSender implements IEpochSender {
+            constructor(p?: proto.MandrakeEncryptMekInput.IEpochSender);
+            public epochPublicData: proto.IEpochPublicData;
+            public authSk: Uint8Array;
+            public authPk: Uint8Array;
+            public static create(properties?: proto.MandrakeEncryptMekInput.IEpochSender): proto.MandrakeEncryptMekInput.EpochSender;
+            public static encode(m: proto.MandrakeEncryptMekInput.IEpochSender, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeEncryptMekInput.EpochSender;
+            public static fromObject(d: { [k: string]: any }): proto.MandrakeEncryptMekInput.EpochSender;
+            public static toObject(m: proto.MandrakeEncryptMekInput.EpochSender, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        interface IMmkSender {
+            mmkPublicData: proto.IMessagingMailboxPublicData;
+            authSk: Uint8Array;
+            authPk: Uint8Array;
+        }
+
+        class MmkSender implements IMmkSender {
+            constructor(p?: proto.MandrakeEncryptMekInput.IMmkSender);
+            public mmkPublicData: proto.IMessagingMailboxPublicData;
+            public authSk: Uint8Array;
+            public authPk: Uint8Array;
+            public static create(properties?: proto.MandrakeEncryptMekInput.IMmkSender): proto.MandrakeEncryptMekInput.MmkSender;
+            public static encode(m: proto.MandrakeEncryptMekInput.IMmkSender, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeEncryptMekInput.MmkSender;
+            public static fromObject(d: { [k: string]: any }): proto.MandrakeEncryptMekInput.MmkSender;
+            public static toObject(m: proto.MandrakeEncryptMekInput.MmkSender, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+    }
+
+    interface IMandrakeEncryptMekResult {
+        success?: (proto.IMandrakeEncryptMekSuccess|null);
+        errorMessage?: (string|null);
+    }
+
+    class MandrakeEncryptMekResult implements IMandrakeEncryptMekResult {
+        constructor(p?: proto.IMandrakeEncryptMekResult);
+        public success?: (proto.IMandrakeEncryptMekSuccess|null);
+        public errorMessage?: (string|null);
+        public result?: ("success"|"errorMessage");
+        public static create(properties?: proto.IMandrakeEncryptMekResult): proto.MandrakeEncryptMekResult;
+        public static encode(m: proto.IMandrakeEncryptMekResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeEncryptMekResult;
+        public static fromObject(d: { [k: string]: any }): proto.MandrakeEncryptMekResult;
+        public static toObject(m: proto.MandrakeEncryptMekResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMandrakeEncryptMekSuccess {
+        distributions?: (proto.MandrakeEncryptMekSuccess.IMekDistributionSingleRecipient[]|null);
+        recipientsHash: Uint8Array;
+        version: (number|Long);
+    }
+
+    class MandrakeEncryptMekSuccess implements IMandrakeEncryptMekSuccess {
+        constructor(p?: proto.IMandrakeEncryptMekSuccess);
+        public distributions: proto.MandrakeEncryptMekSuccess.IMekDistributionSingleRecipient[];
+        public recipientsHash: Uint8Array;
+        public version: (number|Long);
+        public static create(properties?: proto.IMandrakeEncryptMekSuccess): proto.MandrakeEncryptMekSuccess;
+        public static encode(m: proto.IMandrakeEncryptMekSuccess, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeEncryptMekSuccess;
+        public static fromObject(d: { [k: string]: any }): proto.MandrakeEncryptMekSuccess;
+        public static toObject(m: proto.MandrakeEncryptMekSuccess, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    namespace MandrakeEncryptMekSuccess {
+
+        interface IMekDistributionSingleRecipient {
+            encryptedMek: Uint8Array;
+            toMmk: proto.IMessagingMailboxPublicData;
+            recipientMembershipProof?: (proto.IMerkleMembershipProof|null);
+        }
+
+        class MekDistributionSingleRecipient implements IMekDistributionSingleRecipient {
+            constructor(p?: proto.MandrakeEncryptMekSuccess.IMekDistributionSingleRecipient);
+            public encryptedMek: Uint8Array;
+            public toMmk: proto.IMessagingMailboxPublicData;
+            public recipientMembershipProof?: (proto.IMerkleMembershipProof|null);
+            public static create(properties?: proto.MandrakeEncryptMekSuccess.IMekDistributionSingleRecipient): proto.MandrakeEncryptMekSuccess.MekDistributionSingleRecipient;
+            public static encode(m: proto.MandrakeEncryptMekSuccess.IMekDistributionSingleRecipient, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeEncryptMekSuccess.MekDistributionSingleRecipient;
+            public static fromObject(d: { [k: string]: any }): proto.MandrakeEncryptMekSuccess.MekDistributionSingleRecipient;
+            public static toObject(m: proto.MandrakeEncryptMekSuccess.MekDistributionSingleRecipient, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+    }
+
+    interface IMandrakeMekBundle {
+        key: Uint8Array;
+        mekId: Uint8Array;
+        mailboxHeadHash: Uint8Array;
+    }
+
+    class MandrakeMekBundle implements IMandrakeMekBundle {
+        constructor(p?: proto.IMandrakeMekBundle);
+        public key: Uint8Array;
+        public mekId: Uint8Array;
+        public mailboxHeadHash: Uint8Array;
+        public static create(properties?: proto.IMandrakeMekBundle): proto.MandrakeMekBundle;
+        public static encode(m: proto.IMandrakeMekBundle, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeMekBundle;
+        public static fromObject(d: { [k: string]: any }): proto.MandrakeMekBundle;
+        public static toObject(m: proto.MandrakeMekBundle, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMandrakeOpenEpochInput {
+        userFbid: string;
+        epochNumber: (number|Long);
+        exportRootKey: Uint8Array;
+        previousExportRootKey: Uint8Array;
+        previousEpochNumber: (number|Long);
+        previousEpochHead: Uint8Array;
+        previousMmk?: (proto.IMessagingMailboxPublicData|null);
+        detachedDevices?: (proto.IDetachedDevicePublicData[]|null);
+    }
+
+    class MandrakeOpenEpochInput implements IMandrakeOpenEpochInput {
+        constructor(p?: proto.IMandrakeOpenEpochInput);
+        public userFbid: string;
+        public epochNumber: (number|Long);
+        public exportRootKey: Uint8Array;
+        public previousExportRootKey: Uint8Array;
+        public previousEpochNumber: (number|Long);
+        public previousEpochHead: Uint8Array;
+        public previousMmk?: (proto.IMessagingMailboxPublicData|null);
+        public detachedDevices: proto.IDetachedDevicePublicData[];
+        public static create(properties?: proto.IMandrakeOpenEpochInput): proto.MandrakeOpenEpochInput;
+        public static encode(m: proto.IMandrakeOpenEpochInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeOpenEpochInput;
+        public static fromObject(d: { [k: string]: any }): proto.MandrakeOpenEpochInput;
+        public static toObject(m: proto.MandrakeOpenEpochInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMandrakeOpenEpochResult {
+        success?: (proto.IMandrakeOpenEpochSuccess|null);
+        errorMessage?: (string|null);
+    }
+
+    class MandrakeOpenEpochResult implements IMandrakeOpenEpochResult {
+        constructor(p?: proto.IMandrakeOpenEpochResult);
+        public success?: (proto.IMandrakeOpenEpochSuccess|null);
+        public errorMessage?: (string|null);
+        public result?: ("success"|"errorMessage");
+        public static create(properties?: proto.IMandrakeOpenEpochResult): proto.MandrakeOpenEpochResult;
+        public static encode(m: proto.IMandrakeOpenEpochResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeOpenEpochResult;
+        public static fromObject(d: { [k: string]: any }): proto.MandrakeOpenEpochResult;
+        public static toObject(m: proto.MandrakeOpenEpochResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMandrakeOpenEpochSuccess {
+        minosSignedEpoch: proto.IMinosSignedEpoch;
+        signedMmkDistribution: proto.ISignedMmkDistributionFromMailbox;
+    }
+
+    class MandrakeOpenEpochSuccess implements IMandrakeOpenEpochSuccess {
+        constructor(p?: proto.IMandrakeOpenEpochSuccess);
+        public minosSignedEpoch: proto.IMinosSignedEpoch;
+        public signedMmkDistribution: proto.ISignedMmkDistributionFromMailbox;
+        public static create(properties?: proto.IMandrakeOpenEpochSuccess): proto.MandrakeOpenEpochSuccess;
+        public static encode(m: proto.IMandrakeOpenEpochSuccess, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeOpenEpochSuccess;
+        public static fromObject(d: { [k: string]: any }): proto.MandrakeOpenEpochSuccess;
+        public static toObject(m: proto.MandrakeOpenEpochSuccess, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMandrakeOpenInitialEpochInput {
+        userFbid: string;
+        epochNumber: (number|Long);
+        exportRootKey: Uint8Array;
+        detachedDevices?: (proto.IDetachedDevicePublicData[]|null);
+    }
+
+    class MandrakeOpenInitialEpochInput implements IMandrakeOpenInitialEpochInput {
+        constructor(p?: proto.IMandrakeOpenInitialEpochInput);
+        public userFbid: string;
+        public epochNumber: (number|Long);
+        public exportRootKey: Uint8Array;
+        public detachedDevices: proto.IDetachedDevicePublicData[];
+        public static create(properties?: proto.IMandrakeOpenInitialEpochInput): proto.MandrakeOpenInitialEpochInput;
+        public static encode(m: proto.IMandrakeOpenInitialEpochInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeOpenInitialEpochInput;
+        public static fromObject(d: { [k: string]: any }): proto.MandrakeOpenInitialEpochInput;
+        public static toObject(m: proto.MandrakeOpenInitialEpochInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMandrakeOpenInitialEpochResult {
+        success?: (proto.IMandrakeOpenEpochSuccess|null);
+        errorMessage?: (string|null);
+    }
+
+    class MandrakeOpenInitialEpochResult implements IMandrakeOpenInitialEpochResult {
+        constructor(p?: proto.IMandrakeOpenInitialEpochResult);
+        public success?: (proto.IMandrakeOpenEpochSuccess|null);
+        public errorMessage?: (string|null);
+        public result?: ("success"|"errorMessage");
+        public static create(properties?: proto.IMandrakeOpenInitialEpochResult): proto.MandrakeOpenInitialEpochResult;
+        public static encode(m: proto.IMandrakeOpenInitialEpochResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeOpenInitialEpochResult;
+        public static fromObject(d: { [k: string]: any }): proto.MandrakeOpenInitialEpochResult;
+        public static toObject(m: proto.MandrakeOpenInitialEpochResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMandrakeValidateAndDecryptSelfMmkInput {
+        newMmk: proto.IMessagingMailboxPublicData;
+        signature: Uint8Array;
+        existingMmk?: (proto.IMessagingMailboxPublicData|null);
+        exportRootKey: Uint8Array;
+        epochNumber: (number|Long);
+        expectedEpochHead: Uint8Array;
+        encryptedMmk: Uint8Array;
+        version: (number|Long);
+        latestStoredMmk?: (proto.IMessagingMailboxPublicData|null);
+    }
+
+    class MandrakeValidateAndDecryptSelfMmkInput implements IMandrakeValidateAndDecryptSelfMmkInput {
+        constructor(p?: proto.IMandrakeValidateAndDecryptSelfMmkInput);
+        public newMmk: proto.IMessagingMailboxPublicData;
+        public signature: Uint8Array;
+        public existingMmk?: (proto.IMessagingMailboxPublicData|null);
+        public exportRootKey: Uint8Array;
+        public epochNumber: (number|Long);
+        public expectedEpochHead: Uint8Array;
+        public encryptedMmk: Uint8Array;
+        public version: (number|Long);
+        public latestStoredMmk?: (proto.IMessagingMailboxPublicData|null);
+        public static create(properties?: proto.IMandrakeValidateAndDecryptSelfMmkInput): proto.MandrakeValidateAndDecryptSelfMmkInput;
+        public static encode(m: proto.IMandrakeValidateAndDecryptSelfMmkInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeValidateAndDecryptSelfMmkInput;
+        public static fromObject(d: { [k: string]: any }): proto.MandrakeValidateAndDecryptSelfMmkInput;
+        public static toObject(m: proto.MandrakeValidateAndDecryptSelfMmkInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMandrakeValidateAndDecryptSelfMmkResult {
+        success?: (proto.IMandrakeValidateAndDecryptSelfMmkSuccess|null);
+        errorMessage?: (string|null);
+    }
+
+    class MandrakeValidateAndDecryptSelfMmkResult implements IMandrakeValidateAndDecryptSelfMmkResult {
+        constructor(p?: proto.IMandrakeValidateAndDecryptSelfMmkResult);
+        public success?: (proto.IMandrakeValidateAndDecryptSelfMmkSuccess|null);
+        public errorMessage?: (string|null);
+        public result?: ("success"|"errorMessage");
+        public static create(properties?: proto.IMandrakeValidateAndDecryptSelfMmkResult): proto.MandrakeValidateAndDecryptSelfMmkResult;
+        public static encode(m: proto.IMandrakeValidateAndDecryptSelfMmkResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeValidateAndDecryptSelfMmkResult;
+        public static fromObject(d: { [k: string]: any }): proto.MandrakeValidateAndDecryptSelfMmkResult;
+        public static toObject(m: proto.MandrakeValidateAndDecryptSelfMmkResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMandrakeValidateAndDecryptSelfMmkSuccess {
+        mmkSeed: Uint8Array;
+        mailboxHeadHash: Uint8Array;
+    }
+
+    class MandrakeValidateAndDecryptSelfMmkSuccess implements IMandrakeValidateAndDecryptSelfMmkSuccess {
+        constructor(p?: proto.IMandrakeValidateAndDecryptSelfMmkSuccess);
+        public mmkSeed: Uint8Array;
+        public mailboxHeadHash: Uint8Array;
+        public static create(properties?: proto.IMandrakeValidateAndDecryptSelfMmkSuccess): proto.MandrakeValidateAndDecryptSelfMmkSuccess;
+        public static encode(m: proto.IMandrakeValidateAndDecryptSelfMmkSuccess, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeValidateAndDecryptSelfMmkSuccess;
+        public static fromObject(d: { [k: string]: any }): proto.MandrakeValidateAndDecryptSelfMmkSuccess;
+        public static toObject(m: proto.MandrakeValidateAndDecryptSelfMmkSuccess, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMandrakeValidateNewMmkFromDetachedDeviceInput {
+        mmkFromDevice: proto.IMmkFromDetachedDevice;
+        signature: Uint8Array;
+        prevMmk: proto.IMessagingMailboxPublicData;
+    }
+
+    class MandrakeValidateNewMmkFromDetachedDeviceInput implements IMandrakeValidateNewMmkFromDetachedDeviceInput {
+        constructor(p?: proto.IMandrakeValidateNewMmkFromDetachedDeviceInput);
+        public mmkFromDevice: proto.IMmkFromDetachedDevice;
+        public signature: Uint8Array;
+        public prevMmk: proto.IMessagingMailboxPublicData;
+        public static create(properties?: proto.IMandrakeValidateNewMmkFromDetachedDeviceInput): proto.MandrakeValidateNewMmkFromDetachedDeviceInput;
+        public static encode(m: proto.IMandrakeValidateNewMmkFromDetachedDeviceInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeValidateNewMmkFromDetachedDeviceInput;
+        public static fromObject(d: { [k: string]: any }): proto.MandrakeValidateNewMmkFromDetachedDeviceInput;
+        public static toObject(m: proto.MandrakeValidateNewMmkFromDetachedDeviceInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMandrakeValidateNewMmkFromMailboxInput {
+        newMmk: proto.IMessagingMailboxPublicData;
+        signature: Uint8Array;
+        prevMmk?: (proto.IMessagingMailboxPublicData|null);
+        epochPublicData: proto.IEpochPublicData;
+    }
+
+    class MandrakeValidateNewMmkFromMailboxInput implements IMandrakeValidateNewMmkFromMailboxInput {
+        constructor(p?: proto.IMandrakeValidateNewMmkFromMailboxInput);
+        public newMmk: proto.IMessagingMailboxPublicData;
+        public signature: Uint8Array;
+        public prevMmk?: (proto.IMessagingMailboxPublicData|null);
+        public epochPublicData: proto.IEpochPublicData;
+        public static create(properties?: proto.IMandrakeValidateNewMmkFromMailboxInput): proto.MandrakeValidateNewMmkFromMailboxInput;
+        public static encode(m: proto.IMandrakeValidateNewMmkFromMailboxInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeValidateNewMmkFromMailboxInput;
+        public static fromObject(d: { [k: string]: any }): proto.MandrakeValidateNewMmkFromMailboxInput;
+        public static toObject(m: proto.MandrakeValidateNewMmkFromMailboxInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMandrakeValidateNewMmkResult {
+        valid?: (boolean|null);
+        errorMessage?: (string|null);
+    }
+
+    class MandrakeValidateNewMmkResult implements IMandrakeValidateNewMmkResult {
+        constructor(p?: proto.IMandrakeValidateNewMmkResult);
+        public valid?: (boolean|null);
+        public errorMessage?: (string|null);
+        public result?: ("valid"|"errorMessage");
+        public static create(properties?: proto.IMandrakeValidateNewMmkResult): proto.MandrakeValidateNewMmkResult;
+        public static encode(m: proto.IMandrakeValidateNewMmkResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MandrakeValidateNewMmkResult;
+        public static fromObject(d: { [k: string]: any }): proto.MandrakeValidateNewMmkResult;
+        public static toObject(m: proto.MandrakeValidateNewMmkResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
     interface IMediaData {
         localPath?: (string|null);
     }
@@ -6048,6 +7885,101 @@ export namespace proto {
         public static toObject(m: proto.MediaDomainInfo, o?: $protobuf.IConversionOptions): { [k: string]: any };
         public toJSON(): { [k: string]: any };
         public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMediaEntry {
+        fileSha256?: (Uint8Array|null);
+        mediaKey?: (Uint8Array|null);
+        fileEncSha256?: (Uint8Array|null);
+        directPath?: (string|null);
+        mediaKeyTimestamp?: (number|Long|null);
+        serverMediaType?: (string|null);
+        uploadToken?: (Uint8Array|null);
+        validatedTimestamp?: (Uint8Array|null);
+        sidecar?: (Uint8Array|null);
+        objectId?: (string|null);
+        fbid?: (string|null);
+        downloadableThumbnail?: (proto.MediaEntry.IDownloadableThumbnail|null);
+        handle?: (string|null);
+        filename?: (string|null);
+        progressiveJpegDetails?: (proto.MediaEntry.IProgressiveJpegDetails|null);
+        size?: (number|Long|null);
+        lastDownloadAttemptTimestamp?: (number|Long|null);
+    }
+
+    class MediaEntry implements IMediaEntry {
+        constructor(p?: proto.IMediaEntry);
+        public fileSha256: Uint8Array;
+        public mediaKey: Uint8Array;
+        public fileEncSha256: Uint8Array;
+        public directPath: string;
+        public mediaKeyTimestamp: (number|Long);
+        public serverMediaType: string;
+        public uploadToken: Uint8Array;
+        public validatedTimestamp: Uint8Array;
+        public sidecar: Uint8Array;
+        public objectId: string;
+        public fbid: string;
+        public downloadableThumbnail?: (proto.MediaEntry.IDownloadableThumbnail|null);
+        public handle: string;
+        public filename: string;
+        public progressiveJpegDetails?: (proto.MediaEntry.IProgressiveJpegDetails|null);
+        public size: (number|Long);
+        public lastDownloadAttemptTimestamp: (number|Long);
+        public static create(properties?: proto.IMediaEntry): proto.MediaEntry;
+        public static encode(m: proto.IMediaEntry, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MediaEntry;
+        public static fromObject(d: { [k: string]: any }): proto.MediaEntry;
+        public static toObject(m: proto.MediaEntry, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    namespace MediaEntry {
+
+        interface IDownloadableThumbnail {
+            fileSha256?: (Uint8Array|null);
+            fileEncSha256?: (Uint8Array|null);
+            directPath?: (string|null);
+            mediaKey?: (Uint8Array|null);
+            mediaKeyTimestamp?: (number|Long|null);
+            objectId?: (string|null);
+        }
+
+        class DownloadableThumbnail implements IDownloadableThumbnail {
+            constructor(p?: proto.MediaEntry.IDownloadableThumbnail);
+            public fileSha256: Uint8Array;
+            public fileEncSha256: Uint8Array;
+            public directPath: string;
+            public mediaKey: Uint8Array;
+            public mediaKeyTimestamp: (number|Long);
+            public objectId: string;
+            public static create(properties?: proto.MediaEntry.IDownloadableThumbnail): proto.MediaEntry.DownloadableThumbnail;
+            public static encode(m: proto.MediaEntry.IDownloadableThumbnail, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MediaEntry.DownloadableThumbnail;
+            public static fromObject(d: { [k: string]: any }): proto.MediaEntry.DownloadableThumbnail;
+            public static toObject(m: proto.MediaEntry.DownloadableThumbnail, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        interface IProgressiveJpegDetails {
+            scanLengths?: (number[]|null);
+            sidecar?: (Uint8Array|null);
+        }
+
+        class ProgressiveJpegDetails implements IProgressiveJpegDetails {
+            constructor(p?: proto.MediaEntry.IProgressiveJpegDetails);
+            public scanLengths: number[];
+            public sidecar: Uint8Array;
+            public static create(properties?: proto.MediaEntry.IProgressiveJpegDetails): proto.MediaEntry.ProgressiveJpegDetails;
+            public static encode(m: proto.MediaEntry.IProgressiveJpegDetails, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MediaEntry.ProgressiveJpegDetails;
+            public static fromObject(d: { [k: string]: any }): proto.MediaEntry.ProgressiveJpegDetails;
+            public static toObject(m: proto.MediaEntry.ProgressiveJpegDetails, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
     }
 
     enum MediaKeyDomain {
@@ -6114,6 +8046,26 @@ export namespace proto {
         ON = 2
     }
 
+    interface IMekBundle {
+        key: Uint8Array;
+        mekId: Uint8Array;
+        rosterHash: Uint8Array;
+    }
+
+    class MekBundle implements IMekBundle {
+        constructor(p?: proto.IMekBundle);
+        public key: Uint8Array;
+        public mekId: Uint8Array;
+        public rosterHash: Uint8Array;
+        public static create(properties?: proto.IMekBundle): proto.MekBundle;
+        public static encode(m: proto.IMekBundle, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MekBundle;
+        public static fromObject(d: { [k: string]: any }): proto.MekBundle;
+        public static toObject(m: proto.MekBundle, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
     interface IMemberLabel {
         label?: (string|null);
         labelTimestamp?: (number|Long|null);
@@ -6128,6 +8080,50 @@ export namespace proto {
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MemberLabel;
         public static fromObject(d: { [k: string]: any }): proto.MemberLabel;
         public static toObject(m: proto.MemberLabel, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMention {
+        mentionType?: (proto.MENTION_MENTION_TYPE|null);
+        mentionedJid?: (string|null);
+        offset?: (number|null);
+        length?: (number|null);
+    }
+
+    class Mention implements IMention {
+        constructor(p?: proto.IMention);
+        public mentionType: proto.MENTION_MENTION_TYPE;
+        public mentionedJid: string;
+        public offset: number;
+        public length: number;
+        public static create(properties?: proto.IMention): proto.Mention;
+        public static encode(m: proto.IMention, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.Mention;
+        public static fromObject(d: { [k: string]: any }): proto.Mention;
+        public static toObject(m: proto.Mention, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMerkleMembershipProof {
+        proof: Uint8Array;
+        root: Uint8Array;
+        leafIndex: (number|Long);
+        totalLeaves: (number|Long);
+    }
+
+    class MerkleMembershipProof implements IMerkleMembershipProof {
+        constructor(p?: proto.IMerkleMembershipProof);
+        public proof: Uint8Array;
+        public root: Uint8Array;
+        public leafIndex: (number|Long);
+        public totalLeaves: (number|Long);
+        public static create(properties?: proto.IMerkleMembershipProof): proto.MerkleMembershipProof;
+        public static encode(m: proto.IMerkleMembershipProof, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MerkleMembershipProof;
+        public static fromObject(d: { [k: string]: any }): proto.MerkleMembershipProof;
+        public static toObject(m: proto.MerkleMembershipProof, o?: $protobuf.IConversionOptions): { [k: string]: any };
         public toJSON(): { [k: string]: any };
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
@@ -6229,7 +8225,6 @@ export namespace proto {
         newsletterFollowerInviteMessageV2?: (proto.Message.INewsletterFollowerInviteMessage|null);
         pollResultSnapshotMessageV3?: (proto.Message.IPollResultSnapshotMessage|null);
         newsletterAdminProfileMessage?: (proto.Message.IFutureProofMessage|null);
-        newsletterAdminProfileMessageV2?: (proto.Message.IFutureProofMessage|null);
         spoilerMessage?: (proto.Message.IFutureProofMessage|null);
         pollCreationMessageV6?: (proto.Message.IPollCreationMessage|null);
         conditionalRevealMessage?: (proto.Message.IConditionalRevealMessage|null);
@@ -6244,6 +8239,13 @@ export namespace proto {
         musicMessage?: (proto.Message.IMusicMessage|null);
         statusLinkPreviewMetadata?: (proto.Message.IStatusLinkPreviewMetadata|null);
         botPlatformRegistrationSuccessMessage?: (proto.Message.IFutureProofMessage|null);
+        newsletterScheduledMessage?: (proto.Message.IFutureProofMessage|null);
+        acp2SettingMessage?: (proto.Message.IFutureProofMessage|null);
+        audioStickerMessage?: (proto.Message.IFutureProofMessage|null);
+        instantImageMessage?: (proto.Message.IImageMessage|null);
+        requestLocationMessage?: (proto.Message.IRequestLocationMessage|null);
+        botGroupParticipantMessage?: (proto.Message.IFutureProofMessage|null);
+        requestLocationUpdateMessage?: (proto.Message.IRequestLocationUpdateMessage|null);
     }
 
     class Message implements IMessage {
@@ -6344,7 +8346,6 @@ export namespace proto {
         public newsletterFollowerInviteMessageV2?: (proto.Message.INewsletterFollowerInviteMessage|null);
         public pollResultSnapshotMessageV3?: (proto.Message.IPollResultSnapshotMessage|null);
         public newsletterAdminProfileMessage?: (proto.Message.IFutureProofMessage|null);
-        public newsletterAdminProfileMessageV2?: (proto.Message.IFutureProofMessage|null);
         public spoilerMessage?: (proto.Message.IFutureProofMessage|null);
         public pollCreationMessageV6?: (proto.Message.IPollCreationMessage|null);
         public conditionalRevealMessage?: (proto.Message.IConditionalRevealMessage|null);
@@ -6359,6 +8360,13 @@ export namespace proto {
         public musicMessage?: (proto.Message.IMusicMessage|null);
         public statusLinkPreviewMetadata?: (proto.Message.IStatusLinkPreviewMetadata|null);
         public botPlatformRegistrationSuccessMessage?: (proto.Message.IFutureProofMessage|null);
+        public newsletterScheduledMessage?: (proto.Message.IFutureProofMessage|null);
+        public acp2SettingMessage?: (proto.Message.IFutureProofMessage|null);
+        public audioStickerMessage?: (proto.Message.IFutureProofMessage|null);
+        public instantImageMessage?: (proto.Message.IImageMessage|null);
+        public requestLocationMessage?: (proto.Message.IRequestLocationMessage|null);
+        public botGroupParticipantMessage?: (proto.Message.IFutureProofMessage|null);
+        public requestLocationUpdateMessage?: (proto.Message.IRequestLocationUpdateMessage|null);
         public static create(properties?: proto.IMessage): proto.Message;
         public static encode(m: proto.IMessage, w?: $protobuf.Writer): $protobuf.Writer;
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.Message;
@@ -6889,6 +8897,24 @@ export namespace proto {
             public static getTypeUrl(typeUrlPrefix?: string): string;
         }
 
+        interface IChatAnimatedWallpaper {
+            animatedWallpaperId?: (string|null);
+            dimLevel?: (number|null);
+        }
+
+        class ChatAnimatedWallpaper implements IChatAnimatedWallpaper {
+            constructor(p?: proto.Message.IChatAnimatedWallpaper);
+            public animatedWallpaperId: string;
+            public dimLevel: number;
+            public static create(properties?: proto.Message.IChatAnimatedWallpaper): proto.Message.ChatAnimatedWallpaper;
+            public static encode(m: proto.Message.IChatAnimatedWallpaper, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.Message.ChatAnimatedWallpaper;
+            public static fromObject(d: { [k: string]: any }): proto.Message.ChatAnimatedWallpaper;
+            public static toObject(m: proto.Message.ChatAnimatedWallpaper, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
         interface IChatCustomImageWallpaper {
             directPath?: (string|null);
             mediaKey?: (Uint8Array|null);
@@ -6930,16 +8956,20 @@ export namespace proto {
         }
 
         interface IChatSolidColorWallpaper {
-            colorLight?: (string|null);
-            colorDark?: (string|null);
+            backgroundLightArgb?: (number|null);
+            backgroundDarkArgb?: (number|null);
             isDoodleEnabled?: (boolean|null);
+            doodleLightArgb?: (number|null);
+            doodleDarkArgb?: (number|null);
         }
 
         class ChatSolidColorWallpaper implements IChatSolidColorWallpaper {
             constructor(p?: proto.Message.IChatSolidColorWallpaper);
-            public colorLight: string;
-            public colorDark: string;
+            public backgroundLightArgb: number;
+            public backgroundDarkArgb: number;
             public isDoodleEnabled: boolean;
+            public doodleLightArgb: number;
+            public doodleDarkArgb: number;
             public static create(properties?: proto.Message.IChatSolidColorWallpaper): proto.Message.ChatSolidColorWallpaper;
             public static encode(m: proto.Message.IChatSolidColorWallpaper, w?: $protobuf.Writer): $protobuf.Writer;
             public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.Message.ChatSolidColorWallpaper;
@@ -6975,6 +9005,7 @@ export namespace proto {
             solidColor?: (proto.Message.IChatSolidColorWallpaper|null);
             stockImage?: (proto.Message.IChatStockImageWallpaper|null);
             customImage?: (proto.Message.IChatCustomImageWallpaper|null);
+            animatedWallpaper?: (proto.Message.IChatAnimatedWallpaper|null);
         }
 
         class ChatThemeSetting implements IChatThemeSetting {
@@ -6986,7 +9017,8 @@ export namespace proto {
             public solidColor?: (proto.Message.IChatSolidColorWallpaper|null);
             public stockImage?: (proto.Message.IChatStockImageWallpaper|null);
             public customImage?: (proto.Message.IChatCustomImageWallpaper|null);
-            public wallpaper?: ("defaultWallpaper"|"solidColor"|"stockImage"|"customImage");
+            public animatedWallpaper?: (proto.Message.IChatAnimatedWallpaper|null);
+            public wallpaper?: ("defaultWallpaper"|"solidColor"|"stockImage"|"customImage"|"animatedWallpaper");
             public static create(properties?: proto.Message.IChatThemeSetting): proto.Message.ChatThemeSetting;
             public static encode(m: proto.Message.IChatThemeSetting, w?: $protobuf.Writer): $protobuf.Writer;
             public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.Message.ChatThemeSetting;
@@ -7048,6 +9080,24 @@ export namespace proto {
                 public toJSON(): { [k: string]: any };
                 public static getTypeUrl(typeUrlPrefix?: string): string;
             }
+        }
+
+        interface ICoexConnectionDescriptor {
+            providerId?: (number|Long|null);
+            product?: (string|null);
+        }
+
+        class CoexConnectionDescriptor implements ICoexConnectionDescriptor {
+            constructor(p?: proto.Message.ICoexConnectionDescriptor);
+            public providerId: (number|Long);
+            public product: string;
+            public static create(properties?: proto.Message.ICoexConnectionDescriptor): proto.Message.CoexConnectionDescriptor;
+            public static encode(m: proto.Message.ICoexConnectionDescriptor, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.Message.CoexConnectionDescriptor;
+            public static fromObject(d: { [k: string]: any }): proto.Message.CoexConnectionDescriptor;
+            public static toObject(m: proto.Message.CoexConnectionDescriptor, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
         }
 
         interface ICommentMessage {
@@ -7302,6 +9352,10 @@ export namespace proto {
             isCanceled?: (boolean|null);
             endTime?: (number|Long|null);
             callLink?: (string|null);
+            coverImageHandle?: (string|null);
+            locationName?: (string|null);
+            lastUpdatedTsUsec?: (number|Long|null);
+            status?: (proto.Message.EventInviteMessage.EventStatus|null);
         }
 
         class EventInviteMessage implements IEventInviteMessage {
@@ -7315,6 +9369,10 @@ export namespace proto {
             public isCanceled: boolean;
             public endTime: (number|Long);
             public callLink: string;
+            public coverImageHandle: string;
+            public locationName: string;
+            public lastUpdatedTsUsec: (number|Long);
+            public status: proto.Message.EventInviteMessage.EventStatus;
             public static create(properties?: proto.Message.IEventInviteMessage): proto.Message.EventInviteMessage;
             public static encode(m: proto.Message.IEventInviteMessage, w?: $protobuf.Writer): $protobuf.Writer;
             public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.Message.EventInviteMessage;
@@ -7322,6 +9380,19 @@ export namespace proto {
             public static toObject(m: proto.Message.EventInviteMessage, o?: $protobuf.IConversionOptions): { [k: string]: any };
             public toJSON(): { [k: string]: any };
             public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        namespace EventInviteMessage {
+
+            enum EventStatus {
+                UNKNOWN = 0,
+                ACTIVE = 1,
+                CANCELED = 2,
+                SUSPENDED = 3,
+                DELETED = 4,
+                LEFT_EVENT = 5,
+                REMOVED_FROM_INVITE_LIST = 6
+            }
         }
 
         interface IEventMessage {
@@ -7522,6 +9593,7 @@ export namespace proto {
             requestId?: (string|null);
             businessProduct?: (string|null);
             opaqueClientData?: (Uint8Array|null);
+            connection?: (proto.Message.ICoexConnectionDescriptor|null);
         }
 
         class FullHistorySyncOnDemandRequestMetadata implements IFullHistorySyncOnDemandRequestMetadata {
@@ -7529,6 +9601,7 @@ export namespace proto {
             public requestId: string;
             public businessProduct: string;
             public opaqueClientData: Uint8Array;
+            public connection?: (proto.Message.ICoexConnectionDescriptor|null);
             public static create(properties?: proto.Message.IFullHistorySyncOnDemandRequestMetadata): proto.Message.FullHistorySyncOnDemandRequestMetadata;
             public static encode(m: proto.Message.IFullHistorySyncOnDemandRequestMetadata, w?: $protobuf.Writer): $protobuf.Writer;
             public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.Message.FullHistorySyncOnDemandRequestMetadata;
@@ -8734,6 +10807,7 @@ export namespace proto {
             messageCount?: (number|Long|null);
             nonHistoryReceivers?: (string[]|null);
             oldestMessageTimestampInBundle?: (number|Long|null);
+            includesChatTheme?: (boolean|null);
         }
 
         class MessageHistoryMetadata implements IMessageHistoryMetadata {
@@ -8743,6 +10817,7 @@ export namespace proto {
             public messageCount: (number|Long);
             public nonHistoryReceivers: string[];
             public oldestMessageTimestampInBundle: (number|Long);
+            public includesChatTheme: boolean;
             public static create(properties?: proto.Message.IMessageHistoryMetadata): proto.Message.MessageHistoryMetadata;
             public static encode(m: proto.Message.IMessageHistoryMetadata, w?: $protobuf.Writer): $protobuf.Writer;
             public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.Message.MessageHistoryMetadata;
@@ -8799,7 +10874,8 @@ export namespace proto {
         namespace MusicMessage {
 
             enum MusicMessageStyle {
-                UNKNOWN = 0
+                UNKNOWN = 0,
+                VINYL = 1
             }
         }
 
@@ -10148,6 +12224,10 @@ export namespace proto {
             aiMetadataOperation?: (proto.IAIMetadataOperation|null);
             markAsVerifiedAction?: (proto.Message.IMarkAsVerifiedAction|null);
             coexStateSync?: (proto.ICoexStateSync|null);
+            acp2Setting?: (proto.IACP2Setting|null);
+            sharedDeviceContactHashKeyShare?: (proto.Message.ISharedDeviceContactHashKeyShare|null);
+            sharedDeviceContactHashKeyRequest?: (proto.Message.ISharedDeviceContactHashKeyRequest|null);
+            additionalPromptIds?: (string[]|null);
         }
 
         class ProtocolMessage implements IProtocolMessage {
@@ -10182,6 +12262,10 @@ export namespace proto {
             public aiMetadataOperation?: (proto.IAIMetadataOperation|null);
             public markAsVerifiedAction?: (proto.Message.IMarkAsVerifiedAction|null);
             public coexStateSync?: (proto.ICoexStateSync|null);
+            public acp2Setting?: (proto.IACP2Setting|null);
+            public sharedDeviceContactHashKeyShare?: (proto.Message.ISharedDeviceContactHashKeyShare|null);
+            public sharedDeviceContactHashKeyRequest?: (proto.Message.ISharedDeviceContactHashKeyRequest|null);
+            public additionalPromptIds: string[];
             public static create(properties?: proto.Message.IProtocolMessage): proto.Message.ProtocolMessage;
             public static encode(m: proto.Message.IProtocolMessage, w?: $protobuf.Writer): $protobuf.Writer;
             public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.Message.ProtocolMessage;
@@ -10225,7 +12309,10 @@ export namespace proto {
                 CHAT_THEME_SETTING = 34,
                 AI_METADATA_OPERATION = 35,
                 MARK_AS_VERIFIED_ACTION = 36,
-                COEX_STATE_SYNC = 37
+                COEX_STATE_SYNC = 37,
+                ACP2_SETTING = 39,
+                SHARED_DEVICE_CONTACT_HASH_KEY_SHARE = 40,
+                SHARED_DEVICE_CONTACT_HASH_KEY_REQUEST = 41
             }
         }
 
@@ -10267,6 +12354,50 @@ export namespace proto {
             public static toObject(m: proto.Message.ReactionMessage, o?: $protobuf.IConversionOptions): { [k: string]: any };
             public toJSON(): { [k: string]: any };
             public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        interface IRequestLocationMessage {
+            contextInfo?: (proto.IContextInfo|null);
+        }
+
+        class RequestLocationMessage implements IRequestLocationMessage {
+            constructor(p?: proto.Message.IRequestLocationMessage);
+            public contextInfo?: (proto.IContextInfo|null);
+            public static create(properties?: proto.Message.IRequestLocationMessage): proto.Message.RequestLocationMessage;
+            public static encode(m: proto.Message.IRequestLocationMessage, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.Message.RequestLocationMessage;
+            public static fromObject(d: { [k: string]: any }): proto.Message.RequestLocationMessage;
+            public static toObject(m: proto.Message.RequestLocationMessage, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        interface IRequestLocationUpdateMessage {
+            key?: (proto.IMessageKey|null);
+            updateType?: (proto.Message.RequestLocationUpdateMessage.UpdateType|null);
+            senderTimestampMs?: (number|Long|null);
+        }
+
+        class RequestLocationUpdateMessage implements IRequestLocationUpdateMessage {
+            constructor(p?: proto.Message.IRequestLocationUpdateMessage);
+            public key?: (proto.IMessageKey|null);
+            public updateType: proto.Message.RequestLocationUpdateMessage.UpdateType;
+            public senderTimestampMs: (number|Long);
+            public static create(properties?: proto.Message.IRequestLocationUpdateMessage): proto.Message.RequestLocationUpdateMessage;
+            public static encode(m: proto.Message.IRequestLocationUpdateMessage, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.Message.RequestLocationUpdateMessage;
+            public static fromObject(d: { [k: string]: any }): proto.Message.RequestLocationUpdateMessage;
+            public static toObject(m: proto.Message.RequestLocationUpdateMessage, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        namespace RequestLocationUpdateMessage {
+
+            enum UpdateType {
+                UNKNOWN = 0,
+                CANCEL = 1
+            }
         }
 
         interface IRequestPaymentMessage {
@@ -10489,6 +12620,67 @@ export namespace proto {
             public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.Message.SenderKeyDistributionMessage;
             public static fromObject(d: { [k: string]: any }): proto.Message.SenderKeyDistributionMessage;
             public static toObject(m: proto.Message.SenderKeyDistributionMessage, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        interface ISharedDeviceContactHashKey {
+            epoch?: (number|null);
+            kind?: (proto.Message.SharedDeviceContactHashKey.Kind|null);
+            keyData?: (Uint8Array|null);
+        }
+
+        class SharedDeviceContactHashKey implements ISharedDeviceContactHashKey {
+            constructor(p?: proto.Message.ISharedDeviceContactHashKey);
+            public epoch: number;
+            public kind: proto.Message.SharedDeviceContactHashKey.Kind;
+            public keyData: Uint8Array;
+            public static create(properties?: proto.Message.ISharedDeviceContactHashKey): proto.Message.SharedDeviceContactHashKey;
+            public static encode(m: proto.Message.ISharedDeviceContactHashKey, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.Message.SharedDeviceContactHashKey;
+            public static fromObject(d: { [k: string]: any }): proto.Message.SharedDeviceContactHashKey;
+            public static toObject(m: proto.Message.SharedDeviceContactHashKey, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        namespace SharedDeviceContactHashKey {
+
+            enum Kind {
+                UNKNOWN = 0,
+                LID = 1,
+                PHONE_NUMBER = 2
+            }
+        }
+
+        interface ISharedDeviceContactHashKeyRequest {
+            knownEpoch?: (number|null);
+        }
+
+        class SharedDeviceContactHashKeyRequest implements ISharedDeviceContactHashKeyRequest {
+            constructor(p?: proto.Message.ISharedDeviceContactHashKeyRequest);
+            public knownEpoch: number;
+            public static create(properties?: proto.Message.ISharedDeviceContactHashKeyRequest): proto.Message.SharedDeviceContactHashKeyRequest;
+            public static encode(m: proto.Message.ISharedDeviceContactHashKeyRequest, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.Message.SharedDeviceContactHashKeyRequest;
+            public static fromObject(d: { [k: string]: any }): proto.Message.SharedDeviceContactHashKeyRequest;
+            public static toObject(m: proto.Message.SharedDeviceContactHashKeyRequest, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        interface ISharedDeviceContactHashKeyShare {
+            keys?: (proto.Message.ISharedDeviceContactHashKey[]|null);
+        }
+
+        class SharedDeviceContactHashKeyShare implements ISharedDeviceContactHashKeyShare {
+            constructor(p?: proto.Message.ISharedDeviceContactHashKeyShare);
+            public keys: proto.Message.ISharedDeviceContactHashKey[];
+            public static create(properties?: proto.Message.ISharedDeviceContactHashKeyShare): proto.Message.SharedDeviceContactHashKeyShare;
+            public static encode(m: proto.Message.ISharedDeviceContactHashKeyShare, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.Message.SharedDeviceContactHashKeyShare;
+            public static fromObject(d: { [k: string]: any }): proto.Message.SharedDeviceContactHashKeyShare;
+            public static toObject(m: proto.Message.SharedDeviceContactHashKeyShare, o?: $protobuf.IConversionOptions): { [k: string]: any };
             public toJSON(): { [k: string]: any };
             public static getTypeUrl(typeUrlPrefix?: string): string;
         }
@@ -10722,6 +12914,7 @@ export namespace proto {
             accessibilityLabel?: (string|null);
             premium?: (number|null);
             emojis?: (string|null);
+            audioMessage?: (proto.Message.IAudioMessage|null);
         }
 
         class StickerMessage implements IStickerMessage {
@@ -10748,6 +12941,8 @@ export namespace proto {
             public accessibilityLabel: string;
             public premium: number;
             public emojis: string;
+            public audioMessage?: (proto.Message.IAudioMessage|null);
+            public audio?: "audioMessage";
             public static create(properties?: proto.Message.IStickerMessage): proto.Message.StickerMessage;
             public static encode(m: proto.Message.IStickerMessage, w?: $protobuf.Writer): $protobuf.Writer;
             public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.Message.StickerMessage;
@@ -11061,6 +13256,8 @@ export namespace proto {
             motionPhotoPresentationOffsetMs?: (number|Long|null);
             metadataUrl?: (string|null);
             videoSourceType?: (proto.Message.VideoMessage.VideoSourceType|null);
+            dashManifestUrl?: (string|null);
+            smartThumbnailTs?: (number|Long|null);
         }
 
         class VideoMessage implements IVideoMessage {
@@ -11095,6 +13292,8 @@ export namespace proto {
             public motionPhotoPresentationOffsetMs: (number|Long);
             public metadataUrl: string;
             public videoSourceType: proto.Message.VideoMessage.VideoSourceType;
+            public dashManifestUrl: string;
+            public smartThumbnailTs: (number|Long);
             public static create(properties?: proto.Message.IVideoMessage): proto.Message.VideoMessage;
             public static encode(m: proto.Message.IVideoMessage, w?: $protobuf.Writer): $protobuf.Writer;
             public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.Message.VideoMessage;
@@ -11157,7 +13356,8 @@ export namespace proto {
             REACTION = 1,
             EVENT_RESPONSE = 2,
             POLL_UPDATE = 3,
-            PIN_IN_CHAT = 4
+            PIN_IN_CHAT = 4,
+            REQUEST_LOCATION_UPDATE = 5
         }
     }
 
@@ -11222,7 +13422,9 @@ export namespace proto {
             STATUS_ADD_YOURS_DIWALI = 17,
             STATUS_REACTION = 18,
             HEVC_VIDEO_DUAL_UPLOAD = 19,
-            POLL_ADD_OPTION = 20
+            POLL_ADD_OPTION = 20,
+            AV1_VIDEO_DUAL_UPLOAD = 21,
+            STREAMED_HD_VIDEO_DUAL_UPLOAD = 22
         }
     }
 
@@ -11246,6 +13448,8 @@ export namespace proto {
         teeBotMetadata?: (Uint8Array|null);
         accountEncryptionAttestation?: (proto.INonE2EEAttestation|null);
         associatedPrimaryIdentityKey?: (Uint8Array|null);
+        teeContextAnchorMessageId?: (string|null);
+        acp2Setting?: (proto.IACP2Setting|null);
     }
 
     class MessageContextInfo implements IMessageContextInfo {
@@ -11269,6 +13473,8 @@ export namespace proto {
         public teeBotMetadata: Uint8Array;
         public accountEncryptionAttestation?: (proto.INonE2EEAttestation|null);
         public associatedPrimaryIdentityKey: Uint8Array;
+        public teeContextAnchorMessageId: string;
+        public acp2Setting?: (proto.IACP2Setting|null);
         public static create(properties?: proto.IMessageContextInfo): proto.MessageContextInfo;
         public static encode(m: proto.IMessageContextInfo, w?: $protobuf.Writer): $protobuf.Writer;
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MessageContextInfo;
@@ -11324,6 +13530,591 @@ export namespace proto {
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MessageSecretMessage;
         public static fromObject(d: { [k: string]: any }): proto.MessageSecretMessage;
         public static toObject(m: proto.MessageSecretMessage, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMessageText {
+        text?: (string|null);
+        mentionedJid?: (string[]|null);
+        commands?: (proto.ICommand[]|null);
+        mentions?: (proto.IMention[]|null);
+    }
+
+    class MessageText implements IMessageText {
+        constructor(p?: proto.IMessageText);
+        public text: string;
+        public mentionedJid: string[];
+        public commands: proto.ICommand[];
+        public mentions: proto.IMention[];
+        public static create(properties?: proto.IMessageText): proto.MessageText;
+        public static encode(m: proto.IMessageText, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MessageText;
+        public static fromObject(d: { [k: string]: any }): proto.MessageText;
+        public static toObject(m: proto.MessageText, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMessagingMailboxPublicData {
+        epochHead: Uint8Array;
+        deviceRosterHash: Uint8Array;
+        sequenceNumber: (number|Long);
+        sigPk: Uint8Array;
+        encPk: Uint8Array;
+        authPk: Uint8Array;
+    }
+
+    class MessagingMailboxPublicData implements IMessagingMailboxPublicData {
+        constructor(p?: proto.IMessagingMailboxPublicData);
+        public epochHead: Uint8Array;
+        public deviceRosterHash: Uint8Array;
+        public sequenceNumber: (number|Long);
+        public sigPk: Uint8Array;
+        public encPk: Uint8Array;
+        public authPk: Uint8Array;
+        public static create(properties?: proto.IMessagingMailboxPublicData): proto.MessagingMailboxPublicData;
+        public static encode(m: proto.IMessagingMailboxPublicData, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MessagingMailboxPublicData;
+        public static fromObject(d: { [k: string]: any }): proto.MessagingMailboxPublicData;
+        public static toObject(m: proto.MessagingMailboxPublicData, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMinosClientConfig {
+        preferredMessageEncryptionVersion: number;
+        preferredMekEncryptionVersion: number;
+    }
+
+    class MinosClientConfig implements IMinosClientConfig {
+        constructor(p?: proto.IMinosClientConfig);
+        public preferredMessageEncryptionVersion: number;
+        public preferredMekEncryptionVersion: number;
+        public static create(properties?: proto.IMinosClientConfig): proto.MinosClientConfig;
+        public static encode(m: proto.IMinosClientConfig, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MinosClientConfig;
+        public static fromObject(d: { [k: string]: any }): proto.MinosClientConfig;
+        public static toObject(m: proto.MinosClientConfig, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMinosCommand {
+        encryptAndSignMessage?: (proto.IMinosEncryptAndSignMessageInput|null);
+        decryptAndVerifyMessage?: (proto.IMinosDecryptAndVerifyMessageInput|null);
+        generateMek?: (proto.IGenerateMekInput|null);
+        generateMekRosterHash?: (proto.IGenerateMekRosterHashInput|null);
+        encryptMekForDistribution?: (proto.IEncryptMekForDistributionInput|null);
+        decryptMekForDistribution?: (proto.IDecryptMekForDistributionInput|null);
+        encryptMeksForDistributionFromTransportSender?: (proto.IEncryptMeksForDistributionFromTransportSenderInput|null);
+        decryptMekForDistributionFromTransportSender?: (proto.IDecryptMekForDistributionFromTransportSenderInput|null);
+        wrapTransportSigningPublicKey?: (proto.IWrapTransportSigningPublicKeyInput|null);
+        wrapTransportSigningSecretKey?: (proto.IWrapTransportSigningSecretKeyInput|null);
+        deriveMailboxSigningKeypair?: (proto.IDeriveMailboxSigningKeypairInput|null);
+        deriveMailboxEncryptionKeypair?: (proto.IDeriveMailboxEncryptionKeypairInput|null);
+        deriveMailboxAuthKeypair?: (proto.IDeriveMailboxAuthKeypairInput|null);
+        deriveAttachmentAccessTokenSecret?: (proto.IDeriveAttachmentAccessTokenSecretInput|null);
+        deriveAttachmentPrimaryKeySecret?: (proto.IDeriveAttachmentPrimaryKeySecretInput|null);
+        minosOpenInitialEpoch?: (proto.IMinosOpenInitialEpochInput|null);
+        minosOpenEpoch?: (proto.IMinosOpenEpochInput|null);
+        minosValidateEpoch?: (proto.IMinosValidateEpochInput|null);
+        minosVerifySingleEpoch?: (proto.IMinosVerifySingleEpochInput|null);
+        minosThreadIdFromOneToOneThread?: (proto.IMinosThreadIdFromOneToOneThreadInput|null);
+        minosThreadIdFromActThreadId?: (proto.IMinosThreadIdFromActThreadIdInput|null);
+        mandrakeOpenEpoch?: (proto.IMandrakeOpenEpochInput|null);
+        mandrakeEncryptMek?: (proto.IMandrakeEncryptMekInput|null);
+        mandrakeDecryptMek?: (proto.IMandrakeDecryptMekInput|null);
+        mandrakeOpenInitialEpoch?: (proto.IMandrakeOpenInitialEpochInput|null);
+        mandrakeValidateNewMmkFromMailbox?: (proto.IMandrakeValidateNewMmkFromMailboxInput|null);
+        mandrakeValidateNewMmkFromDetachedDevice?: (proto.IMandrakeValidateNewMmkFromDetachedDeviceInput|null);
+        deriveMessagingMailboxKeypairs?: (proto.IDeriveMessagingMailboxKeypairsInput|null);
+        decryptSelfMmkDistribution?: (proto.IDecryptSelfMmkDistributionInput|null);
+        mandrakeValidateAndDecryptSelfMmk?: (proto.IMandrakeValidateAndDecryptSelfMmkInput|null);
+    }
+
+    class MinosCommand implements IMinosCommand {
+        constructor(p?: proto.IMinosCommand);
+        public encryptAndSignMessage?: (proto.IMinosEncryptAndSignMessageInput|null);
+        public decryptAndVerifyMessage?: (proto.IMinosDecryptAndVerifyMessageInput|null);
+        public generateMek?: (proto.IGenerateMekInput|null);
+        public generateMekRosterHash?: (proto.IGenerateMekRosterHashInput|null);
+        public encryptMekForDistribution?: (proto.IEncryptMekForDistributionInput|null);
+        public decryptMekForDistribution?: (proto.IDecryptMekForDistributionInput|null);
+        public encryptMeksForDistributionFromTransportSender?: (proto.IEncryptMeksForDistributionFromTransportSenderInput|null);
+        public decryptMekForDistributionFromTransportSender?: (proto.IDecryptMekForDistributionFromTransportSenderInput|null);
+        public wrapTransportSigningPublicKey?: (proto.IWrapTransportSigningPublicKeyInput|null);
+        public wrapTransportSigningSecretKey?: (proto.IWrapTransportSigningSecretKeyInput|null);
+        public deriveMailboxSigningKeypair?: (proto.IDeriveMailboxSigningKeypairInput|null);
+        public deriveMailboxEncryptionKeypair?: (proto.IDeriveMailboxEncryptionKeypairInput|null);
+        public deriveMailboxAuthKeypair?: (proto.IDeriveMailboxAuthKeypairInput|null);
+        public deriveAttachmentAccessTokenSecret?: (proto.IDeriveAttachmentAccessTokenSecretInput|null);
+        public deriveAttachmentPrimaryKeySecret?: (proto.IDeriveAttachmentPrimaryKeySecretInput|null);
+        public minosOpenInitialEpoch?: (proto.IMinosOpenInitialEpochInput|null);
+        public minosOpenEpoch?: (proto.IMinosOpenEpochInput|null);
+        public minosValidateEpoch?: (proto.IMinosValidateEpochInput|null);
+        public minosVerifySingleEpoch?: (proto.IMinosVerifySingleEpochInput|null);
+        public minosThreadIdFromOneToOneThread?: (proto.IMinosThreadIdFromOneToOneThreadInput|null);
+        public minosThreadIdFromActThreadId?: (proto.IMinosThreadIdFromActThreadIdInput|null);
+        public mandrakeOpenEpoch?: (proto.IMandrakeOpenEpochInput|null);
+        public mandrakeEncryptMek?: (proto.IMandrakeEncryptMekInput|null);
+        public mandrakeDecryptMek?: (proto.IMandrakeDecryptMekInput|null);
+        public mandrakeOpenInitialEpoch?: (proto.IMandrakeOpenInitialEpochInput|null);
+        public mandrakeValidateNewMmkFromMailbox?: (proto.IMandrakeValidateNewMmkFromMailboxInput|null);
+        public mandrakeValidateNewMmkFromDetachedDevice?: (proto.IMandrakeValidateNewMmkFromDetachedDeviceInput|null);
+        public deriveMessagingMailboxKeypairs?: (proto.IDeriveMessagingMailboxKeypairsInput|null);
+        public decryptSelfMmkDistribution?: (proto.IDecryptSelfMmkDistributionInput|null);
+        public mandrakeValidateAndDecryptSelfMmk?: (proto.IMandrakeValidateAndDecryptSelfMmkInput|null);
+        public commandInput?: ("encryptAndSignMessage"|"decryptAndVerifyMessage"|"generateMek"|"generateMekRosterHash"|"encryptMekForDistribution"|"decryptMekForDistribution"|"encryptMeksForDistributionFromTransportSender"|"decryptMekForDistributionFromTransportSender"|"wrapTransportSigningPublicKey"|"wrapTransportSigningSecretKey"|"deriveMailboxSigningKeypair"|"deriveMailboxEncryptionKeypair"|"deriveMailboxAuthKeypair"|"deriveAttachmentAccessTokenSecret"|"deriveAttachmentPrimaryKeySecret"|"minosOpenInitialEpoch"|"minosOpenEpoch"|"minosValidateEpoch"|"minosVerifySingleEpoch"|"minosThreadIdFromOneToOneThread"|"minosThreadIdFromActThreadId"|"mandrakeOpenEpoch"|"mandrakeEncryptMek"|"mandrakeDecryptMek"|"mandrakeOpenInitialEpoch"|"mandrakeValidateNewMmkFromMailbox"|"mandrakeValidateNewMmkFromDetachedDevice"|"deriveMessagingMailboxKeypairs"|"decryptSelfMmkDistribution"|"mandrakeValidateAndDecryptSelfMmk");
+        public static create(properties?: proto.IMinosCommand): proto.MinosCommand;
+        public static encode(m: proto.IMinosCommand, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MinosCommand;
+        public static fromObject(d: { [k: string]: any }): proto.MinosCommand;
+        public static toObject(m: proto.MinosCommand, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMinosDecryptAndVerifyMessageInput {
+        transportSigningPk: Uint8Array;
+        mek: Uint8Array;
+        encryptedMessageCiphertext: Uint8Array;
+        encryptedMessageSignature: Uint8Array;
+        metadata: proto.IMinosMessageMetadata;
+        messageEncryptionVersion?: (number|null);
+        conf?: (proto.IMinosClientConfig|null);
+    }
+
+    class MinosDecryptAndVerifyMessageInput implements IMinosDecryptAndVerifyMessageInput {
+        constructor(p?: proto.IMinosDecryptAndVerifyMessageInput);
+        public transportSigningPk: Uint8Array;
+        public mek: Uint8Array;
+        public encryptedMessageCiphertext: Uint8Array;
+        public encryptedMessageSignature: Uint8Array;
+        public metadata: proto.IMinosMessageMetadata;
+        public messageEncryptionVersion: number;
+        public conf?: (proto.IMinosClientConfig|null);
+        public static create(properties?: proto.IMinosDecryptAndVerifyMessageInput): proto.MinosDecryptAndVerifyMessageInput;
+        public static encode(m: proto.IMinosDecryptAndVerifyMessageInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MinosDecryptAndVerifyMessageInput;
+        public static fromObject(d: { [k: string]: any }): proto.MinosDecryptAndVerifyMessageInput;
+        public static toObject(m: proto.MinosDecryptAndVerifyMessageInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMinosDecryptAndVerifyMessageResult {
+        success?: (proto.IMinosDecryptAndVerifyMessageSuccess|null);
+        errorMessage?: (string|null);
+    }
+
+    class MinosDecryptAndVerifyMessageResult implements IMinosDecryptAndVerifyMessageResult {
+        constructor(p?: proto.IMinosDecryptAndVerifyMessageResult);
+        public success?: (proto.IMinosDecryptAndVerifyMessageSuccess|null);
+        public errorMessage?: (string|null);
+        public result?: ("success"|"errorMessage");
+        public static create(properties?: proto.IMinosDecryptAndVerifyMessageResult): proto.MinosDecryptAndVerifyMessageResult;
+        public static encode(m: proto.IMinosDecryptAndVerifyMessageResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MinosDecryptAndVerifyMessageResult;
+        public static fromObject(d: { [k: string]: any }): proto.MinosDecryptAndVerifyMessageResult;
+        public static toObject(m: proto.MinosDecryptAndVerifyMessageResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMinosDecryptAndVerifyMessageSuccess {
+        plaintext: Uint8Array;
+    }
+
+    class MinosDecryptAndVerifyMessageSuccess implements IMinosDecryptAndVerifyMessageSuccess {
+        constructor(p?: proto.IMinosDecryptAndVerifyMessageSuccess);
+        public plaintext: Uint8Array;
+        public static create(properties?: proto.IMinosDecryptAndVerifyMessageSuccess): proto.MinosDecryptAndVerifyMessageSuccess;
+        public static encode(m: proto.IMinosDecryptAndVerifyMessageSuccess, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MinosDecryptAndVerifyMessageSuccess;
+        public static fromObject(d: { [k: string]: any }): proto.MinosDecryptAndVerifyMessageSuccess;
+        public static toObject(m: proto.MinosDecryptAndVerifyMessageSuccess, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMinosEncryptAndSignMessageInput {
+        transportSigningSk: Uint8Array;
+        mek: Uint8Array;
+        plaintext: Uint8Array;
+        metadata: proto.IMinosMessageMetadata;
+        transportSigningPk?: (Uint8Array|null);
+        conf?: (proto.IMinosClientConfig|null);
+    }
+
+    class MinosEncryptAndSignMessageInput implements IMinosEncryptAndSignMessageInput {
+        constructor(p?: proto.IMinosEncryptAndSignMessageInput);
+        public transportSigningSk: Uint8Array;
+        public mek: Uint8Array;
+        public plaintext: Uint8Array;
+        public metadata: proto.IMinosMessageMetadata;
+        public transportSigningPk: Uint8Array;
+        public conf?: (proto.IMinosClientConfig|null);
+        public static create(properties?: proto.IMinosEncryptAndSignMessageInput): proto.MinosEncryptAndSignMessageInput;
+        public static encode(m: proto.IMinosEncryptAndSignMessageInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MinosEncryptAndSignMessageInput;
+        public static fromObject(d: { [k: string]: any }): proto.MinosEncryptAndSignMessageInput;
+        public static toObject(m: proto.MinosEncryptAndSignMessageInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMinosEncryptAndSignMessageResult {
+        ciphertext: Uint8Array;
+        signature: Uint8Array;
+        version: number;
+    }
+
+    class MinosEncryptAndSignMessageResult implements IMinosEncryptAndSignMessageResult {
+        constructor(p?: proto.IMinosEncryptAndSignMessageResult);
+        public ciphertext: Uint8Array;
+        public signature: Uint8Array;
+        public version: number;
+        public static create(properties?: proto.IMinosEncryptAndSignMessageResult): proto.MinosEncryptAndSignMessageResult;
+        public static encode(m: proto.IMinosEncryptAndSignMessageResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MinosEncryptAndSignMessageResult;
+        public static fromObject(d: { [k: string]: any }): proto.MinosEncryptAndSignMessageResult;
+        public static toObject(m: proto.MinosEncryptAndSignMessageResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMinosMessageMetadata {
+        mekId: Uint8Array;
+        timestamp: (number|Long);
+        messageId: string;
+        threadId: Uint8Array;
+    }
+
+    class MinosMessageMetadata implements IMinosMessageMetadata {
+        constructor(p?: proto.IMinosMessageMetadata);
+        public mekId: Uint8Array;
+        public timestamp: (number|Long);
+        public messageId: string;
+        public threadId: Uint8Array;
+        public static create(properties?: proto.IMinosMessageMetadata): proto.MinosMessageMetadata;
+        public static encode(m: proto.IMinosMessageMetadata, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MinosMessageMetadata;
+        public static fromObject(d: { [k: string]: any }): proto.MinosMessageMetadata;
+        public static toObject(m: proto.MinosMessageMetadata, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMinosOpenEpochInput {
+        userFbid: string;
+        epochNumber: (number|Long);
+        exportRootKey: Uint8Array;
+        previousExportRootKey: Uint8Array;
+        previousEpochNumber: (number|Long);
+        previousEpochHead: Uint8Array;
+    }
+
+    class MinosOpenEpochInput implements IMinosOpenEpochInput {
+        constructor(p?: proto.IMinosOpenEpochInput);
+        public userFbid: string;
+        public epochNumber: (number|Long);
+        public exportRootKey: Uint8Array;
+        public previousExportRootKey: Uint8Array;
+        public previousEpochNumber: (number|Long);
+        public previousEpochHead: Uint8Array;
+        public static create(properties?: proto.IMinosOpenEpochInput): proto.MinosOpenEpochInput;
+        public static encode(m: proto.IMinosOpenEpochInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MinosOpenEpochInput;
+        public static fromObject(d: { [k: string]: any }): proto.MinosOpenEpochInput;
+        public static toObject(m: proto.MinosOpenEpochInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMinosOpenEpochResult {
+        minosSignedEpoch: proto.IMinosSignedEpoch;
+    }
+
+    class MinosOpenEpochResult implements IMinosOpenEpochResult {
+        constructor(p?: proto.IMinosOpenEpochResult);
+        public minosSignedEpoch: proto.IMinosSignedEpoch;
+        public static create(properties?: proto.IMinosOpenEpochResult): proto.MinosOpenEpochResult;
+        public static encode(m: proto.IMinosOpenEpochResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MinosOpenEpochResult;
+        public static fromObject(d: { [k: string]: any }): proto.MinosOpenEpochResult;
+        public static toObject(m: proto.MinosOpenEpochResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMinosOpenInitialEpochInput {
+        userFbid: string;
+        epochNumber: (number|Long);
+        exportRootKey: Uint8Array;
+    }
+
+    class MinosOpenInitialEpochInput implements IMinosOpenInitialEpochInput {
+        constructor(p?: proto.IMinosOpenInitialEpochInput);
+        public userFbid: string;
+        public epochNumber: (number|Long);
+        public exportRootKey: Uint8Array;
+        public static create(properties?: proto.IMinosOpenInitialEpochInput): proto.MinosOpenInitialEpochInput;
+        public static encode(m: proto.IMinosOpenInitialEpochInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MinosOpenInitialEpochInput;
+        public static fromObject(d: { [k: string]: any }): proto.MinosOpenInitialEpochInput;
+        public static toObject(m: proto.MinosOpenInitialEpochInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMinosOpenInitialEpochResult {
+        minosSignedEpoch: proto.IMinosSignedEpoch;
+    }
+
+    class MinosOpenInitialEpochResult implements IMinosOpenInitialEpochResult {
+        constructor(p?: proto.IMinosOpenInitialEpochResult);
+        public minosSignedEpoch: proto.IMinosSignedEpoch;
+        public static create(properties?: proto.IMinosOpenInitialEpochResult): proto.MinosOpenInitialEpochResult;
+        public static encode(m: proto.IMinosOpenInitialEpochResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MinosOpenInitialEpochResult;
+        public static fromObject(d: { [k: string]: any }): proto.MinosOpenInitialEpochResult;
+        public static toObject(m: proto.MinosOpenInitialEpochResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMinosSignedEpoch {
+        epochPublicData: proto.IEpochPublicData;
+        signatures: proto.IEpochSignatures;
+        epochHead: Uint8Array;
+    }
+
+    class MinosSignedEpoch implements IMinosSignedEpoch {
+        constructor(p?: proto.IMinosSignedEpoch);
+        public epochPublicData: proto.IEpochPublicData;
+        public signatures: proto.IEpochSignatures;
+        public epochHead: Uint8Array;
+        public static create(properties?: proto.IMinosSignedEpoch): proto.MinosSignedEpoch;
+        public static encode(m: proto.IMinosSignedEpoch, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MinosSignedEpoch;
+        public static fromObject(d: { [k: string]: any }): proto.MinosSignedEpoch;
+        public static toObject(m: proto.MinosSignedEpoch, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMinosThreadIdFromActThreadIdInput {
+        actThreadId: string;
+    }
+
+    class MinosThreadIdFromActThreadIdInput implements IMinosThreadIdFromActThreadIdInput {
+        constructor(p?: proto.IMinosThreadIdFromActThreadIdInput);
+        public actThreadId: string;
+        public static create(properties?: proto.IMinosThreadIdFromActThreadIdInput): proto.MinosThreadIdFromActThreadIdInput;
+        public static encode(m: proto.IMinosThreadIdFromActThreadIdInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MinosThreadIdFromActThreadIdInput;
+        public static fromObject(d: { [k: string]: any }): proto.MinosThreadIdFromActThreadIdInput;
+        public static toObject(m: proto.MinosThreadIdFromActThreadIdInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMinosThreadIdFromActThreadIdResult {
+        threadId: Uint8Array;
+    }
+
+    class MinosThreadIdFromActThreadIdResult implements IMinosThreadIdFromActThreadIdResult {
+        constructor(p?: proto.IMinosThreadIdFromActThreadIdResult);
+        public threadId: Uint8Array;
+        public static create(properties?: proto.IMinosThreadIdFromActThreadIdResult): proto.MinosThreadIdFromActThreadIdResult;
+        public static encode(m: proto.IMinosThreadIdFromActThreadIdResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MinosThreadIdFromActThreadIdResult;
+        public static fromObject(d: { [k: string]: any }): proto.MinosThreadIdFromActThreadIdResult;
+        public static toObject(m: proto.MinosThreadIdFromActThreadIdResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMinosThreadIdFromOneToOneThreadInput {
+        actThreadId: string;
+        selfFbid: string;
+    }
+
+    class MinosThreadIdFromOneToOneThreadInput implements IMinosThreadIdFromOneToOneThreadInput {
+        constructor(p?: proto.IMinosThreadIdFromOneToOneThreadInput);
+        public actThreadId: string;
+        public selfFbid: string;
+        public static create(properties?: proto.IMinosThreadIdFromOneToOneThreadInput): proto.MinosThreadIdFromOneToOneThreadInput;
+        public static encode(m: proto.IMinosThreadIdFromOneToOneThreadInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MinosThreadIdFromOneToOneThreadInput;
+        public static fromObject(d: { [k: string]: any }): proto.MinosThreadIdFromOneToOneThreadInput;
+        public static toObject(m: proto.MinosThreadIdFromOneToOneThreadInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMinosThreadIdFromOneToOneThreadResult {
+        threadId: Uint8Array;
+    }
+
+    class MinosThreadIdFromOneToOneThreadResult implements IMinosThreadIdFromOneToOneThreadResult {
+        constructor(p?: proto.IMinosThreadIdFromOneToOneThreadResult);
+        public threadId: Uint8Array;
+        public static create(properties?: proto.IMinosThreadIdFromOneToOneThreadResult): proto.MinosThreadIdFromOneToOneThreadResult;
+        public static encode(m: proto.IMinosThreadIdFromOneToOneThreadResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MinosThreadIdFromOneToOneThreadResult;
+        public static fromObject(d: { [k: string]: any }): proto.MinosThreadIdFromOneToOneThreadResult;
+        public static toObject(m: proto.MinosThreadIdFromOneToOneThreadResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMinosValidateEpochInput {
+        epochPublicData: proto.IEpochPublicData;
+        previousEpochPublicData: proto.IEpochPublicData;
+        signatures: proto.IEpochSignatures;
+    }
+
+    class MinosValidateEpochInput implements IMinosValidateEpochInput {
+        constructor(p?: proto.IMinosValidateEpochInput);
+        public epochPublicData: proto.IEpochPublicData;
+        public previousEpochPublicData: proto.IEpochPublicData;
+        public signatures: proto.IEpochSignatures;
+        public static create(properties?: proto.IMinosValidateEpochInput): proto.MinosValidateEpochInput;
+        public static encode(m: proto.IMinosValidateEpochInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MinosValidateEpochInput;
+        public static fromObject(d: { [k: string]: any }): proto.MinosValidateEpochInput;
+        public static toObject(m: proto.MinosValidateEpochInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMinosValidateEpochResult {
+        valid?: (boolean|null);
+        errorMessage?: (string|null);
+    }
+
+    class MinosValidateEpochResult implements IMinosValidateEpochResult {
+        constructor(p?: proto.IMinosValidateEpochResult);
+        public valid?: (boolean|null);
+        public errorMessage?: (string|null);
+        public result?: ("valid"|"errorMessage");
+        public static create(properties?: proto.IMinosValidateEpochResult): proto.MinosValidateEpochResult;
+        public static encode(m: proto.IMinosValidateEpochResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MinosValidateEpochResult;
+        public static fromObject(d: { [k: string]: any }): proto.MinosValidateEpochResult;
+        public static toObject(m: proto.MinosValidateEpochResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMinosVerifySingleEpochInput {
+        epochPublicData: proto.IEpochPublicData;
+        signature: Uint8Array;
+    }
+
+    class MinosVerifySingleEpochInput implements IMinosVerifySingleEpochInput {
+        constructor(p?: proto.IMinosVerifySingleEpochInput);
+        public epochPublicData: proto.IEpochPublicData;
+        public signature: Uint8Array;
+        public static create(properties?: proto.IMinosVerifySingleEpochInput): proto.MinosVerifySingleEpochInput;
+        public static encode(m: proto.IMinosVerifySingleEpochInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MinosVerifySingleEpochInput;
+        public static fromObject(d: { [k: string]: any }): proto.MinosVerifySingleEpochInput;
+        public static toObject(m: proto.MinosVerifySingleEpochInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMinosVerifySingleEpochResult {
+        valid: boolean;
+    }
+
+    class MinosVerifySingleEpochResult implements IMinosVerifySingleEpochResult {
+        constructor(p?: proto.IMinosVerifySingleEpochResult);
+        public valid: boolean;
+        public static create(properties?: proto.IMinosVerifySingleEpochResult): proto.MinosVerifySingleEpochResult;
+        public static encode(m: proto.IMinosVerifySingleEpochResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MinosVerifySingleEpochResult;
+        public static fromObject(d: { [k: string]: any }): proto.MinosVerifySingleEpochResult;
+        public static toObject(m: proto.MinosVerifySingleEpochResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMmkDistribution {
+        toDetachedDevices?: (proto.IMmkDistributionToDetachedDevice[]|null);
+        toMailbox: proto.IMmkDistributionToMailbox;
+        version: (number|Long);
+    }
+
+    class MmkDistribution implements IMmkDistribution {
+        constructor(p?: proto.IMmkDistribution);
+        public toDetachedDevices: proto.IMmkDistributionToDetachedDevice[];
+        public toMailbox: proto.IMmkDistributionToMailbox;
+        public version: (number|Long);
+        public static create(properties?: proto.IMmkDistribution): proto.MmkDistribution;
+        public static encode(m: proto.IMmkDistribution, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MmkDistribution;
+        public static fromObject(d: { [k: string]: any }): proto.MmkDistribution;
+        public static toObject(m: proto.MmkDistribution, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMmkDistributionToDetachedDevice {
+        encryptedMmk: Uint8Array;
+        recipDeviceHash: Uint8Array;
+    }
+
+    class MmkDistributionToDetachedDevice implements IMmkDistributionToDetachedDevice {
+        constructor(p?: proto.IMmkDistributionToDetachedDevice);
+        public encryptedMmk: Uint8Array;
+        public recipDeviceHash: Uint8Array;
+        public static create(properties?: proto.IMmkDistributionToDetachedDevice): proto.MmkDistributionToDetachedDevice;
+        public static encode(m: proto.IMmkDistributionToDetachedDevice, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MmkDistributionToDetachedDevice;
+        public static fromObject(d: { [k: string]: any }): proto.MmkDistributionToDetachedDevice;
+        public static toObject(m: proto.MmkDistributionToDetachedDevice, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMmkDistributionToMailbox {
+        encryptedMmk: Uint8Array;
+        recipMailboxHeadHash: Uint8Array;
+    }
+
+    class MmkDistributionToMailbox implements IMmkDistributionToMailbox {
+        constructor(p?: proto.IMmkDistributionToMailbox);
+        public encryptedMmk: Uint8Array;
+        public recipMailboxHeadHash: Uint8Array;
+        public static create(properties?: proto.IMmkDistributionToMailbox): proto.MmkDistributionToMailbox;
+        public static encode(m: proto.IMmkDistributionToMailbox, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MmkDistributionToMailbox;
+        public static fromObject(d: { [k: string]: any }): proto.MmkDistributionToMailbox;
+        public static toObject(m: proto.MmkDistributionToMailbox, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IMmkFromDetachedDevice {
+        mmk: proto.IMessagingMailboxPublicData;
+        fromDetachedDevice: proto.IDetachedDevicePublicData;
+        membershipProof: proto.IMerkleMembershipProof;
+    }
+
+    class MmkFromDetachedDevice implements IMmkFromDetachedDevice {
+        constructor(p?: proto.IMmkFromDetachedDevice);
+        public mmk: proto.IMessagingMailboxPublicData;
+        public fromDetachedDevice: proto.IDetachedDevicePublicData;
+        public membershipProof: proto.IMerkleMembershipProof;
+        public static create(properties?: proto.IMmkFromDetachedDevice): proto.MmkFromDetachedDevice;
+        public static encode(m: proto.IMmkFromDetachedDevice, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MmkFromDetachedDevice;
+        public static fromObject(d: { [k: string]: any }): proto.MmkFromDetachedDevice;
+        public static toObject(m: proto.MmkFromDetachedDevice, o?: $protobuf.IConversionOptions): { [k: string]: any };
         public toJSON(): { [k: string]: any };
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
@@ -11404,6 +14195,8 @@ export namespace proto {
         sharableEventInviteIsCanceled?: (boolean|null);
         sharableEventInviteJpegThumbnail?: (Uint8Array|null);
         sharableEventInviteCallLink?: (string|null);
+        mediaPngThumbnail?: (string|null);
+        qrUrl?: (string|null);
     }
 
     class MsgOpaqueData implements IMsgOpaqueData {
@@ -11463,6 +14256,8 @@ export namespace proto {
         public sharableEventInviteIsCanceled: boolean;
         public sharableEventInviteJpegThumbnail: Uint8Array;
         public sharableEventInviteCallLink: string;
+        public mediaPngThumbnail: string;
+        public qrUrl: string;
         public static create(properties?: proto.IMsgOpaqueData): proto.MsgOpaqueData;
         public static encode(m: proto.IMsgOpaqueData, w?: $protobuf.Writer): $protobuf.Writer;
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MsgOpaqueData;
@@ -11509,12 +14304,14 @@ export namespace proto {
         interface IPollOption {
             name?: (string|null);
             hash?: (string|null);
+            addOptionMsgKey?: (string|null);
         }
 
         class PollOption implements IPollOption {
             constructor(p?: proto.MsgOpaqueData.IPollOption);
             public name: string;
             public hash: string;
+            public addOptionMsgKey: string;
             public static create(properties?: proto.MsgOpaqueData.IPollOption): proto.MsgOpaqueData.PollOption;
             public static encode(m: proto.MsgOpaqueData.IPollOption, w?: $protobuf.Writer): $protobuf.Writer;
             public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.MsgOpaqueData.PollOption;
@@ -11669,6 +14466,13 @@ export namespace proto {
         BUBBLE_LOCK_MESSAGE_ACTION = 90,
         LABEL_SUBLIST_ACTION = 91,
         DEVICE_CAPABILITIES_V2 = 92,
+        CTWA_MESSAGE_RECEIVED_ACTION = 93,
+        SHARED_DEVICE_ALLOWLIST_ACTION = 94,
+        CONTACT_MANAGER_METADATA_ACTION = 95,
+        BUSINESS_FOLDER_ACTIVATION_ACTION = 96,
+        GROUP_HISTORY_TOGGLE_ACTION = 97,
+        BB_PRO_PENDING_CUSTOMER_BASE_ACTION = 98,
+        COMMUNITY_NESTING_STATE_ACTION = 99,
         SHARE_OWN_PN = 10001,
         BUSINESS_BROADCAST_ACTION = 10002,
         AI_THREAD_DELETE_ACTION = 10003
@@ -12172,12 +14976,14 @@ export namespace proto {
     interface IPollAdditionalMetadata {
         pollInvalidated?: (boolean|null);
         pollNameHashHistory?: (proto.PollAdditionalMetadata.IPollNameHashHistoryEntry[]|null);
+        originalOptions?: (proto.Message.PollCreationMessage.IOption[]|null);
     }
 
     class PollAdditionalMetadata implements IPollAdditionalMetadata {
         constructor(p?: proto.IPollAdditionalMetadata);
         public pollInvalidated: boolean;
         public pollNameHashHistory: proto.PollAdditionalMetadata.IPollNameHashHistoryEntry[];
+        public originalOptions: proto.Message.PollCreationMessage.IOption[];
         public static create(properties?: proto.IPollAdditionalMetadata): proto.PollAdditionalMetadata;
         public static encode(m: proto.IPollAdditionalMetadata, w?: $protobuf.Writer): $protobuf.Writer;
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.PollAdditionalMetadata;
@@ -12418,6 +15224,100 @@ export namespace proto {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
+    interface IQP {
+    }
+
+    class QP implements IQP {
+        constructor(p?: proto.IQP);
+        public static create(properties?: proto.IQP): proto.QP;
+        public static encode(m: proto.IQP, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.QP;
+        public static fromObject(d: { [k: string]: any }): proto.QP;
+        public static toObject(m: proto.QP, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    namespace QP {
+
+        enum ClauseType {
+            AND = 1,
+            OR = 2,
+            NOR = 3
+        }
+
+        interface IFilter {
+            filterName: string;
+            parameters?: (proto.QP.IFilterParameters[]|null);
+            filterResult?: (proto.QP.FilterResult|null);
+            clientNotSupportedConfig: proto.QP.FilterClientNotSupportedConfig;
+        }
+
+        class Filter implements IFilter {
+            constructor(p?: proto.QP.IFilter);
+            public filterName: string;
+            public parameters: proto.QP.IFilterParameters[];
+            public filterResult: proto.QP.FilterResult;
+            public clientNotSupportedConfig: proto.QP.FilterClientNotSupportedConfig;
+            public static create(properties?: proto.QP.IFilter): proto.QP.Filter;
+            public static encode(m: proto.QP.IFilter, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.QP.Filter;
+            public static fromObject(d: { [k: string]: any }): proto.QP.Filter;
+            public static toObject(m: proto.QP.Filter, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        interface IFilterClause {
+            clauseType: proto.QP.ClauseType;
+            clauses?: (proto.QP.IFilterClause[]|null);
+            filters?: (proto.QP.IFilter[]|null);
+        }
+
+        class FilterClause implements IFilterClause {
+            constructor(p?: proto.QP.IFilterClause);
+            public clauseType: proto.QP.ClauseType;
+            public clauses: proto.QP.IFilterClause[];
+            public filters: proto.QP.IFilter[];
+            public static create(properties?: proto.QP.IFilterClause): proto.QP.FilterClause;
+            public static encode(m: proto.QP.IFilterClause, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.QP.FilterClause;
+            public static fromObject(d: { [k: string]: any }): proto.QP.FilterClause;
+            public static toObject(m: proto.QP.FilterClause, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        enum FilterClientNotSupportedConfig {
+            PASS_BY_DEFAULT = 1,
+            FAIL_BY_DEFAULT = 2
+        }
+
+        interface IFilterParameters {
+            key?: (string|null);
+            value?: (string|null);
+        }
+
+        class FilterParameters implements IFilterParameters {
+            constructor(p?: proto.QP.IFilterParameters);
+            public key: string;
+            public value: string;
+            public static create(properties?: proto.QP.IFilterParameters): proto.QP.FilterParameters;
+            public static encode(m: proto.QP.IFilterParameters, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.QP.FilterParameters;
+            public static fromObject(d: { [k: string]: any }): proto.QP.FilterParameters;
+            public static toObject(m: proto.QP.FilterParameters, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        enum FilterResult {
+            TRUE = 1,
+            FALSE = 2,
+            UNKNOWN = 3
+        }
+    }
+
     interface IQuarantinedMessage {
         originalData?: (Uint8Array|null);
         extractedText?: (string|null);
@@ -12496,6 +15396,24 @@ export namespace proto {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
+    interface IRecoverableHistoryConversation {
+        historyChatId?: (string|null);
+        accountLid?: (string|null);
+    }
+
+    class RecoverableHistoryConversation implements IRecoverableHistoryConversation {
+        constructor(p?: proto.IRecoverableHistoryConversation);
+        public historyChatId: string;
+        public accountLid: string;
+        public static create(properties?: proto.IRecoverableHistoryConversation): proto.RecoverableHistoryConversation;
+        public static encode(m: proto.IRecoverableHistoryConversation, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.RecoverableHistoryConversation;
+        public static fromObject(d: { [k: string]: any }): proto.RecoverableHistoryConversation;
+        public static toObject(m: proto.RecoverableHistoryConversation, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
     interface IReportable {
         minVersion?: (number|null);
         maxVersion?: (number|null);
@@ -12532,6 +15450,32 @@ export namespace proto {
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.ReportingTokenInfo;
         public static fromObject(d: { [k: string]: any }): proto.ReportingTokenInfo;
         public static toObject(m: proto.ReportingTokenInfo, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IRoutingInfo {
+        regionId?: (number[]|null);
+        clusterId?: (number[]|null);
+        taskId?: (number|null);
+        debug?: (boolean|null);
+        tcpBbr?: (boolean|null);
+        tcpKeepalive?: (boolean|null);
+    }
+
+    class RoutingInfo implements IRoutingInfo {
+        constructor(p?: proto.IRoutingInfo);
+        public regionId: number[];
+        public clusterId: number[];
+        public taskId: number;
+        public debug: boolean;
+        public tcpBbr: boolean;
+        public tcpKeepalive: boolean;
+        public static create(properties?: proto.IRoutingInfo): proto.RoutingInfo;
+        public static encode(m: proto.IRoutingInfo, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.RoutingInfo;
+        public static fromObject(d: { [k: string]: any }): proto.RoutingInfo;
+        public static toObject(m: proto.RoutingInfo, o?: $protobuf.IConversionOptions): { [k: string]: any };
         public toJSON(): { [k: string]: any };
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
@@ -12916,6 +15860,26 @@ export namespace proto {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
+    interface ISignedMmkDistributionFromMailbox {
+        mmkDistribution: proto.IMmkDistribution;
+        signature: Uint8Array;
+        fromMailbox: proto.IMessagingMailboxPublicData;
+    }
+
+    class SignedMmkDistributionFromMailbox implements ISignedMmkDistributionFromMailbox {
+        constructor(p?: proto.ISignedMmkDistributionFromMailbox);
+        public mmkDistribution: proto.IMmkDistribution;
+        public signature: Uint8Array;
+        public fromMailbox: proto.IMessagingMailboxPublicData;
+        public static create(properties?: proto.ISignedMmkDistributionFromMailbox): proto.SignedMmkDistributionFromMailbox;
+        public static encode(m: proto.ISignedMmkDistributionFromMailbox, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.SignedMmkDistributionFromMailbox;
+        public static fromObject(d: { [k: string]: any }): proto.SignedMmkDistributionFromMailbox;
+        public static toObject(m: proto.SignedMmkDistributionFromMailbox, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
     interface ISignedPreKeyRecordStructure {
         id?: (number|null);
         publicKey?: (Uint8Array|null);
@@ -13251,6 +16215,24 @@ export namespace proto {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
+    interface ISubProtocol {
+        payload?: (Uint8Array|null);
+        version?: (number|null);
+    }
+
+    class SubProtocol implements ISubProtocol {
+        constructor(p?: proto.ISubProtocol);
+        public payload: Uint8Array;
+        public version: number;
+        public static create(properties?: proto.ISubProtocol): proto.SubProtocol;
+        public static encode(m: proto.ISubProtocol, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.SubProtocol;
+        public static fromObject(d: { [k: string]: any }): proto.SubProtocol;
+        public static toObject(m: proto.SubProtocol, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
     interface ISyncActionData {
         index?: (Uint8Array|null);
         value?: (proto.ISyncActionValue|null);
@@ -13357,6 +16339,13 @@ export namespace proto {
         bubbleLockMessageAction?: (proto.SyncActionValue.IBubbleLockMessageAction|null);
         labelSublistAction?: (proto.SyncActionValue.ILabelSublistAction|null);
         deviceCapabilitiesV2?: (proto.IDeviceCapabilities|null);
+        ctwaMessageReceivedAction?: (proto.SyncActionValue.ICtwaMessageReceivedAction|null);
+        sharedDeviceAllowlistAction?: (proto.SyncActionValue.ISharedDeviceAllowlistAction|null);
+        contactManagerMetadataAction?: (proto.SyncActionValue.IContactManagerMetadataAction|null);
+        businessFolderActivationAction?: (proto.SyncActionValue.IBusinessFolderActivationAction|null);
+        groupHistoryToggleAction?: (proto.SyncActionValue.IGroupHistoryToggleAction|null);
+        bbProPendingCustomerBaseAction?: (proto.SyncActionValue.IBBProPendingCustomerBaseAction|null);
+        communityNestingStateAction?: (proto.SyncActionValue.ICommunityNestingStateAction|null);
     }
 
     class SyncActionValue implements ISyncActionValue {
@@ -13444,6 +16433,13 @@ export namespace proto {
         public bubbleLockMessageAction?: (proto.SyncActionValue.IBubbleLockMessageAction|null);
         public labelSublistAction?: (proto.SyncActionValue.ILabelSublistAction|null);
         public deviceCapabilitiesV2?: (proto.IDeviceCapabilities|null);
+        public ctwaMessageReceivedAction?: (proto.SyncActionValue.ICtwaMessageReceivedAction|null);
+        public sharedDeviceAllowlistAction?: (proto.SyncActionValue.ISharedDeviceAllowlistAction|null);
+        public contactManagerMetadataAction?: (proto.SyncActionValue.IContactManagerMetadataAction|null);
+        public businessFolderActivationAction?: (proto.SyncActionValue.IBusinessFolderActivationAction|null);
+        public groupHistoryToggleAction?: (proto.SyncActionValue.IGroupHistoryToggleAction|null);
+        public bbProPendingCustomerBaseAction?: (proto.SyncActionValue.IBBProPendingCustomerBaseAction|null);
+        public communityNestingStateAction?: (proto.SyncActionValue.ICommunityNestingStateAction|null);
         public static create(properties?: proto.ISyncActionValue): proto.SyncActionValue;
         public static encode(m: proto.ISyncActionValue, w?: $protobuf.Writer): $protobuf.Writer;
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.SyncActionValue;
@@ -13568,6 +16564,22 @@ export namespace proto {
             }
         }
 
+        interface IBBProPendingCustomerBaseAction {
+            pending?: (boolean|null);
+        }
+
+        class BBProPendingCustomerBaseAction implements IBBProPendingCustomerBaseAction {
+            constructor(p?: proto.SyncActionValue.IBBProPendingCustomerBaseAction);
+            public pending: boolean;
+            public static create(properties?: proto.SyncActionValue.IBBProPendingCustomerBaseAction): proto.SyncActionValue.BBProPendingCustomerBaseAction;
+            public static encode(m: proto.SyncActionValue.IBBProPendingCustomerBaseAction, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.SyncActionValue.BBProPendingCustomerBaseAction;
+            public static fromObject(d: { [k: string]: any }): proto.SyncActionValue.BBProPendingCustomerBaseAction;
+            public static toObject(m: proto.SyncActionValue.BBProPendingCustomerBaseAction, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
         interface IBizAISettingsNudgeAction {
             category?: (proto.SyncActionValue.BizAISettingsNudgeAction.BizAISettingsCategory|null);
             version?: (number|Long|null);
@@ -13677,6 +16689,8 @@ export namespace proto {
             scheduledTimestamp?: (number|Long|null);
             createTimestamp?: (number|Long|null);
             status?: (proto.SyncActionValue.BusinessBroadcastCampaignStatus|null);
+            bbProStatus?: (proto.SyncActionValue.BusinessBroadcastCampaignBBProStatus|null);
+            customAudienceFbid?: (string|null);
         }
 
         class BusinessBroadcastCampaignAction implements IBusinessBroadcastCampaignAction {
@@ -13690,6 +16704,8 @@ export namespace proto {
             public scheduledTimestamp: (number|Long);
             public createTimestamp: (number|Long);
             public status: proto.SyncActionValue.BusinessBroadcastCampaignStatus;
+            public bbProStatus: proto.SyncActionValue.BusinessBroadcastCampaignBBProStatus;
+            public customAudienceFbid: string;
             public static create(properties?: proto.SyncActionValue.IBusinessBroadcastCampaignAction): proto.SyncActionValue.BusinessBroadcastCampaignAction;
             public static encode(m: proto.SyncActionValue.IBusinessBroadcastCampaignAction, w?: $protobuf.Writer): $protobuf.Writer;
             public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.SyncActionValue.BusinessBroadcastCampaignAction;
@@ -13697,6 +16713,19 @@ export namespace proto {
             public static toObject(m: proto.SyncActionValue.BusinessBroadcastCampaignAction, o?: $protobuf.IConversionOptions): { [k: string]: any };
             public toJSON(): { [k: string]: any };
             public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        enum BusinessBroadcastCampaignBBProStatus {
+            BB_PRO_ACTIVE = 1,
+            BB_PRO_COMPLETED = 2,
+            BB_PRO_IN_DRAFT = 3,
+            BB_PRO_IN_REVIEW = 4,
+            BB_PRO_NOT_SENDING = 5,
+            BB_PRO_OFF = 6,
+            BB_PRO_REJECTED = 7,
+            BB_PRO_SCHEDULED = 8,
+            BB_PRO_SENDING_LIMITED = 9,
+            BB_PRO_PROCESSING = 10
         }
 
         enum BusinessBroadcastCampaignStatus {
@@ -13753,6 +16782,22 @@ export namespace proto {
             public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.SyncActionValue.BusinessBroadcastListAction;
             public static fromObject(d: { [k: string]: any }): proto.SyncActionValue.BusinessBroadcastListAction;
             public static toObject(m: proto.SyncActionValue.BusinessBroadcastListAction, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        interface IBusinessFolderActivationAction {
+            activated?: (boolean|null);
+        }
+
+        class BusinessFolderActivationAction implements IBusinessFolderActivationAction {
+            constructor(p?: proto.SyncActionValue.IBusinessFolderActivationAction);
+            public activated: boolean;
+            public static create(properties?: proto.SyncActionValue.IBusinessFolderActivationAction): proto.SyncActionValue.BusinessFolderActivationAction;
+            public static encode(m: proto.SyncActionValue.IBusinessFolderActivationAction, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.SyncActionValue.BusinessFolderActivationAction;
+            public static fromObject(d: { [k: string]: any }): proto.SyncActionValue.BusinessFolderActivationAction;
+            public static toObject(m: proto.SyncActionValue.BusinessFolderActivationAction, o?: $protobuf.IConversionOptions): { [k: string]: any };
             public toJSON(): { [k: string]: any };
             public static getTypeUrl(typeUrlPrefix?: string): string;
         }
@@ -13837,6 +16882,31 @@ export namespace proto {
             public static getTypeUrl(typeUrlPrefix?: string): string;
         }
 
+        interface ICommunityNestingStateAction {
+            nestingState?: (proto.SyncActionValue.CommunityNestingStateAction.NestingState|null);
+        }
+
+        class CommunityNestingStateAction implements ICommunityNestingStateAction {
+            constructor(p?: proto.SyncActionValue.ICommunityNestingStateAction);
+            public nestingState: proto.SyncActionValue.CommunityNestingStateAction.NestingState;
+            public static create(properties?: proto.SyncActionValue.ICommunityNestingStateAction): proto.SyncActionValue.CommunityNestingStateAction;
+            public static encode(m: proto.SyncActionValue.ICommunityNestingStateAction, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.SyncActionValue.CommunityNestingStateAction;
+            public static fromObject(d: { [k: string]: any }): proto.SyncActionValue.CommunityNestingStateAction;
+            public static toObject(m: proto.SyncActionValue.CommunityNestingStateAction, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        namespace CommunityNestingStateAction {
+
+            enum NestingState {
+                NESTING_STATE_UNKNOWN = 0,
+                NESTING_STATE_NESTED = 1,
+                NESTING_STATE_UNNESTED = 2
+            }
+        }
+
         interface IContactAction {
             fullName?: (string|null);
             firstName?: (string|null);
@@ -13844,6 +16914,7 @@ export namespace proto {
             saveOnPrimaryAddressbook?: (boolean|null);
             pnJid?: (string|null);
             username?: (string|null);
+            birthday?: (string|null);
         }
 
         class ContactAction implements IContactAction {
@@ -13854,11 +16925,44 @@ export namespace proto {
             public saveOnPrimaryAddressbook: boolean;
             public pnJid: string;
             public username: string;
+            public birthday: string;
             public static create(properties?: proto.SyncActionValue.IContactAction): proto.SyncActionValue.ContactAction;
             public static encode(m: proto.SyncActionValue.IContactAction, w?: $protobuf.Writer): $protobuf.Writer;
             public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.SyncActionValue.ContactAction;
             public static fromObject(d: { [k: string]: any }): proto.SyncActionValue.ContactAction;
             public static toObject(m: proto.SyncActionValue.ContactAction, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        interface IContactManagerMetadataAction {
+            isHidden?: (boolean|null);
+        }
+
+        class ContactManagerMetadataAction implements IContactManagerMetadataAction {
+            constructor(p?: proto.SyncActionValue.IContactManagerMetadataAction);
+            public isHidden: boolean;
+            public static create(properties?: proto.SyncActionValue.IContactManagerMetadataAction): proto.SyncActionValue.ContactManagerMetadataAction;
+            public static encode(m: proto.SyncActionValue.IContactManagerMetadataAction, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.SyncActionValue.ContactManagerMetadataAction;
+            public static fromObject(d: { [k: string]: any }): proto.SyncActionValue.ContactManagerMetadataAction;
+            public static toObject(m: proto.SyncActionValue.ContactManagerMetadataAction, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        interface ICtwaMessageReceivedAction {
+            isCtwaMessageReceived?: (boolean|null);
+        }
+
+        class CtwaMessageReceivedAction implements ICtwaMessageReceivedAction {
+            constructor(p?: proto.SyncActionValue.ICtwaMessageReceivedAction);
+            public isCtwaMessageReceived: boolean;
+            public static create(properties?: proto.SyncActionValue.ICtwaMessageReceivedAction): proto.SyncActionValue.CtwaMessageReceivedAction;
+            public static encode(m: proto.SyncActionValue.ICtwaMessageReceivedAction, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.SyncActionValue.CtwaMessageReceivedAction;
+            public static fromObject(d: { [k: string]: any }): proto.SyncActionValue.CtwaMessageReceivedAction;
+            public static toObject(m: proto.SyncActionValue.CtwaMessageReceivedAction, o?: $protobuf.IConversionOptions): { [k: string]: any };
             public toJSON(): { [k: string]: any };
             public static getTypeUrl(typeUrlPrefix?: string): string;
         }
@@ -14090,6 +17194,31 @@ export namespace proto {
             }
         }
 
+        interface IGroupHistoryToggleAction {
+            groupHistoryToggleMode?: (proto.SyncActionValue.GroupHistoryToggleAction.GroupHistoryToggleMode|null);
+        }
+
+        class GroupHistoryToggleAction implements IGroupHistoryToggleAction {
+            constructor(p?: proto.SyncActionValue.IGroupHistoryToggleAction);
+            public groupHistoryToggleMode: proto.SyncActionValue.GroupHistoryToggleAction.GroupHistoryToggleMode;
+            public static create(properties?: proto.SyncActionValue.IGroupHistoryToggleAction): proto.SyncActionValue.GroupHistoryToggleAction;
+            public static encode(m: proto.SyncActionValue.IGroupHistoryToggleAction, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.SyncActionValue.GroupHistoryToggleAction;
+            public static fromObject(d: { [k: string]: any }): proto.SyncActionValue.GroupHistoryToggleAction;
+            public static toObject(m: proto.SyncActionValue.GroupHistoryToggleAction, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+        namespace GroupHistoryToggleAction {
+
+            enum GroupHistoryToggleMode {
+                GROUP_HISTORY_TOGGLE_MODE_UNKNOWN = 0,
+                GROUP_HISTORY_TOGGLE_MODE_ON = 1,
+                GROUP_HISTORY_TOGGLE_MODE_OFF = 2
+            }
+        }
+
         interface IInteractiveMessageAction {
             type: proto.SyncActionValue.InteractiveMessageAction.InteractiveMessageActionMode;
             agmId?: (string|null);
@@ -14200,7 +17329,11 @@ export namespace proto {
                 LOCKED = 13,
                 INVITES = 14,
                 THIRD_PARTY = 15,
-                LEAD = 16
+                LEAD = 16,
+                MENTIONS_AND_REPLIES = 17,
+                REQUESTS = 18,
+                BUSINESS = 19,
+                ONE_ON_ONE = 20
             }
         }
 
@@ -14240,6 +17373,7 @@ export namespace proto {
             fullName?: (string|null);
             firstName?: (string|null);
             username?: (string|null);
+            birthday?: (string|null);
         }
 
         class LidContactAction implements ILidContactAction {
@@ -14247,6 +17381,7 @@ export namespace proto {
             public fullName: string;
             public firstName: string;
             public username: string;
+            public birthday: string;
             public static create(properties?: proto.SyncActionValue.ILidContactAction): proto.SyncActionValue.LidContactAction;
             public static encode(m: proto.SyncActionValue.ILidContactAction, w?: $protobuf.Writer): $protobuf.Writer;
             public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.SyncActionValue.LidContactAction;
@@ -14980,6 +18115,22 @@ export namespace proto {
             }
         }
 
+        interface ISharedDeviceAllowlistAction {
+            allowed?: (boolean|null);
+        }
+
+        class SharedDeviceAllowlistAction implements ISharedDeviceAllowlistAction {
+            constructor(p?: proto.SyncActionValue.ISharedDeviceAllowlistAction);
+            public allowed: boolean;
+            public static create(properties?: proto.SyncActionValue.ISharedDeviceAllowlistAction): proto.SyncActionValue.SharedDeviceAllowlistAction;
+            public static encode(m: proto.SyncActionValue.ISharedDeviceAllowlistAction, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.SyncActionValue.SharedDeviceAllowlistAction;
+            public static fromObject(d: { [k: string]: any }): proto.SyncActionValue.SharedDeviceAllowlistAction;
+            public static toObject(m: proto.SyncActionValue.SharedDeviceAllowlistAction, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
         interface IStarAction {
             starred?: (boolean|null);
         }
@@ -15529,6 +18680,26 @@ export namespace proto {
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
+    interface ISyncdPlainTextRecord {
+        value?: (proto.ISyncActionData|null);
+        keyId?: (Uint8Array|null);
+        mac?: (Uint8Array|null);
+    }
+
+    class SyncdPlainTextRecord implements ISyncdPlainTextRecord {
+        constructor(p?: proto.ISyncdPlainTextRecord);
+        public value?: (proto.ISyncActionData|null);
+        public keyId: Uint8Array;
+        public mac: Uint8Array;
+        public static create(properties?: proto.ISyncdPlainTextRecord): proto.SyncdPlainTextRecord;
+        public static encode(m: proto.ISyncdPlainTextRecord, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.SyncdPlainTextRecord;
+        public static fromObject(d: { [k: string]: any }): proto.SyncdPlainTextRecord;
+        public static toObject(m: proto.SyncdPlainTextRecord, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
     interface ISyncdRecord {
         index?: (proto.ISyncdIndex|null);
         value?: (proto.ISyncdValue|null);
@@ -15567,6 +18738,28 @@ export namespace proto {
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.SyncdSnapshot;
         public static fromObject(d: { [k: string]: any }): proto.SyncdSnapshot;
         public static toObject(m: proto.SyncdSnapshot, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface ISyncdSnapshotRecovery {
+        version?: (proto.ISyncdVersion|null);
+        collectionName?: (string|null);
+        mutationRecords?: (proto.ISyncdPlainTextRecord[]|null);
+        collectionLthash?: (Uint8Array|null);
+    }
+
+    class SyncdSnapshotRecovery implements ISyncdSnapshotRecovery {
+        constructor(p?: proto.ISyncdSnapshotRecovery);
+        public version?: (proto.ISyncdVersion|null);
+        public collectionName: string;
+        public mutationRecords: proto.ISyncdPlainTextRecord[];
+        public collectionLthash: Uint8Array;
+        public static create(properties?: proto.ISyncdSnapshotRecovery): proto.SyncdSnapshotRecovery;
+        public static encode(m: proto.ISyncdSnapshotRecovery, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.SyncdSnapshotRecovery;
+        public static fromObject(d: { [k: string]: any }): proto.SyncdSnapshotRecovery;
+        public static toObject(m: proto.SyncdSnapshotRecovery, o?: $protobuf.IConversionOptions): { [k: string]: any };
         public toJSON(): { [k: string]: any };
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
@@ -15726,6 +18919,44 @@ export namespace proto {
             VIEW_REPLIES = 1,
             AI_THREAD = 2
         }
+    }
+
+    interface IUnCountedAssociatedMessageList {
+        messages?: (proto.IWebMessageInfo[]|null);
+        parentMessage?: (proto.IMessageKey|null);
+        associationType?: (proto.MessageAssociation.AssociationType|null);
+    }
+
+    class UnCountedAssociatedMessageList implements IUnCountedAssociatedMessageList {
+        constructor(p?: proto.IUnCountedAssociatedMessageList);
+        public messages: proto.IWebMessageInfo[];
+        public parentMessage?: (proto.IMessageKey|null);
+        public associationType: proto.MessageAssociation.AssociationType;
+        public static create(properties?: proto.IUnCountedAssociatedMessageList): proto.UnCountedAssociatedMessageList;
+        public static encode(m: proto.IUnCountedAssociatedMessageList, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.UnCountedAssociatedMessageList;
+        public static fromObject(d: { [k: string]: any }): proto.UnCountedAssociatedMessageList;
+        public static toObject(m: proto.UnCountedAssociatedMessageList, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IUnCountedAssociatedMessageListWithMessageBytes {
+        messages?: (proto.IWebMessageInfoWithMessageBytes[]|null);
+        parentMessage?: (proto.IMessageKey|null);
+    }
+
+    class UnCountedAssociatedMessageListWithMessageBytes implements IUnCountedAssociatedMessageListWithMessageBytes {
+        constructor(p?: proto.IUnCountedAssociatedMessageListWithMessageBytes);
+        public messages: proto.IWebMessageInfoWithMessageBytes[];
+        public parentMessage?: (proto.IMessageKey|null);
+        public static create(properties?: proto.IUnCountedAssociatedMessageListWithMessageBytes): proto.UnCountedAssociatedMessageListWithMessageBytes;
+        public static encode(m: proto.IUnCountedAssociatedMessageListWithMessageBytes, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.UnCountedAssociatedMessageListWithMessageBytes;
+        public static fromObject(d: { [k: string]: any }): proto.UnCountedAssociatedMessageListWithMessageBytes;
+        public static toObject(m: proto.UnCountedAssociatedMessageListWithMessageBytes, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
     interface IUrlTrackingMap {
@@ -16130,6 +19361,7 @@ export namespace proto {
         scheduledMessageMetadata?: (proto.IScheduledMessageMetadata|null);
         decisionId?: (string|null);
         decisionSources?: (string[]|null);
+        eventInviteAdditionalMetadata?: (proto.IEventInviteAdditionalMetadata|null);
     }
 
     class WebMessageInfo implements IWebMessageInfo {
@@ -16206,6 +19438,7 @@ export namespace proto {
         public scheduledMessageMetadata?: (proto.IScheduledMessageMetadata|null);
         public decisionId: string;
         public decisionSources: string[];
+        public eventInviteAdditionalMetadata?: (proto.IEventInviteAdditionalMetadata|null);
         public static create(properties?: proto.IWebMessageInfo): proto.WebMessageInfo;
         public static encode(m: proto.IWebMessageInfo, w?: $protobuf.Writer): $protobuf.Writer;
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.WebMessageInfo;
@@ -16463,8 +19696,51 @@ export namespace proto {
             IDENTITY_TRUST_MARKED = 226,
             IDENTITY_TRUST_UNMARKED = 227,
             IDENTITY_TRUST_REVOKED = 228,
-            CTWA_CONSUMER_DISCLOSURE = 230
+            CTWA_CONSUMER_DISCLOSURE = 230,
+            CHANGE_ACP2_SETTING = 240,
+            BIZ_CALLBACK_DISABLED = 244,
+            BIZ_CALLBACK_ENABLED = 247,
+            EPHEMERAL_CHANGED_FOR_COEX = 248,
+            UGC_BOT_PROFILE_UPDATED = 249,
+            ORDER_EPHEMERAL_EXEMPTION = 250,
+            GROUP_DEFAULT_SUB_GROUP_DEMOTE = 251,
+            BIZ_BUSINESS_BROADCAST_ENTRY_POINT = 252,
+            BOT_INLINE_TOS_CHAT = 253,
+            CAMEO_CHAT_CREATED = 254,
+            SENDER_SIDE_CONTACT_INFO = 255,
+            CAMEO_TRANSITIONED = 256,
+            CAMEO_REGISTERED_WITH_NEW_CHAT = 257,
+            PRIVACY_SYSTEM_MESSAGE = 258,
+            BIZ_AI_LEARNING_ENABLED_DISCLOSURE = 259,
+            BIZ_AI_LEARNING_DISABLED_DISCLOSURE = 260,
+            BIZ_AI_REPLIES_MUTED_HISTORICAL_CHAT = 261,
+            INVITE_FROM_IG = 262,
+            GROUP_ADMIN_FIRST_JOIN_VIA_LINK = 263,
+            GROUP_ADMIN_FLOOD_JOIN_VIA_LINK = 264,
+            BIZ_AI_REPLIES_MUTED_IRRELEVANT_HISTORICAL_CHAT = 265,
+            PENDING_INVITE_CREATED = 266,
+            CAMEO_CHAT_EXPIRED = 267,
+            GROUP_PUSHNAME_SHARED = 270,
+            BIZ_POST_SEND_OPT_OUT = 271
         }
+    }
+
+    interface IWebMessageInfoWithMessageBytes {
+        key?: (proto.IMessageKey|null);
+        messageBytes?: (Uint8Array|null);
+    }
+
+    class WebMessageInfoWithMessageBytes implements IWebMessageInfoWithMessageBytes {
+        constructor(p?: proto.IWebMessageInfoWithMessageBytes);
+        public key?: (proto.IMessageKey|null);
+        public messageBytes: Uint8Array;
+        public static create(properties?: proto.IWebMessageInfoWithMessageBytes): proto.WebMessageInfoWithMessageBytes;
+        public static encode(m: proto.IWebMessageInfoWithMessageBytes, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.WebMessageInfoWithMessageBytes;
+        public static fromObject(d: { [k: string]: any }): proto.WebMessageInfoWithMessageBytes;
+        public static toObject(m: proto.WebMessageInfoWithMessageBytes, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
     }
 
     interface IWebNotificationsInfo {
@@ -16485,6 +19761,70 @@ export namespace proto {
         public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.WebNotificationsInfo;
         public static fromObject(d: { [k: string]: any }): proto.WebNotificationsInfo;
         public static toObject(m: proto.WebNotificationsInfo, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IWrapTransportSigningPublicKeyInput {
+        keyBytes: Uint8Array;
+    }
+
+    class WrapTransportSigningPublicKeyInput implements IWrapTransportSigningPublicKeyInput {
+        constructor(p?: proto.IWrapTransportSigningPublicKeyInput);
+        public keyBytes: Uint8Array;
+        public static create(properties?: proto.IWrapTransportSigningPublicKeyInput): proto.WrapTransportSigningPublicKeyInput;
+        public static encode(m: proto.IWrapTransportSigningPublicKeyInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.WrapTransportSigningPublicKeyInput;
+        public static fromObject(d: { [k: string]: any }): proto.WrapTransportSigningPublicKeyInput;
+        public static toObject(m: proto.WrapTransportSigningPublicKeyInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IWrapTransportSigningPublicKeyResult {
+        prefixedKey: Uint8Array;
+    }
+
+    class WrapTransportSigningPublicKeyResult implements IWrapTransportSigningPublicKeyResult {
+        constructor(p?: proto.IWrapTransportSigningPublicKeyResult);
+        public prefixedKey: Uint8Array;
+        public static create(properties?: proto.IWrapTransportSigningPublicKeyResult): proto.WrapTransportSigningPublicKeyResult;
+        public static encode(m: proto.IWrapTransportSigningPublicKeyResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.WrapTransportSigningPublicKeyResult;
+        public static fromObject(d: { [k: string]: any }): proto.WrapTransportSigningPublicKeyResult;
+        public static toObject(m: proto.WrapTransportSigningPublicKeyResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IWrapTransportSigningSecretKeyInput {
+        keyBytes: Uint8Array;
+    }
+
+    class WrapTransportSigningSecretKeyInput implements IWrapTransportSigningSecretKeyInput {
+        constructor(p?: proto.IWrapTransportSigningSecretKeyInput);
+        public keyBytes: Uint8Array;
+        public static create(properties?: proto.IWrapTransportSigningSecretKeyInput): proto.WrapTransportSigningSecretKeyInput;
+        public static encode(m: proto.IWrapTransportSigningSecretKeyInput, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.WrapTransportSigningSecretKeyInput;
+        public static fromObject(d: { [k: string]: any }): proto.WrapTransportSigningSecretKeyInput;
+        public static toObject(m: proto.WrapTransportSigningSecretKeyInput, o?: $protobuf.IConversionOptions): { [k: string]: any };
+        public toJSON(): { [k: string]: any };
+        public static getTypeUrl(typeUrlPrefix?: string): string;
+    }
+
+    interface IWrapTransportSigningSecretKeyResult {
+        prefixedKey: Uint8Array;
+    }
+
+    class WrapTransportSigningSecretKeyResult implements IWrapTransportSigningSecretKeyResult {
+        constructor(p?: proto.IWrapTransportSigningSecretKeyResult);
+        public prefixedKey: Uint8Array;
+        public static create(properties?: proto.IWrapTransportSigningSecretKeyResult): proto.WrapTransportSigningSecretKeyResult;
+        public static encode(m: proto.IWrapTransportSigningSecretKeyResult, w?: $protobuf.Writer): $protobuf.Writer;
+        public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.WrapTransportSigningSecretKeyResult;
+        public static fromObject(d: { [k: string]: any }): proto.WrapTransportSigningSecretKeyResult;
+        public static toObject(m: proto.WrapTransportSigningSecretKeyResult, o?: $protobuf.IConversionOptions): { [k: string]: any };
         public toJSON(): { [k: string]: any };
         public static getTypeUrl(typeUrlPrefix?: string): string;
     }
