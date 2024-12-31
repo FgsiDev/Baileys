@@ -686,25 +686,35 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 
 			const isNeedMetaAttrs =
 				innerMessage?.pinInChatMessage || innerMessage?.keepInChatMessage || innerMessage?.reactionMessage
-			const isGroupStatus = message?.groupStatusMessage || message?.groupStatusMessageV2
+			const isGroupStatus = innerMessage?.groupStatusMessage || innerMessage?.groupStatusMessageV2
 			const isPollUpdate = innerMessage?.pollUpdateMessage
+			const hasAttr = (key: string, value: string) =>
+				[...(additionalNodes || []), ...binaryNodeContent].some(node => node?.attrs?.[key] === value)
+
 			if (isNeedMetaAttrs || isGroupStatus || isPollUpdate) {
 				const metaAttrs: BinaryNodeAttributes = {}
-				if (isNeedMetaAttrs) {
+
+				if (isNeedMetaAttrs && !hasAttr('content_type', 'add_on')) {
 					metaAttrs.content_type = 'add_on'
 				}
-				if (isPollUpdate && !isGroupStatus) {
+
+				if (isPollUpdate && !isGroupStatus && !hasAttr('polltype', 'vote')) {
 					metaAttrs.polltype = 'vote'
 				}
-				if (isGroupStatus) {
+
+				if (isGroupStatus && !hasAttr('is_group_status', 'true')) {
 					metaAttrs.is_group_status = 'true'
 				}
-				binaryNodeContent.push({
-					tag: 'meta',
-					attrs: metaAttrs,
-					content: undefined
-				})
+
+				if (Object.keys(metaAttrs).length) {
+					binaryNodeContent.push({
+						tag: 'meta',
+						attrs: metaAttrs,
+						content: undefined
+					})
+				}
 			}
+
 			if (
 				isNeedMetaAttrs ||
 				innerMessage?.protocolMessage?.memberLabel ||
