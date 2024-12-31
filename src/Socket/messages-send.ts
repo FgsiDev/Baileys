@@ -1095,10 +1095,12 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 						remoteJid: destinationJid,
 						participant: participant?.jid
 					}
-					const reportingNode = await getMessageReportingToken(encoded, reportingMessage, reportingKey)
-					if (reportingNode) {
-						;(stanza.content as BinaryNode[]).push(reportingNode)
-						logger.trace({ jid }, 'added reporting token to message')
+					if (config.autoReportingToken) {
+						const reportingNode = await getMessageReportingToken(encoded, reportingMessage, reportingKey)
+						if (reportingNode) {
+							;(stanza.content as BinaryNode[]).push(reportingNode)
+							logger.trace({ jid }, 'added reporting token to message')
+						}
 					}
 				} catch (error: any) {
 					logger.warn({ jid, trace: error?.stack }, 'failed to attach reporting token')

@@ -76,7 +76,8 @@ export const DEFAULT_CONNECTION_CONFIG: SocketConfig = {
 	countryCode: 'US',
 	getMessage: async () => undefined,
 	cachedGroupMetadata: async () => undefined,
-	makeSignalRepository: makeLibSignalRepository
+	makeSignalRepository: makeLibSignalRepository,
+	autoReportingToken: false
 }
 
 export const MEDIA_PATH_MAP: { [T in MediaType]?: string } = {

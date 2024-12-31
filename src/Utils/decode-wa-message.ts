@@ -398,7 +398,7 @@ export const decryptMessageNode = (
 							case 'msmsg': {
 								// null = no bot node (non-streaming), 'full'/'last' = complete response
 								// 'first' = streaming partial response, intentionally skipped
-								if (botType !== null && !['full', 'last'].includes(botType)) break
+								if (botType !== null && !['full', 'last', 'inner'].includes(botType)) break
 
 								const secretIdCandidates = [botEditTargetId, metaTargetId, fullMessage.key?.id].filter(
 									Boolean

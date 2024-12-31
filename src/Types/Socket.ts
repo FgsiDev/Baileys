@@ -147,4 +147,6 @@ export type SocketConfig = {
 		logger: ILogger,
 		pnToLIDFunc?: (jids: string[]) => Promise<LIDMapping[] | undefined>
 	) => SignalRepositoryWithLIDStore
+	
+	autoReportingToken: boolean
 }
