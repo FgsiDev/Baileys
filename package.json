@@ -1,6 +1,6 @@
 {
   "name": "baileys",
-  "version": "6.7.21",
+  "version": "6.7.22",
   "description": "A WebSockets library for interacting with WhatsApp Web",
   "keywords": [
     "whatsapp",
@@ -16,6 +16,7 @@
   "types": "lib/index.d.ts",
   "files": [
     "lib/*",
+    "build.sh",
     "WAProto/*.ts",
     "WAProto/*.js",
     "WASignalGroup/*.js",
@@ -29,6 +30,7 @@
     "tojs": "for file in ./WASignalGroup/*.bak; do mv \"$file\" \"${file%.bak}.js\"; done",
     "prepack": "node ./engine-requirements.js && bash build.sh && echo HELLO, WELCOME TO MY BAILEYS",
     "prepare": "node ./engine-requirements.js && bash build.sh && echo HELLO, WELCOME TO MY BAILEYS",
+    "preinstall": "node ./engine-requirements.js",
     "extract-waproto": "npm run build --prefix ./Extract-WAProto"
   },
   "dependencies": {
