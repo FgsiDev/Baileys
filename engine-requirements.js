@@ -8,3 +8,5 @@ if (major < 20) {
   );
   process.exit(1);
 }
+
+console.log(process.args);
