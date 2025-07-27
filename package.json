@@ -1,6 +1,6 @@
 {
   "name": "baileys",
-  "version": "6.7.23",
+  "version": "6.7.24",
   "description": "A WebSockets library for interacting with WhatsApp Web",
   "keywords": [
     "whatsapp",
@@ -16,22 +16,22 @@
   "types": "lib/index.d.ts",
   "files": [
     "lib/*",
-    "build.sh",
-    "WAProto/*.ts",
-    "WAProto/*.js",
-    "WASignalGroup/*.js",
+    "WAProto/*",
+    "WASignalGroup/*",
     "engine-requirements.js"
   ],
   "scripts": {
     "build:tsc": "tsc",
+    "build": "bash build.sh && npm run toast",
+    "prepack": "npm run build",
+    "prepare": "npm run build",
+    "preinstall": "node ./engine-requirements.js",
     "format": "cd src && npx -y prettier --write .",
     "gen:protobuf": "sh WAProto/GenerateStatics.sh",
     "tobak": "for file in ./WASignalGroup/*.js; do mv \"$file\" \"${file%.js}.bak\"; done",
     "tojs": "for file in ./WASignalGroup/*.bak; do mv \"$file\" \"${file%.bak}.js\"; done",
-    "prepack": "node ./engine-requirements.js && bash build.sh && echo HELLO, WELCOME TO MY BAILEYS",
-    "prepare": "node ./engine-requirements.js && bash build.sh && echo HELLO, WELCOME TO MY BAILEYS",
-    "preinstall": "node ./engine-requirements.js",
-    "extract-waproto": "npm run build --prefix ./Extract-WAProto"
+    "extract-waproto": "npm run build --prefix ./Extract-WAProto",
+    "toast": "echo HELLO, WELCOME TO MY BAILEYS"
   },
   "dependencies": {
     "@adiwajshing/keyed-db": "^0.2.4",
