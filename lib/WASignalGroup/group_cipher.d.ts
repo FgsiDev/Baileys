@@ -1,0 +1,12 @@
+export = GroupCipher;
+declare class GroupCipher {
+    constructor(senderKeyStore: any, senderKeyName: any);
+    senderKeyStore: any;
+    senderKeyName: any;
+    queueJob(awaitable: any): Promise<any>;
+    encrypt(paddedPlaintext: any): Promise<any>;
+    decrypt(senderKeyMessageBytes: any): Promise<any>;
+    getSenderKey(senderKeyState: any, iteration: any): any;
+    getPlainText(iv: any, key: any, ciphertext: any): any;
+    getCipherText(iv: any, key: any, plaintext: any): any;
+}

@@ -1,0 +1,16 @@
+export function makeUSyncSocket(config: any): {
+    executeUSyncQuery: (usyncQuery: any) => Promise<any>;
+    fileName: string;
+    ws: import("./Client").WebSocketClient;
+    ev: {
+        process(handler: any): () => void;
+        emit(event: any, evData: any): any;
+        isBuffering(): boolean;
+        buffer: () => void;
+        flush: (force?: boolean) => boolean;
+        createBufferedFunction(work: any): (...args: any[]) => Promise<any>;
+        on: (...args: any[]) => any;
+        off: (...args: any[]) => any;
+        removeAllListeners: (...args: any[]) => any;
+    };
+};
