@@ -1,6 +1,6 @@
 {
   "name": "baileys",
-  "version": "6.7.26",
+  "version": "6.7.27",
   "description": "A WebSockets library for interacting with WhatsApp Web",
   "keywords": [
     "whatsapp",
@@ -21,17 +21,9 @@
     "engine-requirements.js"
   ],
   "scripts": {
-    "build:tsc": "tsc",
-    "build": "npm run preinstall && npm run toast",
-    "prepack": "npm run build",
-    "prepare": "npm run build",
-    "preinstall": "npm run tobak && npm run build:tsc && node ./engine-requirements.js",
-    "install": "npm run tojs",
-    "format": "cd src && npx -y prettier --write .",
-    "gen:protobuf": "sh WAProto/GenerateStatics.sh",
-    "tobak": "for file in ./WASignalGroup/*.js; do mv \"$file\" \"${file%.js}.bak\"; done",
-    "tojs": "for file in ./WASignalGroup/*.bak; do mv \"$file\" \"${file%.bak}.js\"; done",
-    "extract-waproto": "npm run build --prefix ./Extract-WAProto",
+    "prepack": "npm run toast",
+    "prepare": "npm run toast",
+    "preinstall": "npm run toast && node ./engine-requirements.js",
     "toast": "echo HELLO, WELCOME TO MY BAILEYS"
   },
   "dependencies": {
