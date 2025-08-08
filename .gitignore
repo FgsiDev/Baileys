@@ -25,3 +25,5 @@ backup.sh
 src
 Extract-WAProto
 Example
+tsconfig.json
+tsconfig2.json
