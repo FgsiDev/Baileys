@@ -1,4 +1,5 @@
 export function promiseTimeout(ms: any, promise: any): Promise<any>;
+export function bindWaitForEvent(ev: any, event: any): (check: any, timeoutMs: any) => Promise<void>;
 export function trimUndefined(obj: any): any;
 export function bytesToCrockford(buffer: any): string;
 export function encodeNewsletterMessage(message: any): any;
@@ -35,7 +36,7 @@ export function delayCancellable(ms: any): {
 };
 export function generateMessageIDV2(userId: any): string;
 export function generateMessageID(): string;
-export function bindWaitForConnectionUpdate(ev: any): any;
+export function bindWaitForConnectionUpdate(ev: any): (check: any, timeoutMs: any) => Promise<void>;
 export function fetchLatestBaileysVersion(options?: {}): Promise<{
     version: any;
     isLatest: boolean;

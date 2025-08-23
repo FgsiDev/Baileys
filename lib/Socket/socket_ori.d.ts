@@ -36,7 +36,7 @@ export function makeSocket(config: any): {
     uploadPreKeysToServerIfRequired: () => Promise<void>;
     requestPairingCode: (phoneNumber: any, code: any) => Promise<any>;
     /** Waits for the connection to WA to reach a state */
-    waitForConnectionUpdate: any;
+    waitForConnectionUpdate: (check: any, timeoutMs: any) => Promise<void>;
     sendWAMBuffer: (wamBuffer: any) => Promise<any>;
 };
 import { WebSocketClient } from "./Client";

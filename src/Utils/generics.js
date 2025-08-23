@@ -194,6 +194,35 @@ export const generateMessageID = () => {
   //return res;
 };
 
+export function bindWaitForEvent(ev, event) {
+  return async (check, timeoutMs) => {
+    let listener;
+    let closeListener;
+    await promiseTimeout(timeoutMs, (resolve, reject) => {
+      closeListener = ({ connection, lastDisconnect }) => {
+        if (connection === "close") {
+          reject(
+            lastDisconnect?.error ||
+              new Boom("Connection Closed", {
+                statusCode: DisconnectReason.connectionClosed,
+              }),
+          );
+        }
+      };
+      ev.on("connection.update", closeListener);
+      listener = async (update) => {
+        if (await check(update)) {
+          resolve();
+        }
+      };
+      ev.on(event, listener);
+    }).finally(() => {
+      ev.off(event, listener);
+      ev.off("connection.update", closeListener);
+    });
+  };
+}
+
 export const bindWaitForConnectionUpdate = (ev) =>
   bindWaitForEvent(ev, "connection.update");
 /**
