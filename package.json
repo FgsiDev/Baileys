@@ -1,6 +1,6 @@
 {
   "name": "baileys",
-  "version": "6.7.31",
+  "version": "6.7.36",
   "description": "A WebSockets library for interacting with WhatsApp Web",
   "keywords": [
     "whatsapp",
@@ -21,10 +21,13 @@
     "engine-requirements.js"
   ],
   "scripts": {
+    "build:tsc": "npm run tobak; tsc; npm run tojs",
     "prepack": "npm run toast",
     "prepare": "npm run toast",
     "preinstall": "npm run toast && node ./engine-requirements.js",
-    "toast": "echo HELLO, WELCOME TO MY BAILEYS"
+    "toast": "echo HELLO, WELCOME TO MY BAILEYS",
+    "tobak": "for file in ./WASignalGroup/*.js; do mv \"$file\" \"${file%.js}.bak\"; done",
+    "tojs": "for file in ./WASignalGroup/*.bak; do mv \"$file\" \"${file%.bak}.js\"; done"
   },
   "dependencies": {
     "@adiwajshing/keyed-db": "^0.2.4",
