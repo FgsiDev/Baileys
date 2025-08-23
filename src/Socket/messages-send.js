@@ -621,7 +621,7 @@ export const makeMessagesSocket = (config) => {
       const isViewOnceButton = isViewOnceWithSpecificType(message);
 
       if (
-        !isNewSletter &&
+        !isNewsletter &&
         (messagesType || isViewOnceButton) &&
         messages?.listMessage?.listType !== "PRODUCT_LIST"
       ) {
