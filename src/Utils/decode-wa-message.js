@@ -91,7 +91,8 @@ export function decodeMessageNode(stanza, meId, meLid) {
     id: msgId,
     senderLid: stanza?.attrs?.sender_lid,
     senderPn: stanza?.attrs?.sender_pn,
-    participant,
+    //participant,
+    participant: stanza?.attrs?.participant_pn,
     participantPn: stanza?.attrs?.participant_pn,
     participantLid: stanza?.attrs?.participant_lid,
     ...(msgType === "newsletter" && stanza.attrs.server_id
