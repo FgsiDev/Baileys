@@ -1,6 +1,6 @@
 {
   "name": "baileys",
-  "version": "6.7.20",
+  "version": "6.7.21",
   "description": "A WebSockets library for interacting with WhatsApp Web",
   "keywords": [
     "whatsapp",
@@ -32,6 +32,7 @@
     "async-lock": "^1.4.1",
     "async-mutex": "^0.5.0",
     "axios": "^1.6.0",
+    "cache-manager": "^7.0.0",
     "libsignal": "github:WhiskeySockets/libsignal-node",
     "lodash": "^4.17.21",
     "music-metadata": "^7.12.3",
