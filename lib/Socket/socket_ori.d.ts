@@ -1,0 +1,42 @@
+export function makeSocket(config: any): {
+    type: string;
+    ws: WebSocketClient;
+    ev: {
+        process(handler: any): () => void;
+        emit(event: any, evData: any): any;
+        isBuffering(): boolean;
+        buffer: () => void;
+        flush: (force?: boolean) => boolean;
+        createBufferedFunction(work: any): (...args: any[]) => Promise<any>;
+        on: (...args: any[]) => any;
+        off: (...args: any[]) => any;
+        removeAllListeners: (...args: any[]) => any;
+    };
+    authState: {
+        creds: any;
+        keys: {
+            get: (type: any, ids: any) => Promise<any>;
+            set: (data: any) => any;
+            isInTransaction: () => boolean;
+            transaction(work: any): Promise<any>;
+        };
+    };
+    signalRepository: any;
+    readonly user: any;
+    generateMessageTag: () => string;
+    query: (node: any, timeoutMs: any) => Promise<any>;
+    waitForMessage: (msgId: any, timeoutMs?: any) => Promise<any>;
+    waitForSocketOpen: () => Promise<void>;
+    sendRawMessage: (data: any) => Promise<void>;
+    sendNode: (frame: any) => Promise<void>;
+    logout: (msg: any) => Promise<void>;
+    end: (error: any) => void;
+    onUnexpectedError: (err: any, msg: any) => void;
+    uploadPreKeys: (count?: number) => Promise<void>;
+    uploadPreKeysToServerIfRequired: () => Promise<void>;
+    requestPairingCode: (phoneNumber: any, code: any) => Promise<any>;
+    /** Waits for the connection to WA to reach a state */
+    waitForConnectionUpdate: any;
+    sendWAMBuffer: (wamBuffer: any) => Promise<any>;
+};
+import { WebSocketClient } from "./Client";

@@ -1,0 +1,6 @@
+lib
+node_modules
+*.bak
+WAProto
+!*_ori.js
+!Enc.js
