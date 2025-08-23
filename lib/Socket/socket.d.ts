@@ -1,6 +1,6 @@
-export function makeSocket(たね: any): {
+export function makeSocket(つき: any): {
     [x: number]: any;
-    ws: やら;
+    ws: えそ;
     ev: {
         process(handler: any): () => void;
         emit(event: any, evData: any): any;
@@ -13,4 +13,4 @@ export function makeSocket(たね: any): {
         removeAllListeners: (...args: any[]) => any;
     };
 };
-import { WebSocketClient as やら } from "./Client";
+import { WebSocketClient as えそ } from "./Client";

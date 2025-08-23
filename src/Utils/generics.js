@@ -1,0 +1,499 @@
+import { Boom } from "@hapi/boom";
+import axios from "axios";
+import { createHash, randomBytes } from "crypto";
+import { platform, release } from "os";
+import { proto } from "../../WAProto";
+import { version as baileysVersion } from "../Defaults/baileys-version.json";
+import { DisconnectReason } from "../Types";
+import { getAllBinaryNodeChildren, jidDecode } from "../WABinary";
+const PLATFORM_MAP = {
+  aix: "AIX",
+  darwin: "Mac OS",
+  win32: "Windows",
+  android: "Android",
+  freebsd: "FreeBSD",
+  openbsd: "OpenBSD",
+  sunos: "Solaris",
+  linux: "Linux",
+  ubuntu: "Ubuntu",
+  ios: "iOS",
+  baileys: "Baileys",
+  chromeos: "Chrome OS",
+  tizen: "Tizen",
+  watchos: "watchOS",
+  wearos: "Wear OS",
+  harmonyos: "HarmonyOS",
+  kaios: "KaiOS",
+  smarttv: "Smart TV",
+  raspberrypi: "Raspberry Pi OS",
+  symbian: "Symbian",
+  blackberry: "Blackberry OS",
+  windowsphone: "Windows Phone",
+};
+
+const COMPANION_PLATFORM_MAP = {
+  Chrome: "49",
+  Edge: "50",
+  Firefox: "51",
+  Opera: "53",
+  Safari: "54",
+  Brave: "1.79.112",
+  Vivaldi: "6.2.3105.58",
+  Tor: "12.5.3",
+  Yandex: "23.7.1",
+  Falkon: "22.08.3",
+  Epiphany: "44.2",
+};
+
+const PLATFORM_VERSIONS = {
+  ubuntu: "22.04.4",
+  darwin: "14.4.1",
+  win32: "10.0.22631",
+  android: "14.0.0",
+  freebsd: "13.2",
+  openbsd: "7.3",
+  sunos: "11",
+  linux: "6.5",
+  ios: "18.2",
+  baileys: "6.5.0",
+  chromeos: "117.0.5938.132",
+  tizen: "6.5",
+  watchos: "10.1",
+  wearos: "4.1",
+  harmonyos: "4.0.0",
+  kaios: "3.1",
+  smarttv: "23.3.1",
+  raspberrypi: "11 (Bullseye)",
+  symbian: "3",
+  blackberry: "10.3.3",
+  windowsphone: "8.1",
+};
+
+export const Browsers = {
+  ubuntu: (browser) => {
+    return [PLATFORM_MAP["ubuntu"], browser, PLATFORM_VERSIONS["ubuntu"]];
+  },
+  macOS: (browser) => {
+    return [PLATFORM_MAP["darwin"], browser, PLATFORM_VERSIONS["darwin"]];
+  },
+  windows: (browser) => {
+    return [PLATFORM_MAP["win32"], browser, PLATFORM_VERSIONS["win32"]];
+  },
+  linux: (browser) => {
+    return [PLATFORM_MAP["linux"], browser, PLATFORM_VERSIONS["linux"]];
+  },
+  solaris: (browser) => {
+    return [PLATFORM_MAP["sunos"], browser, PLATFORM_VERSIONS["sunos"]];
+  },
+  baileys: (browser) => {
+    return [PLATFORM_MAP["baileys"], browser, PLATFORM_VERSIONS["baileys"]];
+  },
+  android: (browser) => {
+    return [PLATFORM_MAP["android"], browser, PLATFORM_VERSIONS["android"]];
+  },
+  iOS: (browser) => {
+    return [PLATFORM_MAP["ios"], browser, PLATFORM_VERSIONS["ios"]];
+  },
+  kaiOS: (browser) => {
+    return [PLATFORM_MAP["kaios"], browser, PLATFORM_VERSIONS["kaios"]];
+  },
+  chromeOS: (browser) => {
+    return [PLATFORM_MAP["chromeos"], browser, PLATFORM_VERSIONS["chromeos"]];
+  },
+  appropriate: (browser) => {
+    const platform = platform();
+    const platformName = PLATFORM_MAP[platform] || "Unknown OS";
+    return [platformName, browser, PLATFORM_VERSIONS[platform] || "latest"];
+  },
+  custom: (platform, browser, version) => {
+    const platformName = PLATFORM_MAP[platform.toLowerCase()] || platform;
+    return [
+      platformName,
+      browser,
+      version || PLATFORM_VERSIONS[platform] || "latest",
+    ];
+  },
+};
+
+export const getPlatformId = (browser) => {
+  const platformType = proto.DeviceProps.PlatformType[browser.toUpperCase()];
+  return platformType ? platformType.toString() : "1";
+};
+
+export const BufferJSON = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  replacer: (k, value) => {
+    if (
+      Buffer.isBuffer(value) ||
+      value instanceof Uint8Array ||
+      value?.type === "Buffer"
+    ) {
+      return {
+        type: "Buffer",
+        data: Buffer.from(value?.data || value).toString("base64"),
+      };
+    }
+    return value;
+  },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  reviver: (_, value) => {
+    if (
+      typeof value === "object" &&
+      !!value &&
+      (value.buffer === true || value.type === "Buffer")
+    ) {
+      const val = value.data || value.value;
+      return typeof val === "string"
+        ? Buffer.from(val, "base64")
+        : Buffer.from(val || []);
+    }
+    return value;
+  },
+};
+export const getKeyAuthor = (key, meId = "me") =>
+  (key?.fromMe ? meId : key?.participant || key?.remoteJid) || "";
+export const writeRandomPadMax16 = (msg) => {
+  const pad = randomBytes(1);
+  pad[0] &= 0xf;
+  if (!pad[0]) {
+    pad[0] = 0xf;
+  }
+  return Buffer.concat([msg, Buffer.alloc(pad[0], pad[0])]);
+};
+export const unpadRandomMax16 = (e) => {
+  const t = new Uint8Array(e);
+  if (0 === t.length) {
+    throw new Error("unpadPkcs7 given empty bytes");
+  }
+  var r = t[t.length - 1];
+  if (r > t.length) {
+    throw new Error(`unpad given ${t.length} bytes, but pad is ${r}`);
+  }
+  return new Uint8Array(t.buffer, t.byteOffset, t.length - r);
+};
+export const encodeWAMessage = (message) =>
+  writeRandomPadMax16(proto.Message.encode(message).finish());
+export const generateRegistrationId = () => {
+  return Uint16Array.from(randomBytes(2))[0] & 16383;
+};
+export const encodeBigEndian = (e, t = 4) => {
+  let r = e;
+  const a = new Uint8Array(t);
+  for (let i = t - 1; i >= 0; i--) {
+    a[i] = 255 & r;
+    r >>>= 8;
+  }
+  return a;
+};
+export const toNumber = (t) =>
+  typeof t === "object" && t
+    ? "toNumber" in t
+      ? t.toNumber()
+      : t.low
+    : t || 0;
+/** unix timestamp of a date in seconds */
+export const unixTimestampSeconds = (date = new Date()) =>
+  Math.floor(date.getTime() / 1000);
+export const debouncedTimeout = (intervalMs = 1000, task) => {
+  let timeout;
+  return {
+    start: (newIntervalMs, newTask) => {
+      task = newTask || task;
+      intervalMs = newIntervalMs || intervalMs;
+      timeout && clearTimeout(timeout);
+      timeout = setTimeout(() => task?.(), intervalMs);
+    },
+    cancel: () => {
+      timeout && clearTimeout(timeout);
+      timeout = undefined;
+    },
+    setTask: (newTask) => (task = newTask),
+    setInterval: (newInterval) => (intervalMs = newInterval),
+  };
+};
+export const delay = (ms) => delayCancellable(ms).delay;
+export const delayCancellable = (ms) => {
+  const stack = new Error().stack;
+  let timeout;
+  let reject;
+  const delay = new Promise((resolve, _reject) => {
+    timeout = setTimeout(resolve, ms);
+    reject = _reject;
+  });
+  const cancel = () => {
+    clearTimeout(timeout);
+    reject(
+      new Boom("Cancelled", {
+        statusCode: 500,
+        data: {
+          stack,
+        },
+      }),
+    );
+  };
+  return { delay, cancel };
+};
+export async function promiseTimeout(ms, promise) {
+  if (!ms) {
+    return new Promise(promise);
+  }
+  const stack = new Error().stack;
+  // Create a promise that rejects in <ms> milliseconds
+  const { delay, cancel } = delayCancellable(ms);
+  const p = new Promise((resolve, reject) => {
+    delay
+      .then(() =>
+        reject(
+          new Boom("Timed Out", {
+            statusCode: DisconnectReason.timedOut,
+            data: {
+              stack,
+            },
+          }),
+        ),
+      )
+      .catch((err) => reject(err));
+    promise(resolve, reject);
+  }).finally(cancel);
+  return p;
+}
+// inspired from whatsmeow code
+// https://github.com/tulir/whatsmeow/blob/64bc969fbe78d31ae0dd443b8d4c80a5d026d07a/send.go#L42
+export const generateMessageIDV2 = (userId) => {
+  return generateMessageID();
+};
+
+// generate a random ID to attach to a message
+export const generateMessageID = () => {
+  const hex = "0123456789ABCDEF";
+  let res = "";
+  for (let i = 0; i < 32; i++) {
+    res += hex[Math.floor(Math.random() * hex.length)];
+  }
+  let randomString = res.split("");
+  let letterIndexes = randomString
+    .map((char, index) => (/[A-F]/.test(char) ? index : -1))
+    .filter((index) => index !== -1);
+  if (letterIndexes.length > 0) {
+    let randomIndex =
+      letterIndexes[Math.floor(Math.random() * letterIndexes.length)];
+    randomString[randomIndex] = randomString[randomIndex].toLowerCase();
+  }
+  return randomString.join("");
+  //return res;
+};
+
+export function bindWaitForEvent(ev, event) {
+  return async (check, timeoutMs) => {
+    let listener;
+    let closeListener;
+    await promiseTimeout(timeoutMs, (resolve, reject) => {
+      closeListener = ({ connection, lastDisconnect }) => {
+        if (connection === "close") {
+          reject(
+            lastDisconnect?.error ||
+              new Boom("Connection Closed", {
+                statusCode: DisconnectReason.connectionClosed,
+              }),
+          );
+        }
+      };
+      ev.on("connection.update", closeListener);
+      listener = async (update) => {
+        if (await check(update)) {
+          resolve();
+        }
+      };
+      ev.on(event, listener);
+    }).finally(() => {
+      ev.off(event, listener);
+      ev.off("connection.update", closeListener);
+    });
+  };
+}
+export const bindWaitForConnectionUpdate = (ev) =>
+  bindWaitForEvent(ev, "connection.update");
+/**
+ * utility that fetches latest baileys version from the master branch.
+ * Use to ensure your WA connection is always on the latest version
+ */
+export const fetchLatestBaileysVersion = async (options = {}) => {
+  const URL =
+    "https://raw.githubusercontent.com/WhiskeySockets/Baileys/master/src/Defaults/baileys-version.json";
+  try {
+    const result = await axios.get(URL, {
+      ...options,
+      responseType: "json",
+    });
+    return {
+      version: result.data.version,
+      isLatest: true,
+    };
+  } catch (error) {
+    return {
+      version: baileysVersion,
+      isLatest: false,
+      error,
+    };
+  }
+};
+/**
+ * A utility that fetches the latest web version of whatsapp.
+ * Use to ensure your WA connection is always on the latest version
+ */
+export const fetchLatestWaWebVersion = async (options) => {
+  try {
+    const { data } = await axios.get("https://web.whatsapp.com/sw.js", {
+      ...options,
+      responseType: "json",
+    });
+    const regex = /\\?"client_revision\\?":\s*(\d+)/;
+    const match = data.match(regex);
+    if (!match?.[1]) {
+      return {
+        version: baileysVersion,
+        isLatest: false,
+        error: {
+          message: "Could not find client revision in the fetched content",
+        },
+      };
+    }
+    const clientRevision = match[1];
+    return {
+      version: [2, 3000, +clientRevision],
+      isLatest: true,
+    };
+  } catch (error) {
+    return {
+      version: baileysVersion,
+      isLatest: false,
+      error,
+    };
+  }
+};
+/** unique message tag prefix for MD clients */
+export const generateMdTagPrefix = () => {
+  const bytes = randomBytes(4);
+  return `${bytes.readUInt16BE()}.${bytes.readUInt16BE(2)}-`;
+};
+const STATUS_MAP = {
+  sender: proto.WebMessageInfo.Status.SERVER_ACK,
+  played: proto.WebMessageInfo.Status.PLAYED,
+  read: proto.WebMessageInfo.Status.READ,
+  "read-self": proto.WebMessageInfo.Status.READ,
+};
+/**
+ * Given a type of receipt, returns what the new status of the message should be
+ * @param type type from receipt
+ */
+export const getStatusFromReceiptType = (type) => {
+  const status = STATUS_MAP[type];
+  if (typeof type === "undefined") {
+    return proto.WebMessageInfo.Status.DELIVERY_ACK;
+  }
+  return status;
+};
+const CODE_MAP = {
+  conflict: DisconnectReason.connectionReplaced,
+};
+/**
+ * Stream errors generally provide a reason, map that to a baileys DisconnectReason
+ * @param reason the string reason given, eg. "conflict"
+ */
+export const getErrorCodeFromStreamError = (node) => {
+  const [reasonNode] = getAllBinaryNodeChildren(node);
+  let reason = reasonNode?.tag || "unknown";
+  const statusCode = +(
+    node.attrs.code ||
+    CODE_MAP[reason] ||
+    DisconnectReason.badSession
+  );
+  if (statusCode === DisconnectReason.restartRequired) {
+    reason = "restart required";
+  }
+  return {
+    reason,
+    statusCode,
+  };
+};
+export const getCallStatusFromNode = ({ tag, attrs }) => {
+  let status;
+  switch (tag) {
+    case "offer":
+    case "offer_notice":
+      status = "offer";
+      break;
+    case "terminate":
+      if (attrs.reason === "timeout") {
+        status = "timeout";
+      } else {
+        //fired when accepted/rejected/timeout/caller hangs up
+        status = "terminate";
+      }
+      break;
+    case "reject":
+      status = "reject";
+      break;
+    case "accept":
+      status = "accept";
+      break;
+    default:
+      status = "ringing";
+      break;
+  }
+  return status;
+};
+const UNEXPECTED_SERVER_CODE_TEXT = "Unexpected server response: ";
+export const getCodeFromWSError = (error) => {
+  let statusCode = 500;
+  if (error?.message?.includes(UNEXPECTED_SERVER_CODE_TEXT)) {
+    const code = +error?.message.slice(UNEXPECTED_SERVER_CODE_TEXT.length);
+    if (!Number.isNaN(code) && code >= 400) {
+      statusCode = code;
+    }
+  } else if (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    error?.code?.startsWith("E") ||
+    error?.message?.includes("timed out")
+  ) {
+    // handle ETIMEOUT, ENOTFOUND etc
+    statusCode = 408;
+  }
+  return statusCode;
+};
+/**
+ * Is the given platform WA business
+ * @param platform AuthenticationCreds.platform
+ */
+export const isWABusinessPlatform = (platform) => {
+  return platform === "smbi" || platform === "smba";
+};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function trimUndefined(obj) {
+  for (const key in obj) {
+    if (typeof obj[key] === "undefined") {
+      delete obj[key];
+    }
+  }
+  return obj;
+}
+const CROCKFORD_CHARACTERS = "123456789ABCDEFGHJKLMNPQRSTVWXYZ";
+export function bytesToCrockford(buffer) {
+  let value = 0;
+  let bitCount = 0;
+  const crockford = [];
+  for (const element of buffer) {
+    value = (value << 8) | (element & 0xff);
+    bitCount += 8;
+    while (bitCount >= 5) {
+      crockford.push(
+        CROCKFORD_CHARACTERS.charAt((value >>> (bitCount - 5)) & 31),
+      );
+      bitCount -= 5;
+    }
+  }
+  if (bitCount > 0) {
+    crockford.push(CROCKFORD_CHARACTERS.charAt((value << (5 - bitCount)) & 31));
+  }
+  return crockford.join("");
+}

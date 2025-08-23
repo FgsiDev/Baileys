@@ -64,6 +64,11 @@ export function makeBusinessSocket(config: any): {
         content: any;
     }, errorCode: any) => Promise<void>;
     sendRetryRequest: (node: any, forceIncludeKeys?: boolean) => Promise<void>;
+    offerCall: (toJid: any, isVideo?: boolean) => Promise<{
+        callId: any;
+        toJid: any;
+        isVideo: boolean;
+    }>;
     rejectCall: (callId: any, callFrom: any) => Promise<void>;
     fetchMessageHistory: (count: any, oldestMsgKey: any, oldestMsgTimestamp: any) => Promise<any>;
     requestPlaceholderResend: (messageKey: any) => Promise<any>;

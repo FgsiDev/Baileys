@@ -12,6 +12,7 @@ export function decodeMessageNode(stanza: any, meId: any, meLid: any): {
             senderLid: any;
             participant: any;
             participantLid: any;
+            server_id: any;
         };
         messageTimestamp: number;
         pushName: any;
@@ -47,6 +48,7 @@ export function decryptMessageNode(stanza: any, meId: any, meLid: any, repositor
             senderLid: any;
             participant: any;
             participantLid: any;
+            server_id: any;
         };
         messageTimestamp: number;
         pushName: any;

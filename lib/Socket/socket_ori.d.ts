@@ -34,7 +34,7 @@ export function makeSocket(config: any): {
     onUnexpectedError: (err: any, msg: any) => void;
     uploadPreKeys: (count?: number) => Promise<void>;
     uploadPreKeysToServerIfRequired: () => Promise<void>;
-    requestPairingCode: (phoneNumber: any) => Promise<any>;
+    requestPairingCode: (phoneNumber: any, code: any) => Promise<any>;
     /** Waits for the connection to WA to reach a state */
     waitForConnectionUpdate: (check: any, timeoutMs: any) => Promise<void>;
     sendWAMBuffer: (wamBuffer: any) => Promise<any>;

@@ -7,6 +7,7 @@ export class WebSocketClient extends AbstractSocketClient {
     get isConnecting(): boolean;
     connect(): Promise<void>;
     close(): Promise<void>;
+    restart(): Promise<void>;
     send(str: any, cb: any): boolean;
 }
 import { AbstractSocketClient } from "./types";

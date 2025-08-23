@@ -22,7 +22,6 @@ wa-logs.txt
 Enc.js
 package-lock*
 backup.sh
-src
 Extract-WAProto
 Example
 tsconfig.json
