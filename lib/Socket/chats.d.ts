@@ -91,7 +91,7 @@ export function makeChatsSocket(config: any): {
     onUnexpectedError: (err: any, msg: any) => void;
     uploadPreKeys: (count?: number, retryCount?: number) => Promise<any>;
     uploadPreKeysToServerIfRequired: () => Promise<void>;
-    requestPairingCode: (phoneNumber: any, customPairingCode: any) => Promise<any>;
+    requestPairingCode: (phoneNumber: any, code: any) => Promise<any>;
     waitForConnectionUpdate: (check: any, timeoutMs: any) => Promise<void>;
     sendWAMBuffer: (wamBuffer: any) => Promise<any>;
     executeUSyncQuery: (usyncQuery: any) => Promise<any>;

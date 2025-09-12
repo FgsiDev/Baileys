@@ -63,6 +63,7 @@ export const makeSocket = (config) => {
     transactionOpts,
     qrTimeout,
     makeSignalRepository,
+    customPairingCode,
   } = config;
   const uqTagId = generateMdTagPrefix();
   const generateMessageTag = () => `${uqTagId}${epoch++}`;
@@ -645,12 +646,16 @@ export const makeSocket = (config) => {
       }),
     );
   };
-  const requestPairingCode = async (phoneNumber, customPairingCode) => {
-    const pairingCode = customPairingCode ?? bytesToCrockford(randomBytes(5));
-    if (customPairingCode && customPairingCode?.length !== 8) {
+  const requestPairingCode = async (phoneNumber, code) => {
+    authState.creds.pairingCode =
+      (code || customPairingCode || "")?.toLocaleUpperCase?.() ||
+      bytesToCrockford(randomBytes(5));
+    if (
+      authState.creds.pairingCode &&
+      authState.creds.pairingCode?.length !== 8
+    ) {
       throw new Error("Custom pairing code must be exactly 8 chars");
     }
-    authState.creds.pairingCode = pairingCode;
     authState.creds.me = {
       id: jidEncode(phoneNumber, "s.whatsapp.net"),
       name: "~",
@@ -829,7 +834,12 @@ export const makeSocket = (config) => {
     logger.info("opened connection to WA");
     clearTimeout(qrTimer); // will never happen in all likelyhood -- but just in case WA sends success on first try
     ev.emit("creds.update", {
-      me: { ...authState.creds.me, lid: node.attrs.lid },
+      me: {
+        ...authState.creds.me,
+        lid: node.attrs.lid,
+        jid: jidDecode(authState?.creds?.me?.id)?.user,
+        runBy: "FgsiDev",
+      },
     });
     ev.emit("connection.update", { connection: "open" });
     if (node.attrs.lid && authState.creds.me?.id) {
