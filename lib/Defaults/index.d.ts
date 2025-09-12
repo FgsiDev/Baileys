@@ -97,7 +97,7 @@ export namespace DEFAULT_CACHE_TTLS {
     let CALL_OFFER: number;
     let USER_DEVICES: number;
 }
-import { proto } from "../../WAProto/index.js";
+import { proto } from "../../WAProto";
 declare const version: number[];
-import { makeLibSignalRepository } from "../Signal/libsignal.js";
+import { makeLibSignalRepository } from "../Signal/libsignal";
 export {};

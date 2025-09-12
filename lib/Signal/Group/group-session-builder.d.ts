@@ -4,4 +4,4 @@ export class GroupSessionBuilder {
     process(senderKeyName: any, senderKeyDistributionMessage: any): Promise<void>;
     create(senderKeyName: any): Promise<SenderKeyDistributionMessage>;
 }
-import { SenderKeyDistributionMessage } from "./sender-key-distribution-message.js";
+import { SenderKeyDistributionMessage } from "./sender-key-distribution-message";

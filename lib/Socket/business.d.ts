@@ -69,7 +69,7 @@ export function makeBusinessSocket(config: any): {
     rejectCall: (callId: any, callFrom: any) => Promise<void>;
     fetchMessageHistory: (count: any, oldestMsgKey: any, oldestMsgTimestamp: any) => Promise<any>;
     requestPlaceholderResend: (messageKey: any) => Promise<any>;
-    messageRetryManager: import("../Utils").MessageRetryManager | null;
+    messageRetryManager: import("..").MessageRetryManager | null;
     getPrivacyTokens: (jids: any) => Promise<any>;
     assertSessions: (jids: any, force: any) => Promise<boolean>;
     relayMessage: (jid: any, message: any, options: any, attempts?: number, maxRetries?: number) => Promise<any>;

@@ -1,6 +1,6 @@
 /* @ts-ignore */
 import { decrypt, encrypt } from "libsignal/src/crypto";
-import { SenderKeyMessage } from "./sender-key-message.js";
+import { SenderKeyMessage } from "./sender-key-message";
 export class GroupCipher {
   constructor(senderKeyStore, senderKeyName) {
     this.senderKeyStore = senderKeyStore;
