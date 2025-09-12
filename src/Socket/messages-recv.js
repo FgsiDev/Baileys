@@ -286,7 +286,7 @@ export const makeMessagesRecvSocket = (config) => {
               message: messageProto,
               messageTimestamp: +child.attrs.t,
             });
-            await upsertMessage(fullMessage, "append");
+            await upsertMessage({ ...fullMessage, node }, "append");
             logger.info("Processed plaintext newsletter message");
           } catch (error) {
             logger.error(
@@ -1119,7 +1119,7 @@ export const makeMessagesRecvSocket = (config) => {
             msg.participant ?? (msg.participant = node.attrs.participant);
             msg.messageTimestamp = +node.attrs.t;
             const fullMsg = proto.WebMessageInfo.create(msg);
-            await upsertMessage(fullMsg, "append");
+            await upsertMessage({ ...fullMsg, node }, "append");
           }
         }),
       ]);
@@ -1328,7 +1328,10 @@ export const makeMessagesRecvSocket = (config) => {
           }
           cleanMessage(msg, authState.creds.me.id);
           await sendMessageAck(node);
-          await upsertMessage(msg, node.attrs.offline ? "append" : "notify");
+          await upsertMessage(
+            { ...msg, node },
+            node.attrs.offline ? "append" : "notify",
+          );
         }),
       ]);
     } catch (error) {

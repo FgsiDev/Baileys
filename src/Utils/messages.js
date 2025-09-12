@@ -46,6 +46,7 @@ const MessageTypeProto = {
   sticker: WAProto.Message.StickerMessage,
   document: WAProto.Message.DocumentMessage,
 };
+const ButtonType = proto.Message.ButtonsMessage.HeaderType;
 /**
  * Uses a regex to test whether the string contains a URL, and returns the URL if it does.
  * @param text eg. hello https://google.com
@@ -407,6 +408,19 @@ export const generateWAMessageContent = async (message, options) => {
         }
       }
     }
+  } else if ("adminInvite" in message) {
+    m.newsletterAdminInviteMessage = {};
+    m.newsletterAdminInviteMessage.newsletterJid = message.adminInvite.jid;
+    m.newsletterAdminInviteMessage.newsletterName = message.adminInvite.name;
+    m.newsletterAdminInviteMessage.caption = message.adminInvite.caption;
+    m.newsletterAdminInviteMessage.inviteExpiration =
+      message.adminInvite.expiration;
+    m.newsletterAdminInviteMessage.contextInfo = message.contextInfo;
+    if (options.getProfilePicUrl) {
+      const pfpUrl = await options.getProfilePicUrl(message.adminInvite.jid);
+      const { thumbnail } = await generateThumbnail(pfpUrl, "image");
+      m.newsletterAdminInviteMessage.jpegThumbnail = thumbnail;
+    }
   } else if ("pin" in message) {
     m.pinInChatMessage = {};
     m.messageContextInfo = {};
@@ -415,8 +429,34 @@ export const generateWAMessageContent = async (message, options) => {
     m.pinInChatMessage.senderTimestampMs = Date.now();
     m.messageContextInfo.messageAddOnDurationInSecs =
       message.type === 1 ? message.time || 86400 : 0;
+  } else if ("keep" in message) {
+    m.keepInChatMessage = {};
+    m.keepInChatMessage.key = message.keep.key;
+    m.keepInChatMessage.keepType = message.keep.type;
+    m.keepInChatMessage.timestampMs = Date.now();
+  } else if ("call" in message) {
+    m.scheduledCallCreationMessage = {
+      scheduledTimestampMs: message.call.time || Date.now(),
+      callType: message.call.type || 1,
+      title: message.call.name,
+    };
+  } else if ("paymentInvite" in message) {
+    m.paymentInviteMessage = {
+      serviceType: message.paymentInvite.type,
+      expiryTimestamp: message.paymentInvite.expiry,
+    };
   } else if ("buttonReply" in message) {
     switch (message.type) {
+      case "list":
+        m.listResponseMessage = {
+          title: message.buttonReply.title,
+          description: message.buttonReply.description,
+          singleSelectReply: {
+            selectedRowId: message.buttonReply.rowId,
+          },
+          lisType: WAProto.Message.ListResponseMessage.ListType.SINGLE_SELECT,
+        };
+        break;
       case "template":
         m.templateButtonReplyMessage = {
           selectedDisplayText: message.buttonReply.displayText,
@@ -428,10 +468,63 @@ export const generateWAMessageContent = async (message, options) => {
         m.buttonsResponseMessage = {
           selectedButtonId: message.buttonReply.id,
           selectedDisplayText: message.buttonReply.displayText,
-          type: proto.Message.ButtonsResponseMessage.Type.DISPLAY_TEXT,
+          type: WAProto.Message.ButtonsResponseMessage.Type.DISPLAY_TEXT,
+        };
+        break;
+      case "interactive":
+        m.interactiveResponseMessage = {
+          body: {
+            text: message.buttonReply.displayText,
+            format:
+              WAProto.Message.InteractiveResponseMessage.Body.Format
+                .EXTENSIONS_1,
+          },
+          nativeFlowResponseMessage: {
+            name: message.buttonReply.nativeFlows.name,
+            paramsJson: message.buttonReply.nativeFlows.paramsJson,
+            version: message.buttonReply.nativeFlows.version,
+          },
         };
         break;
     }
+  } else if ("order" in message) {
+    m.orderMessage = WAProto.Message.OrderMessage.fromObject({
+      ...message.order,
+    });
+  } else if ("product" in message) {
+    const { imageMessage } = await prepareWAMessageMedia(
+      { image: message.product.productImage },
+      options,
+    );
+    m.productMessage = WAProto.Message.ProductMessage.fromObject({
+      ...message,
+      product: {
+        ...message.product,
+        productImage: imageMessage,
+      },
+    });
+  } else if ("pollResult" in message) {
+    if (!Array.isArray(message.pollResult.values)) {
+      throw new boom_1.Boom("Invalid pollResult values", { statusCode: 400 });
+    }
+    const pollResultSnapshotMessage = {
+      name: message.pollResult.name,
+      pollVotes: message.pollResult.values.map(
+        ([optionName, optionVoteCount]) => ({
+          optionName,
+          optionVoteCount,
+        }),
+      ),
+    };
+    if ("mentions" in message && !!message.mentions) {
+      pollResultSnapshotMessage.contextInfo = {
+        mentionedJid: message.mentions,
+      };
+    }
+    if ("contextInfo" in message && !!message.contextInfo) {
+      pollResultSnapshotMessage.contextInfo = message.contextInfo;
+    }
+    m.pollResultSnapshotMessage = pollResultSnapshotMessage;
   } else if ("ptv" in message && message.ptv) {
     const { videoMessage } = await prepareWAMessageMedia(
       { video: message.video },
@@ -478,6 +571,55 @@ export const generateWAMessageContent = async (message, options) => {
     m.eventMessage.extraGuestsAllowed = message.event.extraGuestsAllowed;
     m.eventMessage.isScheduleCall = message.event.isScheduleCall ?? false;
     m.eventMessage.location = message.event.location;
+  } else if ("payment" in message) {
+    const { imageMessage } = message?.payment?.background_url
+      ? await prepareWAMessageMedia(
+          { image: { url: message.payment.background_url } },
+          options,
+        )
+      : { imageMessage: {} };
+    m.requestPaymentMessage = {
+      amount: {
+        currencyCode: message.payment.currency || "IDR",
+        offset: message.payment.offset || 0,
+        value: message.payment.amount || 999999999,
+      },
+      expiryTimestamp: message.payment.expiry || 0,
+      amount1000: message.payment.amount || 999999999 * 1000,
+      currencyCodeIso4217: message.payment.currency || "IDR",
+      requestFrom: message.payment.from || "0@s.whatsapp.net",
+      noteMessage: {
+        extendedTextMessage: {
+          text: message.payment.note,
+          contextInfo: {
+            externalAdReply: {
+              showAdAttribution: true,
+            },
+          },
+        },
+      },
+      ...(message.payment.background_url
+        ? {
+            background: {
+              fileLength: imageMessage.fileLength,
+              width: imageMessage.width,
+              height: imageMessage.height,
+              mimetype: imageMessage.mimetype,
+              placeholderArgb: message.payment.image.placeholderArgb,
+              textArgb: message.payment.image.textArgb,
+              subtextArgb: message.payment.image.subtextArgb,
+              mediaData: {
+                mediaKey: imageMessage.mediaKey,
+                mediaKeyTimestamp: imageMessage.mediaKeyTimestamp,
+                fileSha256: imageMessage.fileSha256,
+                fileEncSha256: imageMessage.fileEncSha256,
+                directPath: imageMessage.directPath,
+              },
+              type: 1,
+            },
+          }
+        : {}),
+    };
   } else if ("poll" in message) {
     (_a = message.poll).selectableCount || (_a.selectableCount = 0);
     (_b = message.poll).toAnnouncementGroup || (_b.toAnnouncementGroup = false);
@@ -525,8 +667,270 @@ export const generateWAMessageContent = async (message, options) => {
   } else {
     m = await prepareWAMessageMedia(message, options);
   }
+  if ("productList" in message && !!message.productList) {
+    const thumbnail = message.thumbnail
+      ? await generateThumbnail(message.thumbnail, "image")
+      : null;
+    const listMessage = {
+      title: message.title,
+      buttonText: message.buttonText,
+      footerText: message.footer,
+      description: message.text,
+      productListInfo: {
+        productSections: message.productList,
+        headerImage: {
+          productId: message.productList[0].products[0].productId,
+          jpegThumbnail: thumbnail?.thumbnail || null,
+        },
+        businessOwnerJid: message.businessOwnerJid,
+      },
+      listType: WAProto.Message.ListMessage.ListType.PRODUCT_LIST,
+    };
+    listMessage.contextInfo = {
+      ...(message.contextInfo || {}),
+      ...(message.mentions ? { mentionedJid: message.mentions } : {}),
+    };
+    m = { listMessage };
+  } else if ("buttons" in message && !!message.buttons) {
+    const buttonsMessage = {
+      buttons: message.buttons.map((b) => ({
+        ...b,
+        type: WAProto.Message.ButtonsMessage.Button.Type.RESPONSE,
+      })),
+    };
+    if ("text" in message) {
+      buttonsMessage.contentText = message.text;
+      buttonsMessage.headerType = ButtonType.EMPTY;
+    } else {
+      if ("caption" in message) {
+        buttonsMessage.contentText = message.caption;
+      }
+      const type = Object.keys(m)[0].replace("Message", "").toUpperCase();
+      buttonsMessage.headerType = ButtonType[type];
+      Object.assign(buttonsMessage, m);
+    }
+    if ("footer" in message && !!message.footer) {
+      buttonsMessage.footerText = message.footer;
+    }
+    if ("title" in message && !!message.title) {
+      buttonsMessage.text = message.title;
+      buttonsMessage.headerType =
+        WAProto.Message.ButtonsMessage.HeaderType.TEXT;
+    }
+    buttonsMessage.contextInfo = {
+      ...(message.contextInfo || {}),
+      ...(message.mentions ? { mentionedJid: message.mentions } : {}),
+    };
+    m = { buttonsMessage };
+  } else if ("templateButtons" in message && !!message.templateButtons) {
+    const hydratedTemplate = {
+      hydratedButtons: message.templateButtons,
+    };
+    if ("text" in message) {
+      hydratedTemplate.hydratedContentText = message.text;
+    } else {
+      if ("caption" in message) {
+        hydratedTemplate.hydratedContentText = message.caption;
+      }
+      Object.assign(msg, m);
+    }
+    if ("footer" in message && !!message.footer) {
+      hydratedTemplate.hydratedFooterText = message.footer;
+    }
+    hydratedTemplate.contextInfo = {
+      ...(message.contextInfo || {}),
+      ...(message.mentions ? { mentionedJid: message.mentions } : {}),
+    };
+    m = {
+      templateMessage: {
+        hydratedTemplate,
+      },
+    };
+  } else if ("sections" in message && !!message.sections) {
+    const listMessage = {
+      sections: message.sections,
+      buttonText: message.buttonText,
+      title: message.title,
+      footerText: message.footer,
+      description: message.text,
+      listType: proto.Message.ListMessage.ListType.SINGLE_SELECT,
+    };
+    m = { listMessage };
+  } else if ("interactiveButtons" in message && !!message.interactiveButtons) {
+    const image = message?.header?.image
+      ? await prepareWAMessageMedia(
+          { image: message?.header?.image, ...options },
+          options,
+        )
+      : null;
+    const video = message?.header?.video
+      ? await prepareWAMessageMedia(
+          { video: message?.header?.video, ...options },
+          options,
+        )
+      : null;
+    const document = message?.header?.document
+      ? await prepareWAMessageMedia(
+          { document: message?.header?.document, ...options },
+          options,
+        )
+      : null;
+    const interactiveMessage = {
+      viewOnceMessageV2Extension: {
+        message: {
+          messageContextInfo: {
+            deviceListMetadata: {},
+            deviceListMetadataVersion: 2,
+          },
+          interactiveMessage: proto.Message.InteractiveMessage.create({
+            contextInfo: message.contextInfo,
+            body: proto.Message.InteractiveMessage.Body.create({
+              text: message.text,
+            }),
+            footer: proto.Message.InteractiveMessage.Footer.create({
+              text: message.footer,
+            }),
+            header: proto.Message.InteractiveMessage.Body.create({
+              title: message.title,
+              subtitle: message.subtitle,
+              hasMediaAttachment: message?.header?.hasMediaAttachment || false,
+              imageMessage: image ? image.imageMessage : null,
+              videoMessage: video ? video.videoMessage : null,
+              documentMessage: document ? document.documentMessage : null,
+              locationMessage: message?.header?.location || null,
+              productMessage: message?.header?.product || null,
+            }),
+            nativeFlowMessage:
+              proto.Message.InteractiveMessage.NativeFlowMessage.create({
+                buttons: message.interactiveButtons,
+              }),
+          }),
+        },
+      },
+    };
+    m = interactiveMessage;
+  }
+  if ("cards" in message && !!message.cards) {
+    const cards = await Promise.all(
+      message.cards.map(async (slide) => {
+        const [url, title, body, footer, buttonType, buttonText, buttonID] =
+          slide;
+        let buttonParamsJson = {};
+
+        switch (buttonType) {
+          case "cta_url":
+            buttonParamsJson = {
+              display_text: buttonText,
+              url: buttonID,
+              merchant_url: buttonID,
+            };
+            break;
+          case "cta_call":
+          case "cta_reminder":
+          case "cta_cancel_reminder":
+          case "address_message":
+          case "quick_reply":
+            buttonParamsJson = { display_text: buttonText, id: buttonID };
+            break;
+          case "cta_copy":
+            buttonParamsJson = {
+              display_text: buttonText,
+              copy_code: buttonID,
+            };
+            break;
+          case "send_location":
+            buttonParamsJson = {};
+            break;
+          default:
+            throw new Error(`Invalid buttonType: ${buttonType}`);
+        }
+
+        let media;
+        const type = message.type;
+        const buttonParamsJsonString = JSON.stringify(buttonParamsJson);
+
+        if (type === "image") {
+          media = await prepareWAMessageMedia(
+            { image: { url }, ...options },
+            options,
+          );
+        } else if (type === "video") {
+          media = await prepareWAMessageMedia(
+            { video: { url }, ...options },
+            options,
+          );
+        } else {
+          throw new Error("Invalid Media Type");
+        }
+
+        return {
+          body: proto.Message.InteractiveMessage.Body.fromObject({
+            text: body,
+          }),
+          footer: proto.Message.InteractiveMessage.Footer.fromObject({
+            text: footer,
+          }),
+          header: proto.Message.InteractiveMessage.Header.fromObject({
+            title,
+            hasMediaAttachment: true,
+            ...media,
+          }),
+          nativeFlowMessage:
+            proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
+              buttons: [
+                {
+                  name: buttonType,
+                  buttonParamsJson: buttonParamsJsonString,
+                },
+              ],
+            }),
+        };
+      }),
+    );
+    const interactiveMessage = {
+      viewOnceMessageV2Extension: {
+        message: {
+          messageContextInfo: {
+            deviceListMetadata: {},
+            deviceListMetadataVersion: 2,
+          },
+          interactiveMessage: proto.Message.InteractiveMessage.fromObject({
+            contextInfo: message.contextInfo,
+            body: proto.Message.InteractiveMessage.Body.fromObject({
+              text: message.text,
+            }),
+            footer: proto.Message.InteractiveMessage.Footer.fromObject({
+              text: message.footer,
+            }),
+            header: proto.Message.InteractiveMessage.Body.fromObject({
+              title: message.title,
+              subtitle: message.subtitle,
+              hasMediaAttachment: false,
+            }),
+            carouselMessage:
+              proto.Message.InteractiveMessage.CarouselMessage.fromObject({
+                cards,
+              }),
+          }),
+        },
+      },
+    };
+    m = interactiveMessage;
+  }
   if ("viewOnce" in message && !!message.viewOnce) {
     m = { viewOnceMessage: { message: m } };
+  }
+  if ("viewOnceV2" in message && !!message.viewOnceV2) {
+    m = { viewOnceMessageV2: { message: m } };
+  }
+  if ("viewOnceV2Extension" in message && !!message.viewOnceV2Extension) {
+    m = { viewOnceMessageV2Extension: { message: m } };
+  }
+  if ("ephemeral" in message && !!message.ephemeral) {
+    m = { ephemeralMessage: { message: m } };
+  }
+  if ("lottie" in message && !!message.lottie) {
+    m = { lottieStickerMessage: { message: m } };
   }
   if ("mentions" in message && message.mentions?.length) {
     const messageType = Object.keys(m)[0];
