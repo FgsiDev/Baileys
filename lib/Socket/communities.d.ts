@@ -1,0 +1,22 @@
+export function makeCommunitiesSocket(config: any): any;
+export function extractCommunityMetadata(result: any): {
+    id: any;
+    subject: any;
+    subjectOwner: any;
+    subjectTime: number;
+    size: any;
+    creation: number;
+    owner: any;
+    desc: any;
+    descId: any;
+    linkedParent: any;
+    restrict: boolean;
+    announce: boolean;
+    isCommunity: boolean;
+    isCommunityAnnounce: boolean;
+    joinApprovalMode: boolean;
+    memberAddMode: boolean;
+    participants: any;
+    ephemeralDuration: number | undefined;
+    addressingMode: any;
+};
