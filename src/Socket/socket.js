@@ -40,6 +40,7 @@ import {
   getBinaryNodeChildren,
   isLidUser,
   jidEncode,
+  jidDecode,
   S_WHATSAPP_NET,
 } from "../WABinary";
 import { USyncQuery, USyncUser } from "../WAUSync/";
