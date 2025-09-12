@@ -1,4 +1,4 @@
-export class SenderKeyDistributionMessage {
+export class SenderKeyDistributionMessage extends CiphertextMessage {
     constructor(id: any, iteration: any, chainKey: any, signatureKey: any, serialized: any);
     serialized: any;
     id: any;
@@ -7,9 +7,10 @@ export class SenderKeyDistributionMessage {
     signatureKey: any;
     intsToByteHighAndLow(highValue: any, lowValue: any): number;
     serialize(): any;
-    getType(): any;
+    getType(): number;
     getIteration(): any;
     getChainKey(): any;
     getSignatureKey(): any;
     getId(): any;
 }
+import { CiphertextMessage } from "./ciphertext-message";

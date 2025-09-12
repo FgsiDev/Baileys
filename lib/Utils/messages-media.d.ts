@@ -82,7 +82,7 @@ export function encryptMediaRetryRequest(key: any, mediaKey: any, meId: any): Pr
     tag: string;
     attrs: {
         id: any;
-        to: any;
+        to: string;
         type: string;
     };
     content: ({

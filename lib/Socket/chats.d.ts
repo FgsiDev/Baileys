@@ -4,9 +4,11 @@ export function makeChatsSocket(config: any): {
         jid: any;
         personaId: any;
     }[]>;
-    processingMutex: any;
+    processingMutex: {
+        mutex(code: any): Promise<void>;
+    };
     fetchPrivacySettings: (force?: boolean) => Promise<any>;
-    upsertMessage: any;
+    upsertMessage: (...args: any[]) => Promise<any>;
     appPatch: (patchCreate: any) => Promise<void>;
     sendPresenceUpdate: (type: any, toJid: any) => Promise<void>;
     presenceSubscribe: (toJid: any, tcToken: any) => Promise<void>;
@@ -41,7 +43,7 @@ export function makeChatsSocket(config: any): {
             business_config: any;
         };
     } | undefined>;
-    resyncAppState: any;
+    resyncAppState: (...args: any[]) => Promise<any>;
     chatModify: (mod: any, jid: any) => Promise<void>;
     cleanDirtyBits: (type: any, fromTimestamp: any) => Promise<void>;
     addOrEditContact: (jid: any, contact: any) => Promise<void>;
@@ -55,11 +57,26 @@ export function makeChatsSocket(config: any): {
     addOrEditQuickReply: (quickReply: any) => Promise<void>;
     removeQuickReply: (timestamp: any) => Promise<void>;
     type: string;
-    ws: any;
-    ev: any;
+    ws: import("./Client/websocket.js").WebSocketClient;
+    ev: {
+        process(handler: any): () => void;
+        emit(event: any, evData: any): any;
+        isBuffering(): boolean;
+        buffer: () => void;
+        flush: () => boolean;
+        createBufferedFunction(work: any): (...args: any[]) => Promise<any>;
+        on: (...args: any[]) => any;
+        off: (...args: any[]) => any;
+        removeAllListeners: (...args: any[]) => any;
+    };
     authState: {
         creds: any;
-        keys: any;
+        keys: {
+            get: (type: any, ids: any) => Promise<any>;
+            set: (data: any) => Promise<void>;
+            isInTransaction: () => boolean;
+            transaction(work: any, key: any): Promise<any>;
+        };
     };
     signalRepository: any;
     user: any;
@@ -72,10 +89,10 @@ export function makeChatsSocket(config: any): {
     logout: (msg: any) => Promise<void>;
     end: (error: any) => void;
     onUnexpectedError: (err: any, msg: any) => void;
-    uploadPreKeys: (count?: any, retryCount?: number) => Promise<any>;
+    uploadPreKeys: (count?: number, retryCount?: number) => Promise<any>;
     uploadPreKeysToServerIfRequired: () => Promise<void>;
     requestPairingCode: (phoneNumber: any, customPairingCode: any) => Promise<any>;
-    waitForConnectionUpdate: any;
+    waitForConnectionUpdate: (check: any, timeoutMs: any) => Promise<void>;
     sendWAMBuffer: (wamBuffer: any) => Promise<any>;
     executeUSyncQuery: (usyncQuery: any) => Promise<any>;
     onWhatsApp: (...jids: any[]) => Promise<any>;

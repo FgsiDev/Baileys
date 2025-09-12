@@ -18,7 +18,7 @@ export namespace WA_CERT_DETAILS {
 export const PROCESSABLE_HISTORY_TYPES: proto.Message.HistorySyncNotification.HistorySyncType[];
 export namespace DEFAULT_CONNECTION_CONFIG {
     export { version };
-    export let browser: any;
+    export let browser: any[];
     export let waWebSocketUrl: string;
     export let connectTimeoutMs: number;
     export let keepAliveIntervalMs: number;
@@ -99,4 +99,5 @@ export namespace DEFAULT_CACHE_TTLS {
 }
 import { proto } from "../../WAProto/index.js";
 declare const version: number[];
+import { makeLibSignalRepository } from "../Signal/libsignal.js";
 export {};

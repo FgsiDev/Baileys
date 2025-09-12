@@ -19,11 +19,27 @@ export function addTransactionCapability(state: any, logger: any, { maxCommitRet
     transaction(work: any, key: any): Promise<any>;
 };
 export function initAuthCreds(): {
-    noiseKey: any;
-    pairingEphemeralKeyPair: any;
-    signedIdentityKey: any;
-    signedPreKey: any;
-    registrationId: any;
+    noiseKey: {
+        private: any;
+        public: any;
+    };
+    pairingEphemeralKeyPair: {
+        private: any;
+        public: any;
+    };
+    signedIdentityKey: {
+        private: any;
+        public: any;
+    };
+    signedPreKey: {
+        keyPair: {
+            private: any;
+            public: any;
+        };
+        signature: any;
+        keyId: any;
+    };
+    registrationId: number;
     advSecretKey: any;
     processedHistoryMessages: never[];
     nextPreKeyId: number;

@@ -5,8 +5,9 @@ export class SenderChainKey {
     iteration: any;
     chainKey: any;
     getIteration(): any;
-    getSenderMessageKey(): any;
+    getSenderMessageKey(): SenderMessageKey;
     getNext(): SenderChainKey;
     getSeed(): any;
     getDerivative(seed: any, key: any): any;
 }
+import { SenderMessageKey } from "./sender-message-key";

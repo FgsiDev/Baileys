@@ -1,7 +1,7 @@
 import { proto } from "../../WAProto/index.js";
-import { makeLibSignalRepository } from "../Signal/libsignal";
-import { Browsers } from "../Utils";
-import logger from "../Utils/logger";
+import { makeLibSignalRepository } from "../Signal/libsignal.js";
+import { Browsers } from "../Utils/index.js";
+import logger from "../Utils/logger.js";
 const version = [2, 3000, 1023223821];
 export const UNAUTHORIZED_CODES = [401, 403, 419];
 export const DEFAULT_ORIGIN = "https://web.whatsapp.com";

@@ -56,7 +56,7 @@ export function getNextPreKeysNode(state: any, count: any): Promise<{
         attrs: {
             xmlns: string;
             type: string;
-            to: any;
+            to: string;
         };
         content: {
             tag: string;

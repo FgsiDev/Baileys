@@ -1,4 +1,4 @@
-export class WebSocketClient {
+export class WebSocketClient extends AbstractSocketClient {
     constructor(...args: any[]);
     socket: any;
     get isOpen(): boolean;
@@ -10,3 +10,4 @@ export class WebSocketClient {
     restart(): Promise<void>;
     send(str: any, cb: any): boolean;
 }
+import { AbstractSocketClient } from "./types";

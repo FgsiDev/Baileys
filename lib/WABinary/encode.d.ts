@@ -1,1 +1,2 @@
-export function encodeBinaryNode(node: any, opts?: any, buffer?: number[]): any;
+export function encodeBinaryNode(node: any, opts?: typeof constants, buffer?: number[]): any;
+import * as constants from "./constants";

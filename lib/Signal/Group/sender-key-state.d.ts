@@ -3,12 +3,14 @@ export class SenderKeyState {
     MAX_MESSAGE_KEYS: number;
     senderKeyStateStructure: any;
     getKeyId(): any;
-    getSenderChainKey(): any;
+    getSenderChainKey(): SenderChainKey;
     setSenderChainKey(chainKey: any): void;
     getSigningKeyPublic(): any;
     getSigningKeyPrivate(): any;
     hasSenderMessageKey(iteration: any): any;
     addSenderMessageKey(senderMessageKey: any): void;
-    removeSenderMessageKey(iteration: any): any;
+    removeSenderMessageKey(iteration: any): SenderMessageKey | null;
     getStructure(): any;
 }
+import { SenderChainKey } from "./sender-chain-key";
+import { SenderMessageKey } from "./sender-message-key";

@@ -8,7 +8,7 @@ export function decodeMessageNode(stanza: any, meId: any, meLid: any): {
             server_id?: any;
             remoteJid: any;
             remoteJidAlt: any;
-            fromMe: any;
+            fromMe: boolean;
             id: any;
             participant: any;
             participantAlt: any;
@@ -53,7 +53,7 @@ export function decryptMessageNode(stanza: any, meId: any, meLid: any, repositor
             server_id?: any;
             remoteJid: any;
             remoteJidAlt: any;
-            fromMe: any;
+            fromMe: boolean;
             id: any;
             participant: any;
             participantAlt: any;

@@ -28,7 +28,7 @@ export function makeLibSignalRepository(auth: any, onWhatsAppFunc: any): {
     }): Promise<any>;
     jidToSignalProtocolAddress(jid: any): any;
     storeLIDPNMapping(lid: any, pn: any): Promise<void>;
-    getLIDMappingStore(): any;
+    getLIDMappingStore(): LIDMappingStore;
     validateSession(jid: any): Promise<{
         exists: boolean;
         reason: string;
@@ -45,3 +45,4 @@ export function makeLibSignalRepository(auth: any, onWhatsAppFunc: any): {
     }): Promise<any>;
     destroy(): void;
 };
+import { LIDMappingStore } from "./lid-mapping";

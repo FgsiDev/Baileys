@@ -19,7 +19,7 @@ declare function _default(config: any): {
         connection: string;
     };
     presences: {};
-    labels: any;
+    labels: ObjectRepository;
     labelAssociations: any;
     bind: (ev: any, options?: {}) => void;
     /** loads messages from the store, if not found -- uses the legacy connection */
@@ -30,7 +30,7 @@ declare function _default(config: any): {
      * Keep in mind that the list is formed from predefined tags and tags
      * that were "caught" during their editing.
      */
-    getLabels: () => any;
+    getLabels: () => ObjectRepository;
     /**
      * Get labels for chat
      *
@@ -55,7 +55,7 @@ declare function _default(config: any): {
         chats: any;
         contacts: {};
         messages: {};
-        labels: any;
+        labels: ObjectRepository;
         labelAssociations: any;
     };
     fromJSON: (json: any) => void;
@@ -63,3 +63,4 @@ declare function _default(config: any): {
     readFromFile: (path: any) => void;
 };
 export default _default;
+import { ObjectRepository } from "./object-repository";

@@ -1,5 +1,5 @@
-import * as keyhelper from "./keyhelper";
-import { SenderKeyDistributionMessage } from "./sender-key-distribution-message";
+import * as keyhelper from "./keyhelper.js";
+import { SenderKeyDistributionMessage } from "./sender-key-distribution-message.js";
 export class GroupSessionBuilder {
   constructor(senderKeyStore) {
     this.senderKeyStore = senderKeyStore;
