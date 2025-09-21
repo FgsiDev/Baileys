@@ -121924,6 +121924,8 @@ $root.proto = (function() {
          * @property {boolean|null} [fromMe] MessageKey fromMe
          * @property {string|null} [id] MessageKey id
          * @property {string|null} [participant] MessageKey participant
+         * @property {string|null} [participantAlt] MessageKey participantAlt
+         * @property {string|null} [remoteJidAlt] MessageKey remoteJidAlt
          */
 
         /**
@@ -121973,6 +121975,22 @@ $root.proto = (function() {
          */
         MessageKey.prototype.participant = null;
 
+        /**
+         * MessageKey participantAlt.
+         * @member {string|null|undefined} participantAlt
+         * @memberof proto.MessageKey
+         * @instance
+         */
+        MessageKey.prototype.participantAlt = null;
+
+        /**
+         * MessageKey remoteJidAlt.
+         * @member {string|null|undefined} remoteJidAlt
+         * @memberof proto.MessageKey
+         * @instance
+         */
+        MessageKey.prototype.remoteJidAlt = null;
+
         // OneOf field names bound to virtual getters and setters
         var $oneOfFields;
 
@@ -122021,6 +122039,28 @@ $root.proto = (function() {
         });
 
         /**
+         * MessageKey _participantAlt.
+         * @member {"participantAlt"|undefined} _participantAlt
+         * @memberof proto.MessageKey
+         * @instance
+         */
+        Object.defineProperty(MessageKey.prototype, "_participantAlt", {
+            get: $util.oneOfGetter($oneOfFields = ["participantAlt"]),
+            set: $util.oneOfSetter($oneOfFields)
+        });
+
+        /**
+         * MessageKey _remoteJidAlt.
+         * @member {"remoteJidAlt"|undefined} _remoteJidAlt
+         * @memberof proto.MessageKey
+         * @instance
+         */
+        Object.defineProperty(MessageKey.prototype, "_remoteJidAlt", {
+            get: $util.oneOfGetter($oneOfFields = ["remoteJidAlt"]),
+            set: $util.oneOfSetter($oneOfFields)
+        });
+
+        /**
          * Creates a new MessageKey instance using the specified properties.
          * @function create
          * @memberof proto.MessageKey
@@ -122052,6 +122092,10 @@ $root.proto = (function() {
                 writer.uint32(/* id 3, wireType 2 =*/26).string(message.id);
             if (message.participant != null && Object.hasOwnProperty.call(message, "participant"))
                 writer.uint32(/* id 4, wireType 2 =*/34).string(message.participant);
+            if (message.participantAlt != null && Object.hasOwnProperty.call(message, "participantAlt"))
+                writer.uint32(/* id 5, wireType 2 =*/42).string(message.participantAlt);
+            if (message.remoteJidAlt != null && Object.hasOwnProperty.call(message, "remoteJidAlt"))
+                writer.uint32(/* id 6, wireType 2 =*/50).string(message.remoteJidAlt);
             return writer;
         };
 
@@ -122097,6 +122141,12 @@ $root.proto = (function() {
                     break;
                 case 4:
                     message.participant = reader.string();
+                    break;
+                case 5:
+                    message.participantAlt = reader.string();
+                    break;
+                case 6:
+                    message.remoteJidAlt = reader.string();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -122154,6 +122204,16 @@ $root.proto = (function() {
                 if (!$util.isString(message.participant))
                     return "participant: string expected";
             }
+            if (message.participantAlt != null && message.hasOwnProperty("participantAlt")) {
+                properties._participantAlt = 1;
+                if (!$util.isString(message.participantAlt))
+                    return "participantAlt: string expected";
+            }
+            if (message.remoteJidAlt != null && message.hasOwnProperty("remoteJidAlt")) {
+                properties._remoteJidAlt = 1;
+                if (!$util.isString(message.remoteJidAlt))
+                    return "remoteJidAlt: string expected";
+            }
             return null;
         };
 
@@ -122177,6 +122237,10 @@ $root.proto = (function() {
                 message.id = String(object.id);
             if (object.participant != null)
                 message.participant = String(object.participant);
+            if (object.participantAlt != null)
+                message.participantAlt = String(object.participantAlt);
+            if (object.remoteJidAlt != null)
+                message.remoteJidAlt = String(object.remoteJidAlt);
             return message;
         };
 
@@ -122212,6 +122276,16 @@ $root.proto = (function() {
                 object.participant = message.participant;
                 if (options.oneofs)
                     object._participant = "participant";
+            }
+            if (message.participantAlt != null && message.hasOwnProperty("participantAlt")) {
+                object.participantAlt = message.participantAlt;
+                if (options.oneofs)
+                    object._participantAlt = "participantAlt";
+            }
+            if (message.remoteJidAlt != null && message.hasOwnProperty("remoteJidAlt")) {
+                object.remoteJidAlt = message.remoteJidAlt;
+                if (options.oneofs)
+                    object._remoteJidAlt = "remoteJidAlt";
             }
             return object;
         };

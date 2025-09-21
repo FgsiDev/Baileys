@@ -41355,6 +41355,12 @@ export namespace proto {
 
         /** MessageKey participant */
         participant?: (string|null);
+
+        /** MessageKey participantAlt */
+        participantAlt?: (string|null);
+
+        /** MessageKey remoteJidAlt */
+        remoteJidAlt?: (string|null);
     }
 
     /** Represents a MessageKey. */
@@ -41378,6 +41384,12 @@ export namespace proto {
         /** MessageKey participant. */
         public participant?: (string|null);
 
+        /** MessageKey participantAlt. */
+        public participantAlt?: (string|null);
+
+        /** MessageKey remoteJidAlt. */
+        public remoteJidAlt?: (string|null);
+
         /** MessageKey _remoteJid. */
         public _remoteJid?: "remoteJid";
 
@@ -41389,6 +41401,12 @@ export namespace proto {
 
         /** MessageKey _participant. */
         public _participant?: "participant";
+
+        /** MessageKey _participantAlt. */
+        public _participantAlt?: "participantAlt";
+
+        /** MessageKey _remoteJidAlt. */
+        public _remoteJidAlt?: "remoteJidAlt";
 
         /**
          * Creates a new MessageKey instance using the specified properties.

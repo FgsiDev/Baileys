@@ -3465,6 +3465,8 @@ message MessageKey {
     optional bool fromMe = 2;
     optional string id = 3;
     optional string participant = 4;
+    optional string participantAlt = 5;
+    optional string remoteJidAlt = 6;
 }
 
 message MessageSecretMessage {
