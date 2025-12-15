@@ -1110,9 +1110,10 @@ async function prepareStickerPackMessage(
 		return {
 			fileName,
 			mimetype: 'image/webp',
-			isAnimated: false,
+			isAnimated: s.isAnimated || false,
 			emojis: s.emojis || [],
-			accessibilityLabel: s.accessibilityLabel
+			accessibilityLabel: s.accessibilityLabel || '',
+			isLottie: s.isLottie || false
 		}
 	})
 
