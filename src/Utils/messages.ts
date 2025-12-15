@@ -1119,7 +1119,7 @@ async function prepareStickerPackMessage(
 	const stickerMetadata = await Promise.all(stickerPromises)
 
 	const zipBuffer = await new Promise<Buffer>((resolve, reject) => {
-		zip(stickerData, (err, data) => {
+		zip(stickerData, (err: Error | null, data: Uint8Array) => {
 			if (err) {
 				reject(err)
 			} else {
