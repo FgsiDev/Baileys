@@ -13,6 +13,7 @@ export type WAMessage = proto.IWebMessageInfo & {
 	messageStubParameters?: any
 	category?: string
 	retryCount?: number
+	node?: BinaryNode
 }
 export type WAMessageContent = proto.IMessage
 export type WAContactMessage = proto.Message.IContactMessage
