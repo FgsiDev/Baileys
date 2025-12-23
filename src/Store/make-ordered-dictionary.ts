@@ -1,36 +1,38 @@
 function makeOrderedDictionary<T>(idGetter: (item: T) => string) {
 	const array: T[] = []
-	const dict: { [_: string]: T } = {}
+	const dict: Record<string, T> = {}
 
 	const get = (id: string): T | undefined => dict[id]
 
-	const update = (item: T) => {
+	const rebuildDict = () => {
+		for (const k of Object.keys(dict)) delete dict[k]
+		for (const item of array) {
+			dict[idGetter(item)] = item
+		}
+	}
+
+	const update = (item: T): boolean => {
 		const id = idGetter(item)
 		const idx = array.findIndex(i => idGetter(i) === id)
 		if (idx >= 0) {
 			array[idx] = item
 			dict[id] = item
+			return true
 		}
-
 		return false
 	}
 
 	const upsert = (item: T, mode: 'append' | 'prepend') => {
 		const id = idGetter(item)
-		if (get(id)) {
+		if (dict[id]) {
 			update(item)
 		} else {
-			if (mode === 'append') {
-				array.push(item)
-			} else {
-				array.splice(0, 0, item)
-			}
-
+			mode === 'append' ? array.push(item) : array.unshift(item)
 			dict[id] = item
 		}
 	}
 
-	const remove = (item: T) => {
+	const remove = (item: T): boolean => {
 		const id = idGetter(item)
 		const idx = array.findIndex(i => idGetter(i) === id)
 		if (idx >= 0) {
@@ -38,7 +40,6 @@ function makeOrderedDictionary<T>(idGetter: (item: T) => string) {
 			delete dict[id]
 			return true
 		}
-
 		return false
 	}
 
@@ -48,22 +49,20 @@ function makeOrderedDictionary<T>(idGetter: (item: T) => string) {
 		upsert,
 		update,
 		remove,
-		updateAssign: (id: string, update: Partial<T>) => {
-			const item = get(id)
-			if (item) {
-				Object.assign(item, update)
+		updateAssign: (id: string, update: Partial<T>): boolean => {
+			const item = dict[id]
+			if (!item) return false
+			Object.assign(item, update)
+			const newId = idGetter(item)
+			if (newId !== id) {
 				delete dict[id]
-				dict[idGetter(item)] = item
-				return true
+				dict[newId] = item
 			}
-
-			return false
+			return true
 		},
 		clear: () => {
-			array.splice(0, array.length)
-			for (const key of Object.keys(dict)) {
-				delete dict[key]
-			}
+			array.length = 0
+			for (const k of Object.keys(dict)) delete dict[k]
 		},
 		filter: (contain: (item: T) => boolean) => {
 			let i = 0
@@ -72,13 +71,14 @@ function makeOrderedDictionary<T>(idGetter: (item: T) => string) {
 					delete dict[idGetter(array[i])]
 					array.splice(i, 1)
 				} else {
-					i += 1
+					i++
 				}
 			}
 		},
-		toJSON: () => array,
+		toJSON: (): T[] => [...array],
 		fromJSON: (newItems: T[]) => {
 			array.splice(0, array.length, ...newItems)
+			rebuildDict()
 		}
 	}
 }

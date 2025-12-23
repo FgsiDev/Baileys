@@ -113,6 +113,28 @@ export default function makeInMemoryStore(
 		for (const l of list) labels.upsertById(l.id, l)
 	}
 
+	const toJSON = () => ({
+		chats,
+		contacts,
+		messages,
+		labels,
+		labelAssociations
+	})
+
+	const fromJSON = (json: any) => {
+		chats.upsert(...json.chats)
+		upsertContacts(Object.values(json.contacts || {}))
+		upsertLabels(Object.values(json.labels || {}))
+		labelAssociations.upsert(...(json.labelAssociations || []))
+
+		for (const jid in json.messages || {}) {
+			const list = getMsgList(jid)
+			for (const m of json.messages[jid]) {
+				list.upsert(proto.WebMessageInfo.fromObject(m) as unknown as WAMessage, 'append')
+			}
+		}
+	}
+
 	const writeToFile = (path: string) => {
 		const { writeFileSync } = require('fs')
 		writeFileSync(path, JSON.stringify(toJSON(), null, 2))
@@ -283,8 +305,10 @@ export default function makeInMemoryStore(
 			safe(({ id, participants, action }) => {
 				const meta = groupMetadata[id]
 				if (!meta) return
+				if (!meta.participants) meta.participants = []
 
 				if (action === 'add') {
+					if (!meta.participants) return
 					meta.participants.push(
 						...participants.map(id => ({
 							id,
@@ -295,10 +319,12 @@ export default function makeInMemoryStore(
 				}
 
 				if (action === 'remove') {
+					if (!meta.participants) return
 					meta.participants = meta.participants.filter(p => !participants.includes(p.id))
 				}
 
 				if (action === 'promote' || action === 'demote') {
+					if (!meta.participants) return
 					meta.participants.forEach(p => {
 						if (participants.includes(p.id)) {
 							p.isAdmin = action === 'promote'
@@ -379,26 +405,8 @@ export default function makeInMemoryStore(
 				.filter(l => l.messageId === msgId)
 				.all()
 				.map(l => l.labelId),
-		toJSON: () => ({
-			chats,
-			contacts,
-			messages,
-			labels,
-			labelAssociations
-		}),
-		fromJSON: (json: any) => {
-			chats.upsert(...json.chats)
-			upsertContacts(Object.values(json.contacts))
-			upsertLabels(Object.values(json.labels || {}))
-			labelAssociations.upsert(...(json.labelAssociations || []))
-
-			for (const jid in json.messages) {
-				const list = getMsgList(jid)
-				for (const m of json.messages[jid]) {
-					list.upsert(proto.WebMessageInfo.fromObject(m) as unknown as WAMessage, 'append')
-				}
-			}
-		},
+		toJSON,
+		fromJSON,
 		writeToFile,
 		readFromFile
 	}
