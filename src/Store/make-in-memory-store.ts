@@ -26,9 +26,7 @@ export const waMessageID = (m: any) => m?.key?.id ?? ''
 
 export const waLabelAssociationKey = {
 	key: (la: any) =>
-		la.type === LabelAssociationType.Chat
-			? la.chatId + la.labelId
-			: la.chatId + la.messageId + la.labelId,
+		la.type === LabelAssociationType.Chat ? la.chatId + la.labelId : la.chatId + la.messageId + la.labelId,
 	compare: (a: string, b: string) => b.localeCompare(a)
 }
 
@@ -104,8 +102,8 @@ export default function makeInMemoryStore(config = {}) {
 		)
 
 		ev.on(
-	'messaging-history.set',
-	safe(({ chats: c, contacts: ct, messages: m, isLatest, syncType }: any) => {
+			'messaging-history.set',
+			safe(({ chats: c, contacts: ct, messages: m, isLatest, syncType }: any) => {
 				if (syncType === proto.HistorySync.HistorySyncType.ON_DEMAND) return
 
 				if (isLatest) {
@@ -201,8 +199,8 @@ export default function makeInMemoryStore(config = {}) {
 		)
 
 		ev.on(
-	'messages.upsert',
-	safe(({ messages: m, type }: any) => {
+			'messages.upsert',
+			safe(({ messages: m, type }: any) => {
 				if (!['append', 'notify'].includes(type)) return
 
 				for (const msg of m) {
@@ -252,8 +250,8 @@ export default function makeInMemoryStore(config = {}) {
 		)
 
 		ev.on(
-	'group-participants.update',
-	safe(({ id, participants, action }: any) => {
+			'group-participants.update',
+			safe(({ id, participants, action }: any) => {
 				const meta = groupMetadata[id]
 				if (!meta) return
 
@@ -316,8 +314,7 @@ export default function makeInMemoryStore(config = {}) {
 		labelAssociations,
 		state,
 		bind,
-
-		loadMessages(jid: any, count: number, cursor?: any)
+		loadMessages: (jid: any, count: number, cursor?: any) => {
 			const list = messages[jid]
 			if (!list) return []
 
@@ -326,11 +323,8 @@ export default function makeInMemoryStore(config = {}) {
 			const idx = list.array.findIndex(m => m.key.id === cursor.id)
 			return idx >= 0 ? list.array.slice(Math.max(0, idx - count), idx) : []
 		},
-
 		loadMessage: (jid: any, id: any) => messages[jid]?.get(id),
-
 		mostRecentMessage: (jid: any) => messages[jid]?.array.at(-1),
-
 		fetchImageUrl: async (jid: any, sock: any) => {
 			const c = contacts[jid]
 			if (!c) return sock?.profilePictureUrl(jid)
@@ -339,7 +333,6 @@ export default function makeInMemoryStore(config = {}) {
 			}
 			return c.imgUrl
 		},
-
 		fetchGroupMetadata: async (jid: any, sock: any) => {
 			if (!groupMetadata[jid]) {
 				const meta = await sock?.groupMetadata(jid)
@@ -347,17 +340,13 @@ export default function makeInMemoryStore(config = {}) {
 			}
 			return groupMetadata[jid]
 		},
-
 		getLabels: () => labels,
-
 		getChatLabels: (chatId: any) => labelAssociations.filter(l => l.chatId === chatId).all(),
-
 		getMessageLabels: (msgId: any) =>
 			labelAssociations
 				.filter(l => l.messageId === msgId)
 				.all()
 				.map(l => l.labelId),
-
 		toJSON: () => ({
 			chats,
 			contacts,
@@ -365,7 +354,6 @@ export default function makeInMemoryStore(config = {}) {
 			labels,
 			labelAssociations
 		}),
-
 		fromJSON: (json: any) => {
 			chats.upsert(...json.chats)
 			upsertContacts(Object.values(json.contacts))
@@ -379,12 +367,10 @@ export default function makeInMemoryStore(config = {}) {
 				}
 			}
 		},
-
 		writeToFile: (path: string) => {
 			const { writeFileSync } = require('fs')
 			writeFileSync(path, JSON.stringify(this.toJSON(), null, 2))
 		},
-
 		readFromFile: (path: string) => {
 			const { readFileSync, existsSync } = require('fs')
 			if (!existsSync(path)) return
