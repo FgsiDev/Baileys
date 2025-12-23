@@ -7,24 +7,29 @@ import makeOrderedDictionary from './make-ordered-dictionary'
 import { ObjectRepository } from './object-repository'
 import KeyedDB from '@adiwajshing/keyed-db'
 
+type AnyFn = (...args: any[]) => any
+type AnyObject = Record<string, any>
 /* =====================
  * Keys
  * ===================== */
 
 export const waChatKey = (pin = true) => ({
-	key: c =>
+	key: (c: any) =>
 		(pin ? (c.pinned ? '1' : '0') : '') +
 		(c.archived ? '0' : '1') +
 		(c.conversationTimestamp ? c.conversationTimestamp.toString(16).padStart(8, '0') : '') +
 		c.id,
-	compare: (a, b) => b.localeCompare(a)
+	compare: (a: string, b: string) => b.localeCompare(a)
 })
 
-export const waMessageID = m => m?.key?.id ?? ''
+export const waMessageID = (m: any) => m?.key?.id ?? ''
 
 export const waLabelAssociationKey = {
-	key: la => (la.type === LabelAssociationType.Chat ? la.chatId + la.labelId : la.chatId + la.messageId + la.labelId),
-	compare: (a, b) => b.localeCompare(a)
+	key: (la: any) =>
+		la.type === LabelAssociationType.Chat
+			? la.chatId + la.labelId
+			: la.chatId + la.messageId + la.labelId,
+	compare: (a: string, b: string) => b.localeCompare(a)
 }
 
 const makeMessageDict = () => makeOrderedDictionary(waMessageID)
@@ -41,7 +46,7 @@ export default function makeInMemoryStore(config = {}) {
 		logger = DEFAULT_CONNECTION_CONFIG.logger.child({
 			stream: 'in-mem-store'
 		})
-	} = config
+	} = config as AnyObject
 
 	/* =====================
 	 * State
@@ -61,28 +66,28 @@ export default function makeInMemoryStore(config = {}) {
 	 * ===================== */
 
 	const safe =
-		fn =>
-		(...args) => {
+		(fn: AnyFn) =>
+		(...args: any[]) => {
 			try {
 				return fn(...args)
-			} catch (err) {
+			} catch (err: any) {
 				logger.error({ err }, 'store error')
 			}
 		}
 
-	const getMsgList = jid => {
+	const getMsgList = (jid: any) => {
 		jid = jidNormalizedUser(jid)
 		if (!messages[jid]) messages[jid] = makeMessageDict()
 		return messages[jid]
 	}
 
-	const upsertContacts = list => {
+	const upsertContacts = (list: any[]) => {
 		for (const c of list) {
 			contacts[c.id] = { ...(contacts[c.id] || {}), ...c }
 		}
 	}
 
-	const upsertLabels = list => {
+	const upsertLabels = (list: any[]) => {
 		for (const l of list) {
 			labels.upsertById(l.id, l)
 		}
@@ -92,15 +97,15 @@ export default function makeInMemoryStore(config = {}) {
 	 * Bind Events (ALL)
 	 * ===================== */
 
-	const bind = ev => {
+	const bind = (ev: any) => {
 		ev.on(
 			'connection.update',
 			safe(u => Object.assign(state, u))
 		)
 
 		ev.on(
-			'messaging-history.set',
-			safe(({ chats: c, contacts: ct, messages: m, isLatest, syncType }) => {
+	'messaging-history.set',
+	safe(({ chats: c, contacts: ct, messages: m, isLatest, syncType }: any) => {
 				if (syncType === proto.HistorySync.HistorySyncType.ON_DEMAND) return
 
 				if (isLatest) {
@@ -160,7 +165,7 @@ export default function makeInMemoryStore(config = {}) {
 						if (upd.unreadCount > 0) {
 							upd.unreadCount = (chat.unreadCount || 0) + upd.unreadCount
 						}
-						Object.assign(chat, upd)
+						Object.assign(chat as AnyObject, upd)
 					})
 				}
 			})
@@ -196,8 +201,8 @@ export default function makeInMemoryStore(config = {}) {
 		)
 
 		ev.on(
-			'messages.upsert',
-			safe(({ messages: m, type }) => {
+	'messages.upsert',
+	safe(({ messages: m, type }: any) => {
 				if (!['append', 'notify'].includes(type)) return
 
 				for (const msg of m) {
@@ -241,14 +246,14 @@ export default function makeInMemoryStore(config = {}) {
 			'groups.update',
 			safe(updates => {
 				for (const u of updates) {
-					Object.assign((groupMetadata[u.id] ||= {}), u)
+					Object.assign((groupMetadata[u.id] ||= {} as AnyObject), u)
 				}
 			})
 		)
 
 		ev.on(
-			'group-participants.update',
-			safe(({ id, participants, action }) => {
+	'group-participants.update',
+	safe(({ id, participants, action }: any) => {
 				const meta = groupMetadata[id]
 				if (!meta) return
 
@@ -312,7 +317,7 @@ export default function makeInMemoryStore(config = {}) {
 		state,
 		bind,
 
-		loadMessages(jid, count, cursor) {
+		loadMessages(jid: any, count: number, cursor?: any)
 			const list = messages[jid]
 			if (!list) return []
 
@@ -322,11 +327,11 @@ export default function makeInMemoryStore(config = {}) {
 			return idx >= 0 ? list.array.slice(Math.max(0, idx - count), idx) : []
 		},
 
-		loadMessage: (jid, id) => messages[jid]?.get(id),
+		loadMessage: (jid: any, id: any) => messages[jid]?.get(id),
 
-		mostRecentMessage: jid => messages[jid]?.array.at(-1),
+		mostRecentMessage: (jid: any) => messages[jid]?.array.at(-1),
 
-		fetchImageUrl: async (jid, sock) => {
+		fetchImageUrl: async (jid: any, sock: any) => {
 			const c = contacts[jid]
 			if (!c) return sock?.profilePictureUrl(jid)
 			if (typeof c.imgUrl === 'undefined') {
@@ -335,7 +340,7 @@ export default function makeInMemoryStore(config = {}) {
 			return c.imgUrl
 		},
 
-		fetchGroupMetadata: async (jid, sock) => {
+		fetchGroupMetadata: async (jid: any, sock: any) => {
 			if (!groupMetadata[jid]) {
 				const meta = await sock?.groupMetadata(jid)
 				if (meta) groupMetadata[jid] = meta
@@ -345,9 +350,9 @@ export default function makeInMemoryStore(config = {}) {
 
 		getLabels: () => labels,
 
-		getChatLabels: chatId => labelAssociations.filter(l => l.chatId === chatId).all(),
+		getChatLabels: (chatId: any) => labelAssociations.filter(l => l.chatId === chatId).all(),
 
-		getMessageLabels: msgId =>
+		getMessageLabels: (msgId: any) =>
 			labelAssociations
 				.filter(l => l.messageId === msgId)
 				.all()
@@ -361,7 +366,7 @@ export default function makeInMemoryStore(config = {}) {
 			labelAssociations
 		}),
 
-		fromJSON: json => {
+		fromJSON: (json: any) => {
 			chats.upsert(...json.chats)
 			upsertContacts(Object.values(json.contacts))
 			upsertLabels(Object.values(json.labels || {}))
@@ -375,12 +380,12 @@ export default function makeInMemoryStore(config = {}) {
 			}
 		},
 
-		writeToFile: path => {
+		writeToFile: (path: string) => {
 			const { writeFileSync } = require('fs')
 			writeFileSync(path, JSON.stringify(this.toJSON(), null, 2))
 		},
 
-		readFromFile: path => {
+		readFromFile: (path: string) => {
 			const { readFileSync, existsSync } = require('fs')
 			if (!existsSync(path)) return
 			this.fromJSON(JSON.parse(readFileSync(path, 'utf8')))
