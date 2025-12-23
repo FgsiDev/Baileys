@@ -1,42 +1,66 @@
+import type KeyedDB from '@adiwajshing/keyed-db'
+import type { Comparable } from '@adiwajshing/keyed-db/lib/Types'
+import type { Logger } from 'pino'
+import type makeMDSocket from '../Socket'
+import type {
+	BaileysEventEmitter,
+	Chat,
+	ConnectionState,
+	Contact,
+	GroupMetadata,
+	PresenceData,
+	WAMessage,
+	WAMessageCursor,
+	WAMessageKey
+} from '../Types'
+import { Label } from '../Types/Label'
+import { LabelAssociation, LabelAssociationType, MessageLabelAssociation } from '../Types/LabelAssociation'
+
 import { proto } from '../../WAProto'
 import { DEFAULT_CONNECTION_CONFIG } from '../Defaults'
-import { LabelAssociationType } from '../Types/LabelAssociation'
 import { md5, toNumber, updateMessageWithReaction, updateMessageWithReceipt } from '../Utils'
 import { jidDecode, jidNormalizedUser } from '../WABinary'
 import makeOrderedDictionary from './make-ordered-dictionary'
 import { ObjectRepository } from './object-repository'
-import KeyedDB from '@adiwajshing/keyed-db'
+import KeyedDBImpl from '@adiwajshing/keyed-db'
 
+type WASocket = ReturnType<typeof makeMDSocket>
 type AnyFn = (...args: any[]) => any
-type AnyObject = Record<string, any>
+
 /* =====================
  * Keys
  * ===================== */
 
-export const waChatKey = (pin = true) => ({
-	key: (c: any) =>
+export const waChatKey = (pin = true): Comparable<Chat, string> => ({
+	key: c =>
 		(pin ? (c.pinned ? '1' : '0') : '') +
 		(c.archived ? '0' : '1') +
 		(c.conversationTimestamp ? c.conversationTimestamp.toString(16).padStart(8, '0') : '') +
 		c.id,
-	compare: (a: string, b: string) => b.localeCompare(a)
+	compare: (a, b) => b.localeCompare(a)
 })
 
-export const waMessageID = (m: any) => m?.key?.id ?? ''
+export const waMessageID = (m: WAMessage) => m.key.id || ''
 
-export const waLabelAssociationKey = {
-	key: (la: any) =>
-		la.type === LabelAssociationType.Chat ? la.chatId + la.labelId : la.chatId + la.messageId + la.labelId,
-	compare: (a: string, b: string) => b.localeCompare(a)
+export const waLabelAssociationKey: Comparable<LabelAssociation, string> = {
+	key: la => (la.type === LabelAssociationType.Chat ? la.chatId + la.labelId : la.chatId + la.messageId + la.labelId),
+	compare: (a, b) => b.localeCompare(a)
 }
 
-const makeMessageDict = () => makeOrderedDictionary(waMessageID)
+const makeMessageDict = () => makeOrderedDictionary<WAMessage>(waMessageID)
 
 /* =====================
  * Store
  * ===================== */
 
-export default function makeInMemoryStore(config = {}) {
+export default function makeInMemoryStore(
+	config: {
+		socket?: WASocket
+		chatKey?: Comparable<Chat, string>
+		labelAssociationKey?: Comparable<LabelAssociation, string>
+		logger?: Logger
+	} = {}
+) {
 	const {
 		socket,
 		chatKey = waChatKey(true),
@@ -44,20 +68,19 @@ export default function makeInMemoryStore(config = {}) {
 		logger = DEFAULT_CONNECTION_CONFIG.logger.child({
 			stream: 'in-mem-store'
 		})
-	} = config as AnyObject
+	} = config
 
-	/* =====================
-	 * State
-	 * ===================== */
-
-	const chats = new KeyedDB(chatKey, c => c.id)
-	const messages = Object.create(null)
-	const contacts = Object.create(null)
-	const groupMetadata = Object.create(null)
-	const presences = Object.create(null)
-	const labels = new ObjectRepository()
-	const labelAssociations = new KeyedDB(labelAssociationKey, labelAssociationKey.key)
-	const state = { connection: 'close' }
+	const chats = new (KeyedDBImpl as any)(chatKey, (c: Chat) => c.id) as KeyedDB<Chat, string>
+	const messages: Record<string, ReturnType<typeof makeMessageDict>> = {}
+	const contacts: Record<string, Contact> = {}
+	const groupMetadata: Record<string, GroupMetadata> = {}
+	const presences: Record<string, Record<string, PresenceData>> = {}
+	const labels = new ObjectRepository<Label>()
+	const labelAssociations = new (KeyedDBImpl as any)(labelAssociationKey, labelAssociationKey.key) as KeyedDB<
+		LabelAssociation,
+		string
+	>
+	const state: ConnectionState = { connection: 'close' }
 
 	/* =====================
 	 * Utils
@@ -68,34 +91,32 @@ export default function makeInMemoryStore(config = {}) {
 		(...args: any[]) => {
 			try {
 				return fn(...args)
-			} catch (err: any) {
+			} catch (err) {
 				logger.error({ err }, 'store error')
 			}
 		}
 
-	const getMsgList = (jid: any) => {
+	const getMsgList = (jid: string) => {
 		jid = jidNormalizedUser(jid)
 		if (!messages[jid]) messages[jid] = makeMessageDict()
 		return messages[jid]
 	}
 
-	const upsertContacts = (list: any[]) => {
+	const upsertContacts = (list: Contact[]) => {
 		for (const c of list) {
 			contacts[c.id] = { ...(contacts[c.id] || {}), ...c }
 		}
 	}
 
-	const upsertLabels = (list: any[]) => {
-		for (const l of list) {
-			labels.upsertById(l.id, l)
-		}
+	const upsertLabels = (list: Label[]) => {
+		for (const l of list) labels.upsertById(l.id, l)
 	}
 
 	/* =====================
-	 * Bind Events (ALL)
+	 * Bind Events (LENGKAP)
 	 * ===================== */
 
-	const bind = (ev: any) => {
+	const bind = (ev: BaileysEventEmitter) => {
 		ev.on(
 			'connection.update',
 			safe(u => Object.assign(state, u))
@@ -103,7 +124,7 @@ export default function makeInMemoryStore(config = {}) {
 
 		ev.on(
 			'messaging-history.set',
-			safe(({ chats: c, contacts: ct, messages: m, isLatest, syncType }: any) => {
+			safe(({ chats: c, contacts: ct, messages: m, isLatest, syncType }) => {
 				if (syncType === proto.HistorySync.HistorySyncType.ON_DEMAND) return
 
 				if (isLatest) {
@@ -115,7 +136,7 @@ export default function makeInMemoryStore(config = {}) {
 				upsertContacts(ct)
 
 				for (const msg of m) {
-					getMsgList(msg.key.remoteJid).upsert(msg, 'prepend')
+					getMsgList(msg.key.remoteJid!).upsert(msg, 'prepend')
 				}
 			})
 		)
@@ -126,11 +147,10 @@ export default function makeInMemoryStore(config = {}) {
 			'contacts.update',
 			safe(async updates => {
 				for (const u of updates) {
-					let contact = contacts[u.id]
-
+					let contact = contacts[u.id!]
 					if (!contact) {
 						for (const id of Object.keys(contacts)) {
-							const { user } = jidDecode(id)
+							const { user } = jidDecode(id)!
 							const hash = (await md5(Buffer.from(user + 'WA_ADD_NOTIF'))).toString('base64').slice(0, 3)
 							if (hash === u.id) {
 								contact = contacts[id]
@@ -158,12 +178,12 @@ export default function makeInMemoryStore(config = {}) {
 			'chats.update',
 			safe(updates => {
 				for (const u of updates) {
-					chats.update(u.id, chat => {
+					chats.update(u.id!, chat => {
 						const upd = { ...u }
-						if (upd.unreadCount > 0) {
-							upd.unreadCount = (chat.unreadCount || 0) + upd.unreadCount
+						if (upd.unreadCount! > 0) {
+							upd.unreadCount = (chat.unreadCount || 0) + upd.unreadCount!
 						}
-						Object.assign(chat as AnyObject, upd)
+						Object.assign(chat, upd)
 					})
 				}
 			})
@@ -171,9 +191,7 @@ export default function makeInMemoryStore(config = {}) {
 
 		ev.on(
 			'chats.delete',
-			safe(ids => {
-				for (const id of ids) chats.deleteById(id)
-			})
+			safe(ids => ids.forEach(id => chats.deleteById(id)))
 		)
 
 		ev.on(
@@ -200,11 +218,10 @@ export default function makeInMemoryStore(config = {}) {
 
 		ev.on(
 			'messages.upsert',
-			safe(({ messages: m, type }: any) => {
+			safe(({ messages: m, type }) => {
 				if (!['append', 'notify'].includes(type)) return
-
 				for (const msg of m) {
-					const jid = jidNormalizedUser(msg.key.remoteJid)
+					const jid = jidNormalizedUser(msg.key.remoteJid!)
 					getMsgList(jid).upsert(msg, 'append')
 
 					if (type === 'notify' && !chats.get(jid)) {
@@ -222,7 +239,7 @@ export default function makeInMemoryStore(config = {}) {
 			'messages.update',
 			safe(updates => {
 				for (const { key, update } of updates) {
-					getMsgList(key.remoteJid).updateAssign(key.id, { ...update })
+					getMsgList(key.remoteJid!).updateAssign(key.id!, update)
 				}
 			})
 		)
@@ -230,13 +247,13 @@ export default function makeInMemoryStore(config = {}) {
 		ev.on(
 			'messages.delete',
 			safe(item => {
-				if (item.all) return messages[item.jid]?.clear()
+				if ('all' in item) return messages[item.jid]?.clear()
 
-				const list = messages[item.keys?.[0]?.remoteJid]
+				const list = messages[item.keys[0].remoteJid!]
 				if (!list) return
 
 				const ids = new Set(item.keys.map(k => k.id))
-				list.forEach(m => ids.has(m.key.id) && (m.isDelete = true))
+				list.filter(m => !ids.has(m.key.id))
 			})
 		)
 
@@ -244,14 +261,14 @@ export default function makeInMemoryStore(config = {}) {
 			'groups.update',
 			safe(updates => {
 				for (const u of updates) {
-					Object.assign((groupMetadata[u.id] ||= {} as AnyObject), u)
+					Object.assign((groupMetadata[u.id!] ||= {} as GroupMetadata), u)
 				}
 			})
 		)
 
 		ev.on(
 			'group-participants.update',
-			safe(({ id, participants, action }: any) => {
+			safe(({ id, participants, action }) => {
 				const meta = groupMetadata[id]
 				if (!meta) return
 
@@ -283,7 +300,7 @@ export default function makeInMemoryStore(config = {}) {
 			'message-receipt.update',
 			safe(updates => {
 				for (const { key, receipt } of updates) {
-					const msg = messages[key.remoteJid]?.get(key.id)
+					const msg = messages[key.remoteJid!]?.get(key.id!)
 					if (msg) updateMessageWithReceipt(msg, receipt)
 				}
 			})
@@ -293,7 +310,7 @@ export default function makeInMemoryStore(config = {}) {
 			'messages.reaction',
 			safe(reactions => {
 				for (const { key, reaction } of reactions) {
-					const msg = messages[key.remoteJid]?.get(key.id)
+					const msg = messages[key.remoteJid!]?.get(key.id!)
 					if (msg) updateMessageWithReaction(msg, reaction)
 				}
 			})
@@ -301,7 +318,7 @@ export default function makeInMemoryStore(config = {}) {
 	}
 
 	/* =====================
-	 * Public API (FULL)
+	 * Public API (UTUH)
 	 * ===================== */
 
 	return {
@@ -314,7 +331,8 @@ export default function makeInMemoryStore(config = {}) {
 		labelAssociations,
 		state,
 		bind,
-		loadMessages: (jid: any, count: number, cursor?: any) => {
+
+		loadMessages: (jid: string, count: number, cursor?: WAMessageCursor) => {
 			const list = messages[jid]
 			if (!list) return []
 
@@ -323,9 +341,11 @@ export default function makeInMemoryStore(config = {}) {
 			const idx = list.array.findIndex(m => m.key.id === cursor.id)
 			return idx >= 0 ? list.array.slice(Math.max(0, idx - count), idx) : []
 		},
-		loadMessage: (jid: any, id: any) => messages[jid]?.get(id),
-		mostRecentMessage: (jid: any) => messages[jid]?.array.at(-1),
-		fetchImageUrl: async (jid: any, sock: any) => {
+
+		loadMessage: (jid: string, id: string) => messages[jid]?.get(id),
+		mostRecentMessage: (jid: string) => messages[jid]?.array.at(-1),
+
+		fetchImageUrl: async (jid: string, sock?: WASocket) => {
 			const c = contacts[jid]
 			if (!c) return sock?.profilePictureUrl(jid)
 			if (typeof c.imgUrl === 'undefined') {
@@ -333,20 +353,25 @@ export default function makeInMemoryStore(config = {}) {
 			}
 			return c.imgUrl
 		},
-		fetchGroupMetadata: async (jid: any, sock: any) => {
+
+		fetchGroupMetadata: async (jid: string, sock?: WASocket) => {
 			if (!groupMetadata[jid]) {
 				const meta = await sock?.groupMetadata(jid)
 				if (meta) groupMetadata[jid] = meta
 			}
 			return groupMetadata[jid]
 		},
+
 		getLabels: () => labels,
-		getChatLabels: (chatId: any) => labelAssociations.filter(l => l.chatId === chatId).all(),
-		getMessageLabels: (msgId: any) =>
+
+		getChatLabels: (chatId: string) => labelAssociations.filter(l => l.chatId === chatId).all(),
+
+		getMessageLabels: (msgId: string) =>
 			labelAssociations
-				.filter(l => l.messageId === msgId)
+				.filter((l: MessageLabelAssociation) => l.messageId === msgId)
 				.all()
 				.map(l => l.labelId),
+
 		toJSON: () => ({
 			chats,
 			contacts,
@@ -354,6 +379,7 @@ export default function makeInMemoryStore(config = {}) {
 			labels,
 			labelAssociations
 		}),
+
 		fromJSON: (json: any) => {
 			chats.upsert(...json.chats)
 			upsertContacts(Object.values(json.contacts))
@@ -367,10 +393,12 @@ export default function makeInMemoryStore(config = {}) {
 				}
 			}
 		},
+
 		writeToFile: (path: string) => {
 			const { writeFileSync } = require('fs')
 			writeFileSync(path, JSON.stringify(this.toJSON(), null, 2))
 		},
+
 		readFromFile: (path: string) => {
 			const { readFileSync, existsSync } = require('fs')
 			if (!existsSync(path)) return

@@ -1,31 +1,31 @@
-export class ObjectRepository<T = any> {
-	private entityMap: Map<string, T>
+export class ObjectRepository<T extends object> {
+	readonly entityMap: Map<string, T>
 
 	constructor(entities: Record<string, T> = {}) {
-		this.entityMap = new Map<string, T>(Object.entries(entities))
+		this.entityMap = new Map(Object.entries(entities))
 	}
 
-	findById(id: string): T | undefined {
+	findById(id: string) {
 		return this.entityMap.get(id)
 	}
 
-	findAll(): T[] {
+	findAll() {
 		return Array.from(this.entityMap.values())
 	}
 
-	upsertById(id: string, entity: T): void {
-		this.entityMap.set(id, { ...(entity as any) })
+	upsertById(id: string, entity: T) {
+		return this.entityMap.set(id, { ...entity })
 	}
 
-	deleteById(id: string): boolean {
+	deleteById(id: string) {
 		return this.entityMap.delete(id)
 	}
 
-	count(): number {
+	count() {
 		return this.entityMap.size
 	}
 
-	toJSON(): T[] {
+	toJSON() {
 		return this.findAll()
 	}
 }
