@@ -13,13 +13,14 @@ import type {
 	WAMessageCursor,
 	WAMessageKey
 } from '../Types'
-import { Label } from '../Types/Label'
-import { LabelAssociation, LabelAssociationType, MessageLabelAssociation } from '../Types/LabelAssociation'
+import type { Label } from '../Types/Label'
+import type { LabelAssociation, MessageLabelAssociation } from '../Types/LabelAssociation'
 
 import { proto } from '../../WAProto'
 import { DEFAULT_CONNECTION_CONFIG } from '../Defaults'
 import { md5, toNumber, updateMessageWithReaction, updateMessageWithReceipt } from '../Utils'
 import { jidDecode, jidNormalizedUser } from '../WABinary'
+import { LabelAssociationType } from '../Types/LabelAssociation'
 import makeOrderedDictionary from './make-ordered-dictionary'
 import { ObjectRepository } from './object-repository'
 import KeyedDBImpl from '@adiwajshing/keyed-db'
@@ -112,6 +113,17 @@ export default function makeInMemoryStore(
 		for (const l of list) labels.upsertById(l.id, l)
 	}
 
+	const writeToFile = (path: string) => {
+		const { writeFileSync } = require('fs')
+		writeFileSync(path, JSON.stringify(toJSON(), null, 2))
+	}
+
+	const readFromFile = (path: string) => {
+		const { readFileSync, existsSync } = require('fs')
+		if (!existsSync(path)) return
+		fromJSON(JSON.parse(readFileSync(path, 'utf8')))
+	}
+
 	/* =====================
 	 * Bind Events (LENGKAP)
 	 * ===================== */
@@ -191,7 +203,7 @@ export default function makeInMemoryStore(
 
 		ev.on(
 			'chats.delete',
-			safe(ids => ids.forEach(id => chats.deleteById(id)))
+			safe(ids => ids.forEach((id: string) => chats.deleteById(id)))
 		)
 
 		ev.on(
@@ -331,20 +343,19 @@ export default function makeInMemoryStore(
 		labelAssociations,
 		state,
 		bind,
-
 		loadMessages: (jid: string, count: number, cursor?: WAMessageCursor) => {
 			const list = messages[jid]
 			if (!list) return []
-
 			if (!cursor) return list.array.slice(-count)
+			const cursorKey =
+				cursor && 'before' in cursor ? cursor.before : cursor && 'after' in cursor ? cursor.after : undefined
 
-			const idx = list.array.findIndex(m => m.key.id === cursor.id)
+			const cursorId = cursorKey?.id
+			const idx = list.array.findIndex(m => m.key.id === cursorId)
 			return idx >= 0 ? list.array.slice(Math.max(0, idx - count), idx) : []
 		},
-
 		loadMessage: (jid: string, id: string) => messages[jid]?.get(id),
 		mostRecentMessage: (jid: string) => messages[jid]?.array.at(-1),
-
 		fetchImageUrl: async (jid: string, sock?: WASocket) => {
 			const c = contacts[jid]
 			if (!c) return sock?.profilePictureUrl(jid)
@@ -353,7 +364,6 @@ export default function makeInMemoryStore(
 			}
 			return c.imgUrl
 		},
-
 		fetchGroupMetadata: async (jid: string, sock?: WASocket) => {
 			if (!groupMetadata[jid]) {
 				const meta = await sock?.groupMetadata(jid)
@@ -361,17 +371,14 @@ export default function makeInMemoryStore(
 			}
 			return groupMetadata[jid]
 		},
-
 		getLabels: () => labels,
-
-		getChatLabels: (chatId: string) => labelAssociations.filter(l => l.chatId === chatId).all(),
-
+		getChatLabels: (chatId: string) => labelAssociations.filter((l: LabelAssociation) => l.chatId === chatId).all(),
 		getMessageLabels: (msgId: string) =>
 			labelAssociations
-				.filter((l: MessageLabelAssociation) => l.messageId === msgId)
+				.filter((l): l is MessageLabelAssociation => 'type' in l && l.type === LabelAssociationType.Message)
+				.filter(l => l.messageId === msgId)
 				.all()
 				.map(l => l.labelId),
-
 		toJSON: () => ({
 			chats,
 			contacts,
@@ -379,7 +386,6 @@ export default function makeInMemoryStore(
 			labels,
 			labelAssociations
 		}),
-
 		fromJSON: (json: any) => {
 			chats.upsert(...json.chats)
 			upsertContacts(Object.values(json.contacts))
@@ -389,20 +395,11 @@ export default function makeInMemoryStore(
 			for (const jid in json.messages) {
 				const list = getMsgList(jid)
 				for (const m of json.messages[jid]) {
-					list.upsert(proto.WebMessageInfo.fromObject(m), 'append')
+					list.upsert(proto.WebMessageInfo.fromObject(m) as unknown as WAMessage, 'append')
 				}
 			}
 		},
-
-		writeToFile: (path: string) => {
-			const { writeFileSync } = require('fs')
-			writeFileSync(path, JSON.stringify(this.toJSON(), null, 2))
-		},
-
-		readFromFile: (path: string) => {
-			const { readFileSync, existsSync } = require('fs')
-			if (!existsSync(path)) return
-			this.fromJSON(JSON.parse(readFileSync(path, 'utf8')))
-		}
+		writeToFile,
+		readFromFile
 	}
 }
