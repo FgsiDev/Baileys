@@ -1,6 +1,5 @@
 <h1><img alt="Baileys logo" src="https://raw.githubusercontent.com/WhiskeySockets/Baileys/refs/heads/master/Media/logo.png" height="75"/></h1>
 
-
 > [!CAUTION]
 > NOTICE OF BREAKING CHANGE.
 >
@@ -12,8 +11,6 @@ Baileys is a WebSockets-based TypeScript library for interacting with the WhatsA
 
 Join the WhiskeySockets community via the link: https://whiskey.so/discord
 
-
-
 # Usage & Guide
 
 > [!IMPORTANT]
@@ -24,10 +21,12 @@ Join the WhiskeySockets community via the link: https://whiskey.so/discord
 The new guide is posted at https://baileys.wiki .
 
 # Sponsor
+
 > [!TIP]
 > If you'd like to financially support this project, you can do so by supporting the current maintainer [here](https://purpshell.dev/sponsor).
 
 # Disclaimer
+
 > [!CAUTION]
 > This project is not affiliated, associated, authorized, endorsed by, or in any way officially connected with WhatsApp or any of its subsidiaries or its affiliates.
 > The official WhatsApp website can be found at whatsapp.com. "WhatsApp" as well as related names, marks, emblems and images are registered trademarks of their respective owners.
@@ -36,6 +35,7 @@ The new guide is posted at https://baileys.wiki .
 > Use at your own discretion. Do not spam people with this. We discourage any stalkerware, bulk or automated messaging usage.
 
 # License
+
 Copyright (c) 2025 Rajeh Taher/WhiskeySockets
 
 Licensed under the MIT License:

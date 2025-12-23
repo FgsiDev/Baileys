@@ -39,7 +39,7 @@ import {
 	generateProfilePicture,
 	getHistoryMsg,
 	newLTHashState,
-	processSyncAction,
+	processSyncAction
 } from '../Utils'
 import { makeMutex } from '../Utils/make-mutex'
 import processMessage from '../Utils/process-message'
@@ -912,7 +912,7 @@ export const makeChatsSocket = (config: SocketConfig) => {
 			},
 			jid
 		)
-	}	
+	}
 
 	/**
 	 * Adds label

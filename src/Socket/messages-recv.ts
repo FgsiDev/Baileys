@@ -151,7 +151,7 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 
 		await delay(5000)
 
-		if (!await placeholderResendCache.get(messageKey?.id!)) {
+		if (!(await placeholderResendCache.get(messageKey?.id!))) {
 			logger.debug({ messageKey }, 'message received while resend requested')
 			return 'RESOLVED'
 		}
@@ -312,7 +312,7 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 							message: messageProto,
 							messageTimestamp: +child.attrs.t!
 						}).toJSON() as WAMessage
-						await upsertMessage(fullMessage, 'append')
+						await upsertMessage({ ...fullMessage, node }, 'append')
 						logger.info('Processed plaintext newsletter message')
 					} catch (error) {
 						logger.error({ error }, 'Failed to decode plaintext newsletter message')
@@ -1159,7 +1159,7 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 						msg.messageTimestamp = +node.attrs.t!
 
 						const fullMsg = proto.WebMessageInfo.fromObject(msg) as WAMessage
-						await upsertMessage(fullMsg, 'append')
+						await upsertMessage({ ...fullMsg, node }, 'append')
 					}
 				})
 			])
@@ -1314,7 +1314,7 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 
 				cleanMessage(msg, authState.creds.me!.id, authState.creds.me!.lid!)
 
-				await upsertMessage(msg, node.attrs.offline ? 'append' : 'notify')
+				await upsertMessage({ ...msg, node }, node.attrs.offline ? 'append' : 'notify')
 			})
 		} catch (error) {
 			logger.error({ error, node: binaryNodeToString(node) }, 'error in handling message')

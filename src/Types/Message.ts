@@ -48,9 +48,8 @@ export type Sticker = {
 	accessibilityLabel?: string
 	isAnimated?: boolean
 	isLottie?: boolean
-		
 }
-		
+
 export type StickerPack = {
 	stickers: Sticker[]
 	cover: WAMediaUpload
