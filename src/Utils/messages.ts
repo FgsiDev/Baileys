@@ -1149,7 +1149,8 @@ async function prepareStickerPackMessage(
 		publisher: publisher,
 		stickerPackId: stickerPackIdValue,
 		packDescription: description,
-		stickerPackOrigin: WAProto.Message.StickerPackMessage.StickerPackOrigin.USER_CREATED,
+		//stickerPackOrigin: WAProto.Message.StickerPackMessage.StickerPackOrigin.USER_CREATED,
+		stickerPackOrigin: WAProto.Message.StickerPackMessage.StickerPackOrigin.THIRD_PARTY,	
 		stickerPackSize: stickerPackSize,
 		stickers: stickerMetadata,
 
