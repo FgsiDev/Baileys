@@ -1090,33 +1090,13 @@ async function prepareStickerPackMessage(
 		const { stream } = await getStream(s.data)
 		const buffer = await toBuffer(stream)
 
-		let webpBuffer: Buffer
-		if ('sharp' in lib && lib.sharp) {
-			webpBuffer = await lib.sharp.default(buffer).webp().toBuffer()
-		} else if ('jimp' in lib && lib.jimp) {
-			const jimpImage = await lib.jimp.Jimp.read(buffer)
-			webpBuffer = await jimpImage.getBuffer('image/jpeg')
-		} else {
-			throw new Boom('No image processing library available for converting sticker to WebP')
-		}
-
-		if (webpBuffer.length > 1024 * 1024) {
+		if (buffer.length > 1024 * 1024) {
 			throw new Boom(`Sticker at index ${i} exceeds the 1MB size limit`, { statusCode: 400 })
 		}
-		
-		const media = await prepareWAMessageMedia({ sticker: webpBuffer }, options)
-		if (!media.stickerMessage || !media.stickerMessage.fileSha256) {
-		  throw new Error('Failed to generate stickerMessage SHA256')
-		}
-		
-		const fileSha256 = Buffer.from(media.stickerMessage.fileSha256)
-		const hash = fileSha256.toString('base64').replace(/\//g, '-')
-		const fileName = `${hash}.webp`
-		stickerData[fileName] = [new Uint8Array(webpBuffer), { level: 0 }]		
 
-		//const hash = sha256(webpBuffer).toString('base64').replace(/\//g, '-')
-		//const fileName = `${hash}.webp`
-		//stickerData[fileName] = [new Uint8Array(webpBuffer), { level: 0 as 0 }]
+		const hash = sha256(buffer).toString('base64').replace(/\//g, '-')
+		const fileName = `${hash}.webp`
+		stickerData[fileName] = [new Uint8Array(buffer), { level: 0 as 0 }]
 		return {
 			fileName,
 			mimetype: 'image/webp',
