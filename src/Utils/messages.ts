@@ -1104,10 +1104,15 @@ async function prepareStickerPackMessage(
 			throw new Boom(`Sticker at index ${i} exceeds the 1MB size limit`, { statusCode: 400 })
 		}
 		
-		const { stickerMessage } = await prepareWAMessageMedia({ sticker: webpBuffer }, options)
-		const hash = stickerMessage.fileSha256.toString('base64').replace(/\//g, '-')
+		const media = await prepareWAMessageMedia({ sticker: webpBuffer }, options)
+		if (!media.stickerMessage || !media.stickerMessage.fileSha256) {
+		  throw new Error('Failed to generate stickerMessage SHA256')
+		}
+		
+		const fileSha256 = Buffer.from(media.stickerMessage.fileSha256)
+		const hash = fileSha256.toString('base64').replace(/\//g, '-')
 		const fileName = `${hash}.webp`
-		stickerData[fileName] = [new Uint8Array(webpBuffer), { level: 0 as 0 }]		
+		stickerData[fileName] = [new Uint8Array(webpBuffer), { level: 0 }]		
 
 		//const hash = sha256(webpBuffer).toString('base64').replace(/\//g, '-')
 		//const fileName = `${hash}.webp`
