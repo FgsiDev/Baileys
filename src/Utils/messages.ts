@@ -1136,7 +1136,7 @@ async function prepareStickerPackMessage(
 	stickerPack: StickerPack,
 	options: MessageContentGenerationOptions
 ): Promise<proto.IMessage> {
-	const { stickers, name, publisher, packId, description } = stickerPack
+	const { stickers, name, publisher, packId, description, isWebpThumb } = stickerPack
 
 	if (stickers.length > 60) {
 		throw new Boom('Sticker pack exceeds the maximum limit of 60 stickers', { statusCode: 400 })
@@ -1158,7 +1158,9 @@ async function prepareStickerPackMessage(
 		let isAnimated = false
 		const isWebP = isWebPBuffer(buffer)
 
-		if (isWebP) {
+		if (s.isLottie) {
+			webpBuffer = buffer
+		} else if (isWebP) {
 			// Already WebP - preserve original to keep exif metadata and animation
 			webpBuffer = buffer
 			isAnimated = isAnimatedWebP(buffer)
@@ -1178,7 +1180,7 @@ async function prepareStickerPackMessage(
 		}
 
 		const hash = sha256(webpBuffer).toString('base64').replace(/\//g, '-')
-		const fileName = `${hash}.webp`
+		const fileName = s.fileName || `${hash}.webp`
 		stickerData[fileName] = [new Uint8Array(webpBuffer), { level: 0 as 0 }]
 		return {
 			fileName,
@@ -1193,14 +1195,17 @@ async function prepareStickerPackMessage(
 	const stickerMetadata = await Promise.all(stickerPromises)
 
 	// Process and add cover/tray icon to the ZIP
-	const trayIconFileName = `${stickerPackIdValue}.webp`
+	const trayIconFileName = isWebpThumb ? `${stickerPackIdValue}.webp` : `${stickerPackIdValue}.png`
 	const { stream: coverStream } = await getStream(stickerPack.cover)
 	const coverBuffer = await toBuffer(coverStream)
 
 	let coverWebpBuffer: Buffer
 	const isCoverWebP = isWebPBuffer(coverBuffer)
 
-	if (isCoverWebP) {
+	if (isWebpThumb) {
+		// Already WebP - preserve original to keep exif metadata
+		coverWebpBuffer = coverBuffer
+	} else if (isCoverWebP) {
 		// Already WebP - preserve original to keep exif metadata
 		coverWebpBuffer = coverBuffer
 	} else if ('sharp' in lib && lib.sharp) {

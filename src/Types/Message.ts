@@ -49,6 +49,7 @@ export type Sticker = {
 	accessibilityLabel?: string
 	isAnimated?: boolean
 	isLottie?: boolean
+	fileName?: string
 }
 
 export type StickerPack = {
@@ -58,6 +59,7 @@ export type StickerPack = {
 	publisher: string
 	description?: string
 	packId?: string
+	isWebpThumb?: boolean
 }
 
 export enum WAMessageAddressingMode {
