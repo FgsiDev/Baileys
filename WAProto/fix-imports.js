@@ -1,15 +1,15 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { exit } from 'process';
 
-const filePath = './index.js'
+const filePath = '../WAProto/index.js'
 
 try {
   let content = readFileSync(filePath, 'utf8')
 
-  content = content.replace(/import \* as (\$protobuf) from/g, 'import $1 from')
-  content = content.replace(/(['"])protobufjs\/minimal(['"])/g, '$1protobufjs/minimal.js$2')
+  content = content.replace(/import \* as (\$protobuf) from/g, 'import $1 from')  
+  content = content.replace(/(['"])protobufjs\/minimal(['"])/g, '$1protobufjs/minimal.js$2')  
 
-  /*const marker = 'const $root = $protobuf.roots["default"] || ($protobuf.roots["default"] = {});\n\n'
+  const marker = 'const $root = $protobuf.roots["default"] || ($protobuf.roots["default"] = {});\n\n'
   const longToStringHelper =
     'function longToString(value, unsigned) {\n' +
     '\tif (typeof value === "string") {\n' +
@@ -75,7 +75,7 @@ try {
   content = content.replace(longPattern, (_match, prefix, field, unsignedFlag) => {
     const unsignedArg = unsignedFlag ? ', true' : ''
     return `${prefix}o.longs === String ? longToString(m.${field}${unsignedArg}) : o.longs === Number ? longToNumber(m.${field}${unsignedArg}) : m.${field};`
-  })*/
+  })
 
   writeFileSync(filePath, content, 'utf8')
   console.log(`✅ Fixed imports in ${filePath}`)
