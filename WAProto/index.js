@@ -1,15 +1,13 @@
 /*eslint-disable block-scoped-var, id-length, no-control-regex, no-magic-numbers, no-prototype-builtins, no-redeclare, no-shadow, no-var, sort-vars*/
-"use strict";
+import * as $protobuf from "protobufjs/minimal";
 
-var $protobuf = require("protobufjs/minimal");
+const $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.util;
 
-var $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.util;
+const $root = $protobuf.roots["default"] || ($protobuf.roots["default"] = {});
 
-var $root = $protobuf.roots["default"] || ($protobuf.roots["default"] = {});
+export const proto = $root.proto = (() => {
 
-$root.proto = (function() {
-
-    var proto = {};
+    const proto = {};
 
     proto.ADVDeviceIdentity = (function() {
 
@@ -205,7 +203,7 @@ $root.proto = (function() {
     })();
 
     proto.ADVEncryptionType = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
+        const valuesById = {}, values = Object.create(valuesById);
         values[valuesById[0] = "E2EE"] = 0;
         values[valuesById[1] = "HOSTED"] = 1;
         values[valuesById[2] = "NON_E2EE"] = 2;
@@ -1247,7 +1245,7 @@ $root.proto = (function() {
             };
 
             AIHomeOption.AIHomeActionType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "PROMPT"] = 0;
                 values[valuesById[1] = "CREATE_IMAGE"] = 1;
                 values[valuesById[2] = "ANIMATE_PHOTO"] = 2;
@@ -1987,7 +1985,7 @@ $root.proto = (function() {
         })();
 
         AIRichResponseCodeMetadata.AIRichResponseCodeHighlightType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "AI_RICH_RESPONSE_CODE_HIGHLIGHT_DEFAULT"] = 0;
             values[valuesById[1] = "AI_RICH_RESPONSE_CODE_HIGHLIGHT_KEYWORD"] = 1;
             values[valuesById[2] = "AI_RICH_RESPONSE_CODE_HIGHLIGHT_METHOD"] = 2;
@@ -2141,7 +2139,7 @@ $root.proto = (function() {
 
             AIRichResponseContentItemMetadata.prototype.reelItem = null;
 
-            var $oneOfFields;
+            let $oneOfFields;
 
             Object.defineProperty(AIRichResponseContentItemMetadata.prototype, "aIRichResponseContentItem", {
                 get: $util.oneOfGetter($oneOfFields = ["reelItem"]),
@@ -2359,7 +2357,7 @@ $root.proto = (function() {
         })();
 
         AIRichResponseContentItemsMetadata.ContentType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "DEFAULT"] = 0;
             values[valuesById[1] = "CAROUSEL"] = 1;
             return values;
@@ -2528,7 +2526,7 @@ $root.proto = (function() {
         };
 
         AIRichResponseDynamicMetadata.AIRichResponseDynamicMetadataType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "AI_RICH_RESPONSE_DYNAMIC_METADATA_TYPE_UNKNOWN"] = 0;
             values[valuesById[1] = "AI_RICH_RESPONSE_DYNAMIC_METADATA_TYPE_IMAGE"] = 1;
             values[valuesById[2] = "AI_RICH_RESPONSE_DYNAMIC_METADATA_TYPE_GIF"] = 2;
@@ -2925,7 +2923,7 @@ $root.proto = (function() {
         };
 
         AIRichResponseInlineImageMetadata.AIRichResponseImageAlignment = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "AI_RICH_RESPONSE_IMAGE_LAYOUT_LEADING_ALIGNED"] = 0;
             values[valuesById[1] = "AI_RICH_RESPONSE_IMAGE_LAYOUT_TRAILING_ALIGNED"] = 1;
             values[valuesById[2] = "AI_RICH_RESPONSE_IMAGE_LAYOUT_CENTER_ALIGNED"] = 2;
@@ -3743,7 +3741,7 @@ $root.proto = (function() {
     })();
 
     proto.AIRichResponseMessageType = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
+        const valuesById = {}, values = Object.create(valuesById);
         values[valuesById[0] = "AI_RICH_RESPONSE_TYPE_UNKNOWN"] = 0;
         values[valuesById[1] = "AI_RICH_RESPONSE_TYPE_STANDARD"] = 1;
         return values;
@@ -4026,7 +4024,7 @@ $root.proto = (function() {
     })();
 
     proto.AIRichResponseSubMessageType = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
+        const valuesById = {}, values = Object.create(valuesById);
         values[valuesById[0] = "AI_RICH_RESPONSE_UNKNOWN"] = 0;
         values[valuesById[1] = "AI_RICH_RESPONSE_GRID_IMAGE"] = 1;
         values[valuesById[2] = "AI_RICH_RESPONSE_TEXT"] = 2;
@@ -4377,7 +4375,7 @@ $root.proto = (function() {
     })();
 
     proto.AISubscriptionRequestType = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
+        const valuesById = {}, values = Object.create(valuesById);
         values[valuesById[0] = "UNSPECIFIED"] = 0;
         values[valuesById[1] = "THINK_HARD"] = 1;
         values[valuesById[2] = "IMAGE_GEN"] = 2;
@@ -4721,7 +4719,7 @@ $root.proto = (function() {
             };
 
             AIThreadClientInfo.AIThreadType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "DEFAULT"] = 1;
                 values[valuesById[2] = "INCOGNITO"] = 2;
@@ -5485,13 +5483,13 @@ $root.proto = (function() {
         };
 
         BizAccountLinkInfo.AccountType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "ENTERPRISE"] = 0;
             return values;
         })();
 
         BizAccountLinkInfo.HostStorageType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "ON_PREMISE"] = 0;
             values[valuesById[1] = "FACEBOOK"] = 1;
             return values;
@@ -5872,21 +5870,21 @@ $root.proto = (function() {
         };
 
         BizIdentityInfo.ActualActorsType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "SELF"] = 0;
             values[valuesById[1] = "BSP"] = 1;
             return values;
         })();
 
         BizIdentityInfo.HostStorageType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "ON_PREMISE"] = 0;
             values[valuesById[1] = "FACEBOOK"] = 1;
             return values;
         })();
 
         BizIdentityInfo.VerifiedLevelValue = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN"] = 0;
             values[valuesById[1] = "LOW"] = 1;
             values[valuesById[2] = "HIGH"] = 2;
@@ -6024,7 +6022,7 @@ $root.proto = (function() {
         };
 
         BotAgeCollectionMetadata.AgeCollectionType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "O18_BINARY"] = 0;
             values[valuesById[1] = "WAFFLE"] = 1;
             return values;
@@ -6584,7 +6582,7 @@ $root.proto = (function() {
         };
 
         BotCapabilityMetadata.BotCapabilityType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN"] = 0;
             values[valuesById[1] = "PROGRESS_INDICATOR"] = 1;
             values[valuesById[2] = "RICH_RESPONSE_HEADING"] = 2;
@@ -6873,7 +6871,7 @@ $root.proto = (function() {
         };
 
         BotDocumentMessageMetadata.DocumentPluginType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "TEXT_EXTRACTION"] = 0;
             values[valuesById[1] = "OCR_AND_IMAGES"] = 1;
             return values;
@@ -7163,7 +7161,7 @@ $root.proto = (function() {
         };
 
         BotFeedbackMessage.BotFeedbackKind = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "BOT_FEEDBACK_POSITIVE"] = 0;
             values[valuesById[1] = "BOT_FEEDBACK_NEGATIVE_GENERIC"] = 1;
             values[valuesById[2] = "BOT_FEEDBACK_NEGATIVE_HELPFUL"] = 2;
@@ -7183,7 +7181,7 @@ $root.proto = (function() {
         })();
 
         BotFeedbackMessage.BotFeedbackKindMultipleNegative = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[1] = "BOT_FEEDBACK_MULTIPLE_NEGATIVE_GENERIC"] = 1;
             values[valuesById[2] = "BOT_FEEDBACK_MULTIPLE_NEGATIVE_HELPFUL"] = 2;
             values[valuesById[4] = "BOT_FEEDBACK_MULTIPLE_NEGATIVE_INTERESTING"] = 4;
@@ -7197,13 +7195,13 @@ $root.proto = (function() {
         })();
 
         BotFeedbackMessage.BotFeedbackKindMultiplePositive = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[1] = "BOT_FEEDBACK_MULTIPLE_POSITIVE_GENERIC"] = 1;
             return values;
         })();
 
         BotFeedbackMessage.ReportKind = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "NONE"] = 0;
             values[valuesById[1] = "GENERIC"] = 1;
             return values;
@@ -8516,7 +8514,7 @@ $root.proto = (function() {
         };
 
         BotImagineMetadata.ImagineType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN"] = 0;
             values[valuesById[1] = "IMAGINE"] = 1;
             values[valuesById[2] = "MEMU"] = 2;
@@ -8671,7 +8669,7 @@ $root.proto = (function() {
         };
 
         BotInfrastructureDiagnostics.BotBackend = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "AAPI"] = 0;
             values[valuesById[1] = "CLIPPY"] = 1;
             return values;
@@ -8776,7 +8774,7 @@ $root.proto = (function() {
         };
 
         BotLinkedAccount.BotLinkedAccountType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "BOT_LINKED_ACCOUNT_TYPE_1P"] = 0;
             return values;
         })();
@@ -9129,7 +9127,7 @@ $root.proto = (function() {
         };
 
         BotMediaMetadata.OrientationType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[1] = "CENTER"] = 1;
             values[valuesById[2] = "LEFT"] = 2;
             values[valuesById[3] = "RIGHT"] = 3;
@@ -9591,7 +9589,7 @@ $root.proto = (function() {
         };
 
         BotMessageOrigin.BotMessageOriginType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "BOT_MESSAGE_ORIGIN_TYPE_AI_INITIATED"] = 0;
             return values;
         })();
@@ -10737,7 +10735,7 @@ $root.proto = (function() {
     })();
 
     proto.BotMetricsEntryPoint = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
+        const valuesById = {}, values = Object.create(valuesById);
         values[valuesById[0] = "UNDEFINED_ENTRY_POINT"] = 0;
         values[valuesById[1] = "FAVICON"] = 1;
         values[valuesById[2] = "CHATLIST"] = 2;
@@ -11129,7 +11127,7 @@ $root.proto = (function() {
     })();
 
     proto.BotMetricsThreadEntryPoint = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
+        const valuesById = {}, values = Object.create(valuesById);
         values[valuesById[1] = "AI_TAB_THREAD"] = 1;
         values[valuesById[2] = "AI_HOME_THREAD"] = 2;
         values[valuesById[3] = "AI_DEEPLINK_IMMERSIVE_THREAD"] = 3;
@@ -11289,7 +11287,7 @@ $root.proto = (function() {
         };
 
         BotModeSelectionMetadata.BotUserSelectionMode = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "DEFAULT_MODE"] = 0;
             values[valuesById[1] = "THINK_HARD_MODE"] = 1;
             return values;
@@ -11447,7 +11445,7 @@ $root.proto = (function() {
         };
 
         BotModelMetadata.ModelType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN_TYPE"] = 0;
             values[valuesById[1] = "LLAMA_PROD"] = 1;
             values[valuesById[2] = "LLAMA_PROD_PREMIUM"] = 2;
@@ -11455,7 +11453,7 @@ $root.proto = (function() {
         })();
 
         BotModelMetadata.PremiumModelStatus = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN_STATUS"] = 0;
             values[valuesById[1] = "AVAILABLE"] = 1;
             values[valuesById[2] = "QUOTA_EXCEED_LIMIT"] = 2;
@@ -11780,7 +11778,7 @@ $root.proto = (function() {
         };
 
         BotPluginMetadata.PluginType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN_PLUGIN"] = 0;
             values[valuesById[1] = "REELS"] = 1;
             values[valuesById[2] = "SEARCH"] = 2;
@@ -11788,7 +11786,7 @@ $root.proto = (function() {
         })();
 
         BotPluginMetadata.SearchProvider = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN"] = 0;
             values[valuesById[1] = "BING"] = 1;
             values[valuesById[2] = "GOOGLE"] = 2;
@@ -12455,7 +12453,7 @@ $root.proto = (function() {
                 };
 
                 BotPlanningSearchSourcesMetadata.BotPlanningSearchSourceProvider = (function() {
-                    var valuesById = {}, values = Object.create(valuesById);
+                    const valuesById = {}, values = Object.create(valuesById);
                     values[valuesById[0] = "UNKNOWN"] = 0;
                     values[valuesById[1] = "OTHER"] = 1;
                     values[valuesById[2] = "GOOGLE"] = 2;
@@ -12601,7 +12599,7 @@ $root.proto = (function() {
             })();
 
             BotPlanningStepMetadata.BotSearchSourceProvider = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN_PROVIDER"] = 0;
                 values[valuesById[1] = "OTHER"] = 1;
                 values[valuesById[2] = "GOOGLE"] = 2;
@@ -12610,7 +12608,7 @@ $root.proto = (function() {
             })();
 
             BotPlanningStepMetadata.PlanningStepStatus = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "PLANNED"] = 1;
                 values[valuesById[2] = "EXECUTING"] = 2;
@@ -12742,7 +12740,7 @@ $root.proto = (function() {
         };
 
         BotPromotionMessageMetadata.BotPromotionType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN_TYPE"] = 0;
             values[valuesById[1] = "C50"] = 1;
             values[valuesById[2] = "SURVEY_PLATFORM"] = 2;
@@ -13202,7 +13200,7 @@ $root.proto = (function() {
             };
 
             BotFeatureQuotaMetadata.BotFeatureType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN_FEATURE"] = 0;
                 values[valuesById[1] = "REASONING_FEATURE"] = 1;
                 return values;
@@ -13419,7 +13417,7 @@ $root.proto = (function() {
         };
 
         BotReminderMetadata.ReminderAction = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[1] = "NOTIFY"] = 1;
             values[valuesById[2] = "CREATE"] = 2;
             values[valuesById[3] = "DELETE"] = 3;
@@ -13428,7 +13426,7 @@ $root.proto = (function() {
         })();
 
         BotReminderMetadata.ReminderFrequency = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[1] = "ONCE"] = 1;
             values[valuesById[2] = "DAILY"] = 2;
             values[valuesById[3] = "WEEKLY"] = 3;
@@ -14009,7 +14007,7 @@ $root.proto = (function() {
     })();
 
     proto.BotSessionSource = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
+        const valuesById = {}, values = Object.create(valuesById);
         values[valuesById[0] = "NONE"] = 0;
         values[valuesById[1] = "NULL_STATE"] = 1;
         values[valuesById[2] = "TYPEAHEAD"] = 2;
@@ -14298,7 +14296,7 @@ $root.proto = (function() {
         };
 
         BotSignatureVerificationUseCaseProof.BotSignatureUseCase = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNSPECIFIED"] = 0;
             values[valuesById[1] = "WA_BOT_MSG"] = 1;
             values[valuesById[2] = "WA_TEE_BOT_MSG"] = 2;
@@ -14605,7 +14603,7 @@ $root.proto = (function() {
             };
 
             BotSourceItem.SourceProvider = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "BING"] = 1;
                 values[valuesById[2] = "GOOGLE"] = 2;
@@ -15529,7 +15527,7 @@ $root.proto = (function() {
         };
 
         CallLogRecord.CallResult = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "CONNECTED"] = 0;
             values[valuesById[1] = "REJECTED"] = 1;
             values[valuesById[2] = "CANCELLED"] = 2;
@@ -15545,7 +15543,7 @@ $root.proto = (function() {
         })();
 
         CallLogRecord.CallType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "REGULAR"] = 0;
             values[valuesById[1] = "SCHEDULED_CALL"] = 1;
             values[valuesById[2] = "VOICE_CHAT"] = 2;
@@ -15705,7 +15703,7 @@ $root.proto = (function() {
         })();
 
         CallLogRecord.SilenceReason = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "NONE"] = 0;
             values[valuesById[1] = "SCHEDULED"] = 1;
             values[valuesById[2] = "PRIVACY"] = 2;
@@ -16746,7 +16744,7 @@ $root.proto = (function() {
                 };
 
                 CtwaContextData.ContextInfoExternalAdReplyInfoMediaType = (function() {
-                    var valuesById = {}, values = Object.create(valuesById);
+                    const valuesById = {}, values = Object.create(valuesById);
                     values[valuesById[0] = "NONE"] = 0;
                     values[valuesById[1] = "IMAGE"] = 1;
                     values[valuesById[2] = "VIDEO"] = 2;
@@ -18041,14 +18039,14 @@ $root.proto = (function() {
         };
 
         ClientPayload.AccountType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "DEFAULT"] = 0;
             values[valuesById[1] = "GUEST"] = 1;
             return values;
         })();
 
         ClientPayload.ConnectReason = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "PUSH"] = 0;
             values[valuesById[1] = "USER_ACTIVATED"] = 1;
             values[valuesById[2] = "SCHEDULED"] = 2;
@@ -18060,7 +18058,7 @@ $root.proto = (function() {
         })();
 
         ClientPayload.ConnectType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "CELLULAR_UNKNOWN"] = 0;
             values[valuesById[1] = "WIFI_UNKNOWN"] = 1;
             values[valuesById[100] = "CELLULAR_EDGE"] = 100;
@@ -18217,7 +18215,7 @@ $root.proto = (function() {
             };
 
             DNSSource.DNSResolutionMethod = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "SYSTEM"] = 0;
                 values[valuesById[1] = "GOOGLE"] = 1;
                 values[valuesById[2] = "HARDCODED"] = 2;
@@ -18492,7 +18490,7 @@ $root.proto = (function() {
         })();
 
         ClientPayload.IOSAppExtension = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "SHARE_EXTENSION"] = 0;
             values[valuesById[1] = "SERVICE_EXTENSION"] = 1;
             values[valuesById[2] = "INTENTS_EXTENSION"] = 2;
@@ -18640,7 +18638,7 @@ $root.proto = (function() {
         })();
 
         ClientPayload.Product = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "WHATSAPP"] = 0;
             values[valuesById[1] = "MESSENGER"] = 1;
             values[valuesById[2] = "INTEROP"] = 2;
@@ -18650,7 +18648,7 @@ $root.proto = (function() {
         })();
 
         ClientPayload.TrafficAnonymization = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "OFF"] = 0;
             values[valuesById[1] = "STANDARD"] = 1;
             return values;
@@ -19338,7 +19336,7 @@ $root.proto = (function() {
             })();
 
             UserAgent.DeviceType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "PHONE"] = 0;
                 values[valuesById[1] = "TABLET"] = 1;
                 values[valuesById[2] = "DESKTOP"] = 2;
@@ -19348,7 +19346,7 @@ $root.proto = (function() {
             })();
 
             UserAgent.DistributionChannel = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "APPSTORE"] = 0;
                 values[valuesById[1] = "WEBSITE"] = 1;
                 values[valuesById[2] = "TESTFLIGHT"] = 2;
@@ -19357,7 +19355,7 @@ $root.proto = (function() {
             })();
 
             UserAgent.Platform = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "ANDROID"] = 0;
                 values[valuesById[1] = "IOS"] = 1;
                 values[valuesById[2] = "WINDOWS_PHONE"] = 2;
@@ -19400,7 +19398,7 @@ $root.proto = (function() {
             })();
 
             UserAgent.ReleaseChannel = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "RELEASE"] = 0;
                 values[valuesById[1] = "BETA"] = 1;
                 values[valuesById[2] = "ALPHA"] = 2;
@@ -19599,7 +19597,7 @@ $root.proto = (function() {
             };
 
             WebInfo.WebSubPlatform = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "WEB_BROWSER"] = 0;
                 values[valuesById[1] = "APP_STORE"] = 1;
                 values[valuesById[2] = "WIN_STORE"] = 2;
@@ -19854,7 +19852,7 @@ $root.proto = (function() {
     })();
 
     proto.CollectionName = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
+        const valuesById = {}, values = Object.create(valuesById);
         values[valuesById[0] = "COLLECTION_NAME_UNKNOWN"] = 0;
         values[valuesById[1] = "REGULAR"] = 1;
         values[valuesById[2] = "REGULAR_LOW"] = 2;
@@ -21817,7 +21815,7 @@ $root.proto = (function() {
             };
 
             AdReplyInfo.MediaType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "NONE"] = 0;
                 values[valuesById[1] = "IMAGE"] = 1;
                 values[valuesById[2] = "VIDEO"] = 2;
@@ -21988,7 +21986,7 @@ $root.proto = (function() {
             };
 
             BusinessInteractionPills.EntryPoint = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "ENTRY_POINT_UNKNOWN"] = 0;
                 values[valuesById[1] = "P2P_LINK_SHARE"] = 1;
                 values[valuesById[2] = "CONTACT_CARD_SHARING"] = 2;
@@ -22159,7 +22157,7 @@ $root.proto = (function() {
             })();
 
             BusinessInteractionPills.PillType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "VIEW_BUSINESS"] = 1;
                 values[valuesById[2] = "CHAT"] = 2;
@@ -22269,7 +22267,7 @@ $root.proto = (function() {
         })();
 
         ContextInfo.CrossAppSource = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "CROSS_APP_SOURCE_UNKNOWN"] = 0;
             values[valuesById[1] = "CROSS_APP_SOURCE_INSTAGRAM"] = 1;
             values[valuesById[2] = "CROSS_APP_SOURCE_FACEBOOK"] = 2;
@@ -22422,7 +22420,7 @@ $root.proto = (function() {
             };
 
             DataSharingContext.DataSharingFlags = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[1] = "SHOW_MM_DISCLOSURE_ON_CLICK"] = 1;
                 values[valuesById[2] = "SHOW_MM_DISCLOSURE_ON_READ"] = 2;
                 return values;
@@ -23152,14 +23150,14 @@ $root.proto = (function() {
             };
 
             ExternalAdReplyInfo.AdType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "CTWA"] = 0;
                 values[valuesById[1] = "CAWC"] = 1;
                 return values;
             })();
 
             ExternalAdReplyInfo.MediaType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "NONE"] = 0;
                 values[valuesById[1] = "IMAGE"] = 1;
                 values[valuesById[2] = "VIDEO"] = 2;
@@ -23315,7 +23313,7 @@ $root.proto = (function() {
         })();
 
         ContextInfo.ForwardOrigin = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN"] = 0;
             values[valuesById[1] = "CHAT"] = 1;
             values[valuesById[2] = "STATUS"] = 2;
@@ -23499,7 +23497,7 @@ $root.proto = (function() {
             };
 
             ForwardedNewsletterMessageInfo.ContentType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[1] = "UPDATE"] = 1;
                 values[valuesById[2] = "UPDATE_CARD"] = 2;
                 values[valuesById[3] = "LINK_CARD"] = 3;
@@ -23510,7 +23508,7 @@ $root.proto = (function() {
         })();
 
         ContextInfo.PairedMediaType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "NOT_PAIRED_MEDIA"] = 0;
             values[valuesById[1] = "SD_VIDEO_PARENT"] = 1;
             values[valuesById[2] = "HD_VIDEO_CHILD"] = 2;
@@ -23734,14 +23732,14 @@ $root.proto = (function() {
         })();
 
         ContextInfo.QuotedType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "EXPLICIT"] = 0;
             values[valuesById[1] = "AUTO"] = 1;
             return values;
         })();
 
         ContextInfo.StatusAttributionType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "NONE"] = 0;
             values[valuesById[1] = "RESHARED_FROM_MENTION"] = 1;
             values[valuesById[2] = "RESHARED_FROM_POST"] = 2;
@@ -23878,7 +23876,7 @@ $root.proto = (function() {
             };
 
             StatusAudienceMetadata.AudienceType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "CLOSE_FRIENDS"] = 1;
                 return values;
@@ -23888,7 +23886,7 @@ $root.proto = (function() {
         })();
 
         ContextInfo.StatusSourceType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "IMAGE"] = 0;
             values[valuesById[1] = "VIDEO"] = 1;
             values[valuesById[2] = "GIF"] = 2;
@@ -25223,7 +25221,7 @@ $root.proto = (function() {
         };
 
         Conversation.EndOfHistoryTransferType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "COMPLETE_BUT_MORE_MESSAGES_REMAIN_ON_PRIMARY"] = 0;
             values[valuesById[1] = "COMPLETE_AND_NO_MORE_MESSAGE_REMAIN_ON_PRIMARY"] = 1;
             values[valuesById[2] = "COMPLETE_ON_DEMAND_SYNC_BUT_MORE_MSG_REMAIN_ON_PRIMARY"] = 2;
@@ -25232,7 +25230,7 @@ $root.proto = (function() {
         })();
 
         Conversation.GroupAppealStatus = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "NO_APPEAL"] = 0;
             values[valuesById[1] = "APPEAL_IN_REVIEW"] = 1;
             values[valuesById[2] = "APPEAL_APPROVED"] = 2;
@@ -25545,7 +25543,7 @@ $root.proto = (function() {
             };
 
             AiThread.SupportLevel = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "NONE"] = 0;
                 values[valuesById[1] = "INFRA"] = 1;
                 values[valuesById[2] = "FULL"] = 2;
@@ -25701,7 +25699,7 @@ $root.proto = (function() {
         })();
 
         DeviceCapabilities.ChatLockSupportLevel = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "NONE"] = 0;
             values[valuesById[1] = "MINIMAL"] = 1;
             values[valuesById[2] = "FULL"] = 2;
@@ -25812,7 +25810,7 @@ $root.proto = (function() {
         })();
 
         DeviceCapabilities.MemberNameTagPrimarySupport = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "DISABLED"] = 0;
             values[valuesById[1] = "RECEIVER_ENABLED"] = 1;
             values[valuesById[2] = "SENDER_ENABLED"] = 2;
@@ -27155,7 +27153,7 @@ $root.proto = (function() {
         })();
 
         DeviceProps.PlatformType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN"] = 0;
             values[valuesById[1] = "CHROME"] = 1;
             values[valuesById[2] = "FIREFOX"] = 2;
@@ -27366,7 +27364,7 @@ $root.proto = (function() {
         };
 
         DisappearingMode.Initiator = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "CHANGED_IN_CHAT"] = 0;
             values[valuesById[1] = "INITIATED_BY_ME"] = 1;
             values[valuesById[2] = "INITIATED_BY_OTHER"] = 2;
@@ -27375,7 +27373,7 @@ $root.proto = (function() {
         })();
 
         DisappearingMode.Trigger = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN"] = 0;
             values[valuesById[1] = "CHAT_SETTING"] = 1;
             values[valuesById[2] = "ACCOUNT_SETTING"] = 2;
@@ -27400,7 +27398,7 @@ $root.proto = (function() {
         EmbeddedContent.prototype.embeddedMessage = null;
         EmbeddedContent.prototype.embeddedMusic = null;
 
-        var $oneOfFields;
+        let $oneOfFields;
 
         Object.defineProperty(EmbeddedContent.prototype, "content", {
             get: $util.oneOfGetter($oneOfFields = ["embeddedMessage", "embeddedMusic"]),
@@ -29602,7 +29600,7 @@ $root.proto = (function() {
         };
 
         GroupHistoryBundleInfo.ProcessState = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "NOT_INJECTED"] = 0;
             values[valuesById[1] = "INJECTED"] = 1;
             values[valuesById[2] = "INJECTED_PARTIAL"] = 2;
@@ -29958,7 +29956,7 @@ $root.proto = (function() {
         };
 
         GroupParticipant.Rank = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "REGULAR"] = 0;
             values[valuesById[1] = "ADMIN"] = 1;
             values[valuesById[2] = "SUPERADMIN"] = 2;
@@ -30824,7 +30822,7 @@ $root.proto = (function() {
         })();
 
         HandshakeMessage.HandshakePqMode = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "HANDSHAKE_PQ_MODE_UNKNOWN"] = 0;
             values[valuesById[1] = "XXKEM"] = 1;
             values[valuesById[2] = "XXKEM_FS"] = 2;
@@ -31619,14 +31617,14 @@ $root.proto = (function() {
         };
 
         HistorySync.BotAIWaitListState = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "IN_WAITLIST"] = 0;
             values[valuesById[1] = "AI_AVAILABLE"] = 1;
             return values;
         })();
 
         HistorySync.HistorySyncType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "INITIAL_BOOTSTRAP"] = 0;
             values[valuesById[1] = "INITIAL_STATUS_V3"] = 1;
             values[valuesById[2] = "FULL"] = 2;
@@ -31773,7 +31771,7 @@ $root.proto = (function() {
         HydratedTemplateButton.prototype.urlButton = null;
         HydratedTemplateButton.prototype.callButton = null;
 
-        var $oneOfFields;
+        let $oneOfFields;
 
         Object.defineProperty(HydratedTemplateButton.prototype, "hydratedButton", {
             get: $util.oneOfGetter($oneOfFields = ["quickReplyButton", "urlButton", "callButton"]),
@@ -32255,7 +32253,7 @@ $root.proto = (function() {
             };
 
             HydratedURLButton.WebviewPresentationType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[1] = "FULL"] = 1;
                 values[valuesById[2] = "TALL"] = 2;
                 values[valuesById[3] = "COMPACT"] = 3;
@@ -33266,7 +33264,7 @@ $root.proto = (function() {
         InteractiveAnnotation.prototype.embeddedAction = null;
         InteractiveAnnotation.prototype.tapAction = null;
 
-        var $oneOfFields;
+        let $oneOfFields;
 
         Object.defineProperty(InteractiveAnnotation.prototype, "action", {
             get: $util.oneOfGetter($oneOfFields = ["location", "newsletter", "embeddedAction", "tapAction"]),
@@ -33485,7 +33483,7 @@ $root.proto = (function() {
         };
 
         InteractiveAnnotation.StatusLinkType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[1] = "RASTERIZED_LINK_PREVIEW"] = 1;
             values[valuesById[2] = "RASTERIZED_LINK_TRUNCATED"] = 2;
             values[valuesById[3] = "RASTERIZED_LINK_FULL_URL"] = 3;
@@ -33805,7 +33803,7 @@ $root.proto = (function() {
     })();
 
     proto.KeepType = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
+        const valuesById = {}, values = Object.create(valuesById);
         values[valuesById[0] = "UNKNOWN"] = 0;
         values[valuesById[1] = "KEEP_FOR_ALL"] = 1;
         values[valuesById[2] = "UNDO_KEEP_FOR_ALL"] = 2;
@@ -34755,7 +34753,7 @@ $root.proto = (function() {
         };
 
         LimitSharing.TriggerType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN"] = 0;
             values[valuesById[1] = "CHAT_SETTING"] = 1;
             values[valuesById[2] = "BIZ_SUPPORTS_FB_HOSTING"] = 2;
@@ -35219,7 +35217,7 @@ $root.proto = (function() {
     })();
 
     proto.MediaKeyDomain = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
+        const valuesById = {}, values = Object.create(valuesById);
         values[valuesById[0] = "MEDIA_KEY_DOMAIN_UNKNOWN"] = 0;
         values[valuesById[1] = "MEDIA_KEY_DOMAIN_E2EE"] = 1;
         values[valuesById[2] = "MEDIA_KEY_DOMAIN_NON_E2EE"] = 2;
@@ -35525,7 +35523,7 @@ $root.proto = (function() {
         };
 
         MediaRetryNotification.ResultType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "GENERAL_ERROR"] = 0;
             values[valuesById[1] = "SUCCESS"] = 1;
             values[valuesById[2] = "NOT_FOUND"] = 2;
@@ -35537,7 +35535,7 @@ $root.proto = (function() {
     })();
 
     proto.MediaVisibility = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
+        const valuesById = {}, values = Object.create(valuesById);
         values[valuesById[0] = "DEFAULT"] = 0;
         values[valuesById[1] = "OFF"] = 1;
         values[valuesById[2] = "ON"] = 2;
@@ -38901,7 +38899,7 @@ $root.proto = (function() {
             };
 
             BCallMessage.MediaType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "AUDIO"] = 1;
                 values[valuesById[2] = "VIDEO"] = 2;
@@ -38932,7 +38930,7 @@ $root.proto = (function() {
             ButtonsMessage.prototype.videoMessage = null;
             ButtonsMessage.prototype.locationMessage = null;
 
-            var $oneOfFields;
+            let $oneOfFields;
 
             Object.defineProperty(ButtonsMessage.prototype, "header", {
                 get: $util.oneOfGetter($oneOfFields = ["text", "documentMessage", "imageMessage", "videoMessage", "locationMessage"]),
@@ -39537,7 +39535,7 @@ $root.proto = (function() {
                 })();
 
                 Button.Type = (function() {
-                    var valuesById = {}, values = Object.create(valuesById);
+                    const valuesById = {}, values = Object.create(valuesById);
                     values[valuesById[0] = "UNKNOWN"] = 0;
                     values[valuesById[1] = "RESPONSE"] = 1;
                     values[valuesById[2] = "NATIVE_FLOW"] = 2;
@@ -39548,7 +39546,7 @@ $root.proto = (function() {
             })();
 
             ButtonsMessage.HeaderType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "EMPTY"] = 1;
                 values[valuesById[2] = "TEXT"] = 2;
@@ -39576,7 +39574,7 @@ $root.proto = (function() {
             ButtonsResponseMessage.prototype.type = 0;
             ButtonsResponseMessage.prototype.selectedDisplayText = null;
 
-            var $oneOfFields;
+            let $oneOfFields;
 
             Object.defineProperty(ButtonsResponseMessage.prototype, "response", {
                 get: $util.oneOfGetter($oneOfFields = ["selectedDisplayText"]),
@@ -39714,7 +39712,7 @@ $root.proto = (function() {
             };
 
             ButtonsResponseMessage.Type = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "DISPLAY_TEXT"] = 1;
                 return values;
@@ -40211,7 +40209,7 @@ $root.proto = (function() {
             };
 
             CallLogMessage.CallOutcome = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "CONNECTED"] = 0;
                 values[valuesById[1] = "MISSED"] = 1;
                 values[valuesById[2] = "FAILED"] = 2;
@@ -40364,7 +40362,7 @@ $root.proto = (function() {
             })();
 
             CallLogMessage.CallType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "REGULAR"] = 0;
                 values[valuesById[1] = "SCHEDULED_CALL"] = 1;
                 values[valuesById[2] = "VOICE_CHAT"] = 2;
@@ -41066,7 +41064,7 @@ $root.proto = (function() {
             ChatThemeSetting.prototype.stockImage = null;
             ChatThemeSetting.prototype.customImage = null;
 
-            var $oneOfFields;
+            let $oneOfFields;
 
             Object.defineProperty(ChatThemeSetting.prototype, "wallpaper", {
                 get: $util.oneOfGetter($oneOfFields = ["defaultWallpaper", "solidColor", "stockImage", "customImage"]),
@@ -41449,7 +41447,7 @@ $root.proto = (function() {
             };
 
             CloudAPIThreadControlNotification.CloudAPIThreadControl = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "CONTROL_PASSED"] = 1;
                 values[valuesById[2] = "CONTROL_TAKEN"] = 2;
@@ -41830,7 +41828,7 @@ $root.proto = (function() {
             };
 
             ConditionalRevealMessage.ConditionalRevealMessageType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "SCHEDULED_MESSAGE"] = 1;
                 return values;
@@ -43861,7 +43859,7 @@ $root.proto = (function() {
             };
 
             EventResponseMessage.EventResponseType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "GOING"] = 1;
                 values[valuesById[2] = "NOT_GOING"] = 2;
@@ -44589,7 +44587,7 @@ $root.proto = (function() {
             };
 
             ExtendedTextMessage.FontType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "SYSTEM"] = 0;
                 values[valuesById[1] = "SYSTEM_TEXT"] = 1;
                 values[valuesById[2] = "FB_SCRIPT"] = 2;
@@ -44602,7 +44600,7 @@ $root.proto = (function() {
             })();
 
             ExtendedTextMessage.InviteLinkGroupType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "DEFAULT"] = 0;
                 values[valuesById[1] = "PARENT"] = 1;
                 values[valuesById[2] = "SUB"] = 2;
@@ -44611,7 +44609,7 @@ $root.proto = (function() {
             })();
 
             ExtendedTextMessage.PreviewType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "NONE"] = 0;
                 values[valuesById[1] = "VIDEO"] = 1;
                 values[valuesById[4] = "PLACEHOLDER"] = 4;
@@ -45181,7 +45179,7 @@ $root.proto = (function() {
             };
 
             GroupInviteMessage.GroupType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "DEFAULT"] = 0;
                 values[valuesById[1] = "PARENT"] = 1;
                 return values;
@@ -45433,7 +45431,7 @@ $root.proto = (function() {
                 HSMLocalizableParameter.prototype.currency = null;
                 HSMLocalizableParameter.prototype.dateTime = null;
 
-                var $oneOfFields;
+                let $oneOfFields;
 
                 Object.defineProperty(HSMLocalizableParameter.prototype, "paramOneof", {
                     get: $util.oneOfGetter($oneOfFields = ["currency", "dateTime"]),
@@ -45676,7 +45674,7 @@ $root.proto = (function() {
                     HSMDateTime.prototype.component = null;
                     HSMDateTime.prototype.unixEpoch = null;
 
-                    var $oneOfFields;
+                    let $oneOfFields;
 
                     Object.defineProperty(HSMDateTime.prototype, "datetimeOneof", {
                         get: $util.oneOfGetter($oneOfFields = ["component", "unixEpoch"]),
@@ -45992,14 +45990,14 @@ $root.proto = (function() {
                         };
 
                         HSMDateTimeComponent.CalendarType = (function() {
-                            var valuesById = {}, values = Object.create(valuesById);
+                            const valuesById = {}, values = Object.create(valuesById);
                             values[valuesById[1] = "GREGORIAN"] = 1;
                             values[valuesById[2] = "SOLAR_HIJRI"] = 2;
                             return values;
                         })();
 
                         HSMDateTimeComponent.DayOfWeekType = (function() {
-                            var valuesById = {}, values = Object.create(valuesById);
+                            const valuesById = {}, values = Object.create(valuesById);
                             values[valuesById[1] = "MONDAY"] = 1;
                             values[valuesById[2] = "TUESDAY"] = 2;
                             values[valuesById[3] = "WEDNESDAY"] = 3;
@@ -46609,7 +46607,7 @@ $root.proto = (function() {
         })();
 
         Message.HistorySyncType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "INITIAL_BOOTSTRAP"] = 0;
             values[valuesById[1] = "INITIAL_STATUS_V3"] = 1;
             values[valuesById[2] = "FULL"] = 2;
@@ -47306,7 +47304,7 @@ $root.proto = (function() {
             };
 
             ImageMessage.ImageSourceType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "USER_IMAGE"] = 0;
                 values[valuesById[1] = "AI_GENERATED"] = 1;
                 values[valuesById[2] = "AI_MODIFIED"] = 2;
@@ -47407,7 +47405,7 @@ $root.proto = (function() {
         })();
 
         Message.InsightDeliveryState = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "SENT"] = 0;
             values[valuesById[1] = "DELIVERED"] = 1;
             values[valuesById[2] = "READ"] = 2;
@@ -47436,7 +47434,7 @@ $root.proto = (function() {
             InteractiveMessage.prototype.nativeFlowMessage = null;
             InteractiveMessage.prototype.carouselMessage = null;
 
-            var $oneOfFields;
+            let $oneOfFields;
 
             Object.defineProperty(InteractiveMessage.prototype, "interactiveMessage", {
                 get: $util.oneOfGetter($oneOfFields = ["shopStorefrontMessage", "collectionMessage", "nativeFlowMessage", "carouselMessage"]),
@@ -48014,7 +48012,7 @@ $root.proto = (function() {
                 };
 
                 CarouselMessage.CarouselCardType = (function() {
-                    var valuesById = {}, values = Object.create(valuesById);
+                    const valuesById = {}, values = Object.create(valuesById);
                     values[valuesById[0] = "UNKNOWN"] = 0;
                     values[valuesById[1] = "HSCROLL_CARDS"] = 1;
                     values[valuesById[2] = "ALBUM_IMAGE"] = 2;
@@ -48154,7 +48152,7 @@ $root.proto = (function() {
                 Footer.prototype.hasMediaAttachment = false;
                 Footer.prototype.audioMessage = null;
 
-                var $oneOfFields;
+                let $oneOfFields;
 
                 Object.defineProperty(Footer.prototype, "media", {
                     get: $util.oneOfGetter($oneOfFields = ["audioMessage"]),
@@ -48288,7 +48286,7 @@ $root.proto = (function() {
                 Header.prototype.locationMessage = null;
                 Header.prototype.productMessage = null;
 
-                var $oneOfFields;
+                let $oneOfFields;
 
                 Object.defineProperty(Header.prototype, "media", {
                     get: $util.oneOfGetter($oneOfFields = ["documentMessage", "imageMessage", "jpegThumbnail", "videoMessage", "locationMessage", "productMessage"]),
@@ -48884,7 +48882,7 @@ $root.proto = (function() {
                 };
 
                 ShopMessage.Surface = (function() {
-                    var valuesById = {}, values = Object.create(valuesById);
+                    const valuesById = {}, values = Object.create(valuesById);
                     values[valuesById[0] = "UNKNOWN_SURFACE"] = 0;
                     values[valuesById[1] = "FB"] = 1;
                     values[valuesById[2] = "IG"] = 2;
@@ -48911,7 +48909,7 @@ $root.proto = (function() {
             InteractiveResponseMessage.prototype.contextInfo = null;
             InteractiveResponseMessage.prototype.nativeFlowResponseMessage = null;
 
-            var $oneOfFields;
+            let $oneOfFields;
 
             Object.defineProperty(InteractiveResponseMessage.prototype, "interactiveResponseMessage", {
                 get: $util.oneOfGetter($oneOfFields = ["nativeFlowResponseMessage"]),
@@ -49140,7 +49138,7 @@ $root.proto = (function() {
                 };
 
                 Body.Format = (function() {
-                    var valuesById = {}, values = Object.create(valuesById);
+                    const valuesById = {}, values = Object.create(valuesById);
                     values[valuesById[0] = "DEFAULT"] = 0;
                     values[valuesById[1] = "EXTENSIONS_1"] = 1;
                     return values;
@@ -49545,7 +49543,7 @@ $root.proto = (function() {
             };
 
             InvoiceMessage.AttachmentType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "IMAGE"] = 0;
                 values[valuesById[1] = "PDF"] = 1;
                 return values;
@@ -49938,7 +49936,7 @@ $root.proto = (function() {
             };
 
             LinkPreviewMetadata.SocialMediaPostType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "NONE"] = 0;
                 values[valuesById[1] = "REEL"] = 1;
                 values[valuesById[2] = "LIVE_VIDEO"] = 2;
@@ -50174,7 +50172,7 @@ $root.proto = (function() {
             };
 
             ListMessage.ListType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "SINGLE_SELECT"] = 1;
                 values[valuesById[2] = "PRODUCT_LIST"] = 2;
@@ -51038,7 +51036,7 @@ $root.proto = (function() {
             };
 
             ListResponseMessage.ListType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "SINGLE_SELECT"] = 1;
                 return values;
@@ -53074,7 +53072,7 @@ $root.proto = (function() {
             };
 
             OrderMessage.OrderStatus = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[1] = "INQUIRY"] = 1;
                 values[valuesById[2] = "ACCEPTED"] = 2;
                 values[valuesById[3] = "DECLINED"] = 3;
@@ -53082,7 +53080,7 @@ $root.proto = (function() {
             })();
 
             OrderMessage.OrderSurface = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[1] = "CATALOG"] = 1;
                 return values;
             })();
@@ -53384,14 +53382,14 @@ $root.proto = (function() {
             };
 
             PaymentInviteMessage.InviteType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "DEFAULT"] = 0;
                 values[valuesById[1] = "MAPPER"] = 1;
                 return values;
             })();
 
             PaymentInviteMessage.ServiceType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "FBPAY"] = 1;
                 values[valuesById[2] = "NOVI"] = 2;
@@ -53711,7 +53709,7 @@ $root.proto = (function() {
                 };
 
                 PaymentLinkHeader.PaymentLinkHeaderType = (function() {
-                    var valuesById = {}, values = Object.create(valuesById);
+                    const valuesById = {}, values = Object.create(valuesById);
                     values[valuesById[0] = "LINK_PREVIEW"] = 0;
                     values[valuesById[1] = "ORDER"] = 1;
                     return values;
@@ -54067,7 +54065,7 @@ $root.proto = (function() {
             };
 
             PaymentReminderMessage.ReminderFrequency = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "REMINDER_FREQUENCY_UNKNOWN"] = 0;
                 values[valuesById[1] = "WEEKLY"] = 1;
                 values[valuesById[2] = "BI_WEEKLY"] = 2;
@@ -54077,7 +54075,7 @@ $root.proto = (function() {
             })();
 
             PaymentReminderMessage.ReminderStatus = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "REMINDER_STATUS_UNKNOWN"] = 0;
                 values[valuesById[1] = "ACTIVE"] = 1;
                 values[valuesById[2] = "CANCELLED_BY_CREATOR"] = 2;
@@ -55000,7 +54998,7 @@ $root.proto = (function() {
                 };
 
                 GalaxyFlowAction.GalaxyFlowActionType = (function() {
-                    var valuesById = {}, values = Object.create(valuesById);
+                    const valuesById = {}, values = Object.create(valuesById);
                     values[valuesById[1] = "NOTIFY_LAUNCH"] = 1;
                     values[valuesById[2] = "DOWNLOAD_RESPONSES"] = 2;
                     return values;
@@ -57141,7 +57139,7 @@ $root.proto = (function() {
                 })();
 
                 PeerDataOperationResult.FullHistorySyncOnDemandResponseCode = (function() {
-                    var valuesById = {}, values = Object.create(valuesById);
+                    const valuesById = {}, values = Object.create(valuesById);
                     values[valuesById[0] = "REQUEST_SUCCESS"] = 0;
                     values[valuesById[1] = "REQUEST_TIME_EXPIRED"] = 1;
                     values[valuesById[2] = "DECLINED_SHARING_HISTORY"] = 2;
@@ -57369,7 +57367,7 @@ $root.proto = (function() {
                 })();
 
                 PeerDataOperationResult.HistorySyncChunkRetryResponseCode = (function() {
-                    var valuesById = {}, values = Object.create(valuesById);
+                    const valuesById = {}, values = Object.create(valuesById);
                     values[valuesById[1] = "GENERATION_ERROR"] = 1;
                     values[valuesById[2] = "CHUNK_CONSUMED"] = 2;
                     values[valuesById[3] = "TIMEOUT"] = 3;
@@ -58240,7 +58238,7 @@ $root.proto = (function() {
         })();
 
         Message.PeerDataOperationRequestType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UPLOAD_STICKER"] = 0;
             values[valuesById[1] = "SEND_RECENT_STICKER_BOOTSTRAP"] = 1;
             values[valuesById[2] = "GENERATE_LINK_PREVIEW"] = 2;
@@ -58406,7 +58404,7 @@ $root.proto = (function() {
             };
 
             PinInChatMessage.Type = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN_TYPE"] = 0;
                 values[valuesById[1] = "PIN_FOR_ALL"] = 1;
                 values[valuesById[2] = "UNPIN_FOR_ALL"] = 2;
@@ -58512,7 +58510,7 @@ $root.proto = (function() {
             };
 
             PlaceholderMessage.PlaceholderType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "MASK_LINKED_DEVICES"] = 0;
                 return values;
             })();
@@ -58628,7 +58626,7 @@ $root.proto = (function() {
         })();
 
         Message.PollContentType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN"] = 0;
             values[valuesById[1] = "TEXT"] = 1;
             values[valuesById[2] = "IMAGE"] = 2;
@@ -59443,7 +59441,7 @@ $root.proto = (function() {
         })();
 
         Message.PollType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "POLL"] = 0;
             values[valuesById[1] = "QUIZ"] = 1;
             return values;
@@ -60979,7 +60977,7 @@ $root.proto = (function() {
             };
 
             ProtocolMessage.Type = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "REVOKE"] = 0;
                 values[valuesById[3] = "EPHEMERAL_SETTING"] = 3;
                 values[valuesById[4] = "EPHEMERAL_SYNC_RESPONSE"] = 4;
@@ -61708,14 +61706,14 @@ $root.proto = (function() {
             };
 
             RequestWelcomeMessageMetadata.LocalChatState = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "EMPTY"] = 0;
                 values[valuesById[1] = "NON_EMPTY"] = 1;
                 return values;
             })();
 
             RequestWelcomeMessageMetadata.WelcomeTrigger = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "CHAT_OPEN"] = 0;
                 values[valuesById[1] = "COMPANION_PAIRING"] = 1;
                 return values;
@@ -61870,7 +61868,7 @@ $root.proto = (function() {
             };
 
             ScheduledCallCreationMessage.CallType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "VOICE"] = 1;
                 values[valuesById[2] = "VIDEO"] = 2;
@@ -61996,7 +61994,7 @@ $root.proto = (function() {
             };
 
             ScheduledCallEditMessage.EditType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "CANCEL"] = 1;
                 return values;
@@ -62197,7 +62195,7 @@ $root.proto = (function() {
             };
 
             SecretEncryptedMessage.SecretEncType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "EVENT_EDIT"] = 1;
                 values[valuesById[2] = "MESSAGE_EDIT"] = 2;
@@ -62797,7 +62795,7 @@ $root.proto = (function() {
             };
 
             SplitPaymentParticipant.SplitPaymentStatus = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "PENDING"] = 0;
                 values[valuesById[1] = "PAID"] = 1;
                 return values;
@@ -62946,7 +62944,7 @@ $root.proto = (function() {
             };
 
             StatusNotificationMessage.StatusNotificationType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "STATUS_ADD_YOURS"] = 1;
                 values[valuesById[2] = "STATUS_RESHARE"] = 2;
@@ -63211,7 +63209,7 @@ $root.proto = (function() {
             };
 
             StatusQuotedMessage.StatusQuotedMessageType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[1] = "QUESTION_ANSWER"] = 1;
                 return values;
             })();
@@ -63349,7 +63347,7 @@ $root.proto = (function() {
             };
 
             StatusStickerInteractionMessage.StatusStickerType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "REACTION"] = 1;
                 return values;
@@ -64522,7 +64520,7 @@ $root.proto = (function() {
             })();
 
             StickerPackMessage.StickerPackOrigin = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "FIRST_PARTY"] = 0;
                 values[valuesById[1] = "THIRD_PARTY"] = 1;
                 values[valuesById[2] = "USER_CREATED"] = 2;
@@ -64841,7 +64839,7 @@ $root.proto = (function() {
             TemplateMessage.prototype.hydratedFourRowTemplate = null;
             TemplateMessage.prototype.interactiveMessageTemplate = null;
 
-            var $oneOfFields;
+            let $oneOfFields;
 
             Object.defineProperty(TemplateMessage.prototype, "format", {
                 get: $util.oneOfGetter($oneOfFields = ["fourRowTemplate", "hydratedFourRowTemplate", "interactiveMessageTemplate"]),
@@ -65020,7 +65018,7 @@ $root.proto = (function() {
                 FourRowTemplate.prototype.videoMessage = null;
                 FourRowTemplate.prototype.locationMessage = null;
 
-                var $oneOfFields;
+                let $oneOfFields;
 
                 Object.defineProperty(FourRowTemplate.prototype, "title", {
                     get: $util.oneOfGetter($oneOfFields = ["documentMessage", "highlyStructuredMessage", "imageMessage", "videoMessage", "locationMessage"]),
@@ -65252,7 +65250,7 @@ $root.proto = (function() {
                 HydratedFourRowTemplate.prototype.videoMessage = null;
                 HydratedFourRowTemplate.prototype.locationMessage = null;
 
-                var $oneOfFields;
+                let $oneOfFields;
 
                 Object.defineProperty(HydratedFourRowTemplate.prototype, "title", {
                     get: $util.oneOfGetter($oneOfFields = ["documentMessage", "hydratedTitleText", "imageMessage", "videoMessage", "locationMessage"]),
@@ -66391,7 +66389,7 @@ $root.proto = (function() {
             };
 
             VideoMessage.Attribution = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "NONE"] = 0;
                 values[valuesById[1] = "GIPHY"] = 1;
                 values[valuesById[2] = "TENOR"] = 2;
@@ -66400,7 +66398,7 @@ $root.proto = (function() {
             })();
 
             VideoMessage.VideoSourceType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "USER_VIDEO"] = 0;
                 values[valuesById[1] = "AI_GENERATED"] = 1;
                 return values;
@@ -66687,7 +66685,7 @@ $root.proto = (function() {
         };
 
         MessageAddOn.MessageAddOnType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNDEFINED"] = 0;
             values[valuesById[1] = "REACTION"] = 1;
             values[valuesById[2] = "EVENT_RESPONSE"] = 2;
@@ -67021,7 +67019,7 @@ $root.proto = (function() {
         };
 
         MessageAssociation.AssociationType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN"] = 0;
             values[valuesById[1] = "MEDIA_ALBUM"] = 1;
             values[valuesById[2] = "BOT_PLUGIN"] = 2;
@@ -67449,7 +67447,7 @@ $root.proto = (function() {
         };
 
         MessageContextInfo.MessageAddonExpiryType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[1] = "STATIC"] = 1;
             values[valuesById[2] = "DEPENDENT_ON_PARENT"] = 2;
             return values;
@@ -68935,7 +68933,7 @@ $root.proto = (function() {
         })();
 
         MsgOpaqueData.PollContentType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN"] = 0;
             values[valuesById[1] = "TEXT"] = 1;
             values[valuesById[2] = "IMAGE"] = 2;
@@ -69046,7 +69044,7 @@ $root.proto = (function() {
         })();
 
         MsgOpaqueData.PollType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "POLL"] = 0;
             values[valuesById[1] = "QUIZ"] = 1;
             return values;
@@ -69372,7 +69370,7 @@ $root.proto = (function() {
     })();
 
     proto.MutationProps = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
+        const valuesById = {}, values = Object.create(valuesById);
         values[valuesById[2] = "STAR_ACTION"] = 2;
         values[valuesById[3] = "CONTACT_ACTION"] = 3;
         values[valuesById[4] = "MUTE_ACTION"] = 4;
@@ -70343,7 +70341,7 @@ $root.proto = (function() {
         };
 
         PastParticipant.LeaveReason = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "LEFT"] = 0;
             values[valuesById[1] = "REMOVED"] = 1;
             return values;
@@ -70806,7 +70804,7 @@ $root.proto = (function() {
         };
 
         PatchDebugData.Platform = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "ANDROID"] = 0;
             values[valuesById[1] = "SMBA"] = 1;
             values[valuesById[2] = "IPHONE"] = 2;
@@ -71253,7 +71251,7 @@ $root.proto = (function() {
         })();
 
         PaymentBackground.Type = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN"] = 0;
             values[valuesById[1] = "DEFAULT"] = 1;
             return values;
@@ -71764,14 +71762,14 @@ $root.proto = (function() {
         };
 
         PaymentInfo.Currency = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN_CURRENCY"] = 0;
             values[valuesById[1] = "INR"] = 1;
             return values;
         })();
 
         PaymentInfo.Status = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN_STATUS"] = 0;
             values[valuesById[1] = "PROCESSING"] = 1;
             values[valuesById[2] = "SENT"] = 2;
@@ -71788,7 +71786,7 @@ $root.proto = (function() {
         })();
 
         PaymentInfo.TxnStatus = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN"] = 0;
             values[valuesById[1] = "PENDING_SETUP"] = 1;
             values[valuesById[2] = "PENDING_RECEIVER_SETUP"] = 2;
@@ -72257,7 +72255,7 @@ $root.proto = (function() {
         };
 
         PinInChat.Type = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN_TYPE"] = 0;
             values[valuesById[1] = "PIN_FOR_ALL"] = 1;
             values[valuesById[2] = "UNPIN_FOR_ALL"] = 2;
@@ -73317,7 +73315,7 @@ $root.proto = (function() {
     })();
 
     proto.PrivacySystemMessage = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
+        const valuesById = {}, values = Object.create(valuesById);
         values[valuesById[1] = "E2EE_MSG"] = 1;
         values[valuesById[2] = "NE2EE_SELF"] = 2;
         values[valuesById[3] = "NE2EE_OTHER"] = 3;
@@ -73568,7 +73566,7 @@ $root.proto = (function() {
         };
 
         ProcessedVideo.VideoQuality = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNDEFINED"] = 0;
             values[valuesById[1] = "LOW"] = 1;
             values[valuesById[2] = "MID"] = 2;
@@ -76866,7 +76864,7 @@ $root.proto = (function() {
     })();
 
     proto.SessionTransparencyType = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
+        const valuesById = {}, values = Object.create(valuesById);
         values[valuesById[0] = "UNKNOWN_TYPE"] = 0;
         values[valuesById[1] = "NY_AI_SAFETY_DISCLAIMER"] = 1;
         return values;
@@ -77225,7 +77223,7 @@ $root.proto = (function() {
         StatusAttribution.prototype.rlAttribution = null;
         StatusAttribution.prototype.aiCreatedAttribution = null;
 
-        var $oneOfFields;
+        let $oneOfFields;
 
         Object.defineProperty(StatusAttribution.prototype, "attributionData", {
             get: $util.oneOfGetter($oneOfFields = ["statusReshare", "externalShare", "music", "groupStatus", "rlAttribution", "aiCreatedAttribution"]),
@@ -77569,7 +77567,7 @@ $root.proto = (function() {
             };
 
             AiCreatedAttribution.Source = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "STATUS_MIMICRY"] = 1;
                 return values;
@@ -77764,7 +77762,7 @@ $root.proto = (function() {
             };
 
             ExternalShare.Source = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "INSTAGRAM"] = 1;
                 values[valuesById[2] = "FACEBOOK"] = 2;
@@ -78140,7 +78138,7 @@ $root.proto = (function() {
             };
 
             RLAttribution.Source = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "RAY_BAN_META_GLASSES"] = 1;
                 values[valuesById[2] = "OAKLEY_META_GLASSES"] = 2;
@@ -78410,7 +78408,7 @@ $root.proto = (function() {
             })();
 
             StatusReshare.Source = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "INTERNAL_RESHARE"] = 1;
                 values[valuesById[2] = "MENTION_RESHARE"] = 2;
@@ -78423,7 +78421,7 @@ $root.proto = (function() {
         })();
 
         StatusAttribution.Type = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN"] = 0;
             values[valuesById[1] = "RESHARE"] = 1;
             values[valuesById[2] = "EXTERNAL_SHARE"] = 2;
@@ -81098,7 +81096,7 @@ $root.proto = (function() {
             };
 
             AvatarUpdatedAction.AvatarEventType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UPDATED"] = 0;
                 values[valuesById[1] = "CREATED"] = 1;
                 values[valuesById[2] = "DELETED"] = 2;
@@ -81280,7 +81278,7 @@ $root.proto = (function() {
             };
 
             BizAISettingsNudgeAction.BizAISettingsCategory = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNKNOWN"] = 0;
                 values[valuesById[1] = "INSTRUCTIONS"] = 1;
                 values[valuesById[2] = "RESPONSE_SETTINGS"] = 2;
@@ -81830,7 +81828,7 @@ $root.proto = (function() {
         })();
 
         SyncActionValue.BusinessBroadcastCampaignStatus = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[1] = "DRAFT"] = 1;
             values[valuesById[2] = "SCHEDULED"] = 2;
             values[valuesById[3] = "PROCESSING"] = 3;
@@ -84205,7 +84203,7 @@ $root.proto = (function() {
             };
 
             InteractiveMessageAction.InteractiveMessageActionMode = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[1] = "DISABLE_CTA"] = 1;
                 return values;
             })();
@@ -84688,7 +84686,7 @@ $root.proto = (function() {
             };
 
             LabelEditAction.ListType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "NONE"] = 0;
                 values[valuesById[1] = "UNREAD"] = 1;
                 values[valuesById[2] = "GROUPS"] = 2;
@@ -85213,7 +85211,7 @@ $root.proto = (function() {
             };
 
             MaibaAIFeaturesControlAction.MaibaAIFeatureStatus = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "ENABLED"] = 0;
                 values[valuesById[1] = "ENABLED_HAS_LEARNING"] = 1;
                 values[valuesById[2] = "DISABLED"] = 2;
@@ -85536,7 +85534,7 @@ $root.proto = (function() {
             };
 
             MarketingMessageAction.MarketingMessagePrototypeType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "PERSONALIZED"] = 0;
                 return values;
             })();
@@ -85777,7 +85775,7 @@ $root.proto = (function() {
             };
 
             MerchantPaymentPartnerAction.Status = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "ACTIVE"] = 0;
                 values[valuesById[1] = "INACTIVE"] = 1;
                 return values;
@@ -86562,7 +86560,7 @@ $root.proto = (function() {
             };
 
             NoteEditAction.NoteType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[1] = "UNSTRUCTURED"] = 1;
                 values[valuesById[2] = "STRUCTURED"] = 2;
                 return values;
@@ -86679,7 +86677,7 @@ $root.proto = (function() {
             };
 
             NotificationActivitySettingAction.NotificationActivitySetting = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "DEFAULT_ALL_MESSAGES"] = 0;
                 values[valuesById[1] = "ALL_MESSAGES"] = 1;
                 values[valuesById[2] = "HIGHLIGHTS"] = 2;
@@ -87083,7 +87081,7 @@ $root.proto = (function() {
             };
 
             PaymentTosAction.PaymentNotice = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "BR_PAY_PRIVACY_POLICY"] = 0;
                 return values;
             })();
@@ -87831,7 +87829,7 @@ $root.proto = (function() {
             };
 
             PrivateProcessingSettingAction.PrivateProcessingStatus = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "UNDEFINED"] = 0;
                 values[valuesById[1] = "ENABLED"] = 1;
                 values[valuesById[2] = "DISABLED"] = 2;
@@ -88918,7 +88916,7 @@ $root.proto = (function() {
             };
 
             SettingsSyncAction.DisplayMode = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "DISPLAY_MODE_UNKNOWN"] = 0;
                 values[valuesById[1] = "ALWAYS"] = 1;
                 values[valuesById[2] = "NEVER"] = 2;
@@ -88927,7 +88925,7 @@ $root.proto = (function() {
             })();
 
             SettingsSyncAction.MediaQualitySetting = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "MEDIA_QUALITY_UNKNOWN"] = 0;
                 values[valuesById[1] = "STANDARD"] = 1;
                 values[valuesById[2] = "HD"] = 2;
@@ -88935,7 +88933,7 @@ $root.proto = (function() {
             })();
 
             SettingsSyncAction.SettingKey = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "SETTING_KEY_UNKNOWN"] = 0;
                 values[valuesById[1] = "START_AT_LOGIN"] = 1;
                 values[valuesById[2] = "MINIMIZE_TO_TRAY"] = 2;
@@ -88974,7 +88972,7 @@ $root.proto = (function() {
             })();
 
             SettingsSyncAction.SettingPlatform = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "PLATFORM_UNKNOWN"] = 0;
                 values[valuesById[1] = "WEB"] = 1;
                 values[valuesById[2] = "HYBRID"] = 2;
@@ -89580,7 +89578,7 @@ $root.proto = (function() {
             })();
 
             StatusPrivacyAction.StatusDistributionMode = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "ALLOW_LIST"] = 0;
                 values[valuesById[1] = "DENY_LIST"] = 1;
                 values[valuesById[2] = "CONTACTS"] = 2;
@@ -91354,7 +91352,7 @@ $root.proto = (function() {
             };
 
             UsernameChatStartModeAction.ChatStartMode = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[1] = "LID"] = 1;
                 values[valuesById[2] = "PN"] = 2;
                 return values;
@@ -91467,7 +91465,7 @@ $root.proto = (function() {
             };
 
             WaffleAccountLinkStateAction.AccountLinkState = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
+                const valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "ACTIVE"] = 0;
                 values[valuesById[1] = "PAUSED"] = 1;
                 values[valuesById[2] = "UNLINKED"] = 2;
@@ -91783,7 +91781,7 @@ $root.proto = (function() {
         };
 
         SyncdMutation.SyncdOperation = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "SET"] = 0;
             values[valuesById[1] = "REMOVE"] = 1;
             return values;
@@ -92751,7 +92749,7 @@ $root.proto = (function() {
         TemplateButton.prototype.urlButton = null;
         TemplateButton.prototype.callButton = null;
 
-        var $oneOfFields;
+        let $oneOfFields;
 
         Object.defineProperty(TemplateButton.prototype, "button", {
             get: $util.oneOfGetter($oneOfFields = ["quickReplyButton", "urlButton", "callButton"]),
@@ -93323,7 +93321,7 @@ $root.proto = (function() {
         };
 
         ThreadID.ThreadType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN"] = 0;
             values[valuesById[1] = "VIEW_REPLIES"] = 1;
             values[valuesById[2] = "AI_THREAD"] = 2;
@@ -93753,14 +93751,14 @@ $root.proto = (function() {
         };
 
         UserPassword.Encoding = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UTF8"] = 0;
             values[valuesById[1] = "UTF8_BROKEN"] = 1;
             return values;
         })();
 
         UserPassword.Transformer = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "NONE"] = 0;
             values[valuesById[1] = "PBKDF2_HMAC_SHA512"] = 1;
             values[valuesById[2] = "PBKDF2_HMAC_SHA384"] = 2;
@@ -93881,7 +93879,7 @@ $root.proto = (function() {
                 Value.prototype.asBlob = null;
                 Value.prototype.asUnsignedInteger = null;
 
-                var $oneOfFields;
+                let $oneOfFields;
 
                 Object.defineProperty(Value.prototype, "value", {
                     get: $util.oneOfGetter($oneOfFields = ["asBlob", "asUnsignedInteger"]),
@@ -96317,7 +96315,7 @@ $root.proto = (function() {
         };
 
         WebFeatures.Flag = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "NOT_STARTED"] = 0;
             values[valuesById[1] = "FORCE_UPGRADE"] = 1;
             values[valuesById[2] = "DEVELOPMENT"] = 2;
@@ -96329,7 +96327,7 @@ $root.proto = (function() {
     })();
 
     proto.WebLinkRenderConfig = (function() {
-        var valuesById = {}, values = Object.create(valuesById);
+        const valuesById = {}, values = Object.create(valuesById);
         values[valuesById[0] = "WEBVIEW"] = 0;
         values[valuesById[1] = "SYSTEM"] = 1;
         return values;
@@ -98690,7 +98688,7 @@ $root.proto = (function() {
         };
 
         WebMessageInfo.BizPrivacyStatus = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "E2EE"] = 0;
             values[valuesById[2] = "FB"] = 2;
             values[valuesById[1] = "BSP"] = 1;
@@ -98699,7 +98697,7 @@ $root.proto = (function() {
         })();
 
         WebMessageInfo.Status = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "ERROR"] = 0;
             values[valuesById[1] = "PENDING"] = 1;
             values[valuesById[2] = "SERVER_ACK"] = 2;
@@ -98710,7 +98708,7 @@ $root.proto = (function() {
         })();
 
         WebMessageInfo.StubType = (function() {
-            var valuesById = {}, values = Object.create(valuesById);
+            const valuesById = {}, values = Object.create(valuesById);
             values[valuesById[0] = "UNKNOWN"] = 0;
             values[valuesById[1] = "REVOKE"] = 1;
             values[valuesById[2] = "CIPHERTEXT"] = 2;
@@ -99108,4 +99106,4 @@ $root.proto = (function() {
     return proto;
 })();
 
-module.exports = $root;
+export { $root as default };
