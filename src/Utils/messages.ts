@@ -624,17 +624,17 @@ export const generateWAMessageContent = async (
 		}
 	}
 	
-	//--
-	
+	//--	
 	if ('spoiler' in message && !!message.spoiler) {
         const messageType = Object.keys(m)[0]! as Extract<keyof proto.IMessage, MessageWithContextInfo>
         const key = m[messageType];
         if ('contextInfo' in key! && !!key.contextInfo) {
-            key.contextInfo.isSpoiler = message.spoiler;
+            key.contextInfo.isSpoiler = !!message.spoiler;
         }
         else if (key) {
             key.contextInfo = {
-                isSpoiler: message.spoiler
+                ...key.contextInfo,
+                isSpoiler: !!message.spoiler
             };
         }
         m = { spoilerMessage: { message: m } };
