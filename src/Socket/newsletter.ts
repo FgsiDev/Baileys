@@ -5,7 +5,7 @@ import { generateProfilePicture } from '../Utils/messages-media'
 import { getBinaryNodeChild, getBinaryNodeChildren, S_WHATSAPP_NET } from '../WABinary'
 import { makeGroupsSocket } from './groups'
 import { executeWMexQuery as genericExecuteWMexQuery } from './mex'
-import { proto } from '../WAProto'
+import { proto } from '../../WAProto/index.js'
 
 const parseNewsletterCreateResponse = (response: NewsletterCreateResponse): NewsletterMetadata => {
 	const { id, thread_metadata: thread, viewer_metadata: viewer } = response
@@ -210,13 +210,17 @@ export const makeNewsletterSocket = (config: SocketConfig) => {
 				if (!plaintext?.content) continue
 
 				try {
-					const buf =
-						typeof plaintext.content === 'string'
-							? Buffer.from(plaintext.content, 'binary')
-							: Buffer.from(plaintext.content)
-
+					const content = plaintext.content
+					let buf: Buffer
+					if (typeof content === 'string') {
+						buf = Buffer.from(content, 'binary')
+					} else if (content instanceof Uint8Array || Buffer.isBuffer(content)) {
+						buf = Buffer.from(content)
+					} else {
+						// BinaryNode[] atau tipe lain yang tidak didukung
+						continue
+					}
 					const msg = proto.Message.decode(buf).toJSON()
-
 					const full = proto.WebMessageInfo.fromObject({
 						key: {
 							remoteJid: newsletterJid,
@@ -256,7 +260,7 @@ export const makeNewsletterSocket = (config: SocketConfig) => {
 		},
 
 		newsletterAdminCount: async (jid: string) => {
-			const res = await executeWMexQuery(
+			const res = await executeWMexQuery<{ admin_count: number }>(
 				{ newsletter_id: jid },
 				QueryIds.ADMIN_COUNT,
 				XWAPaths.xwa2_newsletter_admin_count
