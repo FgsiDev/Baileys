@@ -183,7 +183,8 @@ export const prepareWAMessageMedia = async (
 		const { mediaUrl, directPath } = await options.upload(filePath, {
 			fileEncSha256B64: fileSha256B64,
 			mediaType: mediaType,
-			timeoutMs: options.mediaUploadTimeoutMs
+			timeoutMs: options.mediaUploadTimeoutMs,
+			newsletter: isNewsletter
 		})
 
 		await fs.unlink(filePath)
@@ -623,23 +624,22 @@ export const generateWAMessageContent = async (
 			key.contextInfo = message.contextInfo
 		}
 	}
-	
-	//--	
+
+	//--
 	if ('spoiler' in message && !!message.spoiler) {
-        const messageType = Object.keys(m)[0]! as Extract<keyof proto.IMessage, MessageWithContextInfo>
-        const key = m[messageType];
-        if ('contextInfo' in key! && !!key.contextInfo) {
-            key.contextInfo.isSpoiler = !!message.spoiler;
-        }
-        else if (key) {
-            key.contextInfo = {
-                ...key.contextInfo,
-                isSpoiler: !!message.spoiler
-            };
-        }
-        m = { spoilerMessage: { message: m } };
-        delete message.spoiler;
-    }
+		const messageType = Object.keys(m)[0]! as Extract<keyof proto.IMessage, MessageWithContextInfo>
+		const key = m[messageType]
+		if ('contextInfo' in key! && !!key.contextInfo) {
+			key.contextInfo.isSpoiler = !!message.spoiler
+		} else if (key) {
+			key.contextInfo = {
+				...key.contextInfo,
+				isSpoiler: !!message.spoiler
+			}
+		}
+		m = { spoilerMessage: { message: m } }
+		delete message.spoiler
+	}
 
 	return WAProto.Message.create(m)
 }
@@ -769,12 +769,33 @@ export const normalizeMessageContent = (content: WAMessageContent | null | undef
 
 	function getFutureProofMessage(message: typeof content) {
 		return (
-			message?.ephemeralMessage ||
-			message?.viewOnceMessage ||
+			message?.associatedChildMessage ||
+			message?.botForwardedMessage ||
+			message?.botInvokeMessage ||
+			message?.botTaskMessage ||
 			message?.documentWithCaptionMessage ||
+			message?.editedMessage ||
+			message?.ephemeralMessage ||
+			message?.eventCoverImage ||
+			message?.groupMentionedMessage ||
+			message?.groupStatusMentionMessage ||
+			message?.groupStatusMessage ||
+			message?.groupStatusMessageV2 ||
+			message?.limitSharingMessage ||
+			message?.lottieStickerMessage ||
+			message?.newsletterAdminProfileMessage ||
+			message?.newsletterAdminProfileMessageV2 ||
+			message?.newsletterAdminProfileStatusMessage ||
+			message?.pollCreationMessageV4 ||
+			message?.pollCreationOptionImageMessage ||
+			message?.questionMessage ||
+			message?.questionReplyMessage ||
+			message?.spoilerMessage ||
+			message?.statusAddYours ||
+			message?.statusMentionMessage ||
+			message?.viewOnceMessage ||
 			message?.viewOnceMessageV2 ||
-			message?.viewOnceMessageV2Extension ||
-			message?.editedMessage
+			message?.viewOnceMessageV2Extension
 		)
 	}
 }

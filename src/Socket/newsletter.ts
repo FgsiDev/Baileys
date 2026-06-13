@@ -2,14 +2,15 @@ import type { NewsletterCreateResponse, SocketConfig, WAMediaUpload } from '../T
 import type { NewsletterMetadata, NewsletterUpdate } from '../Types'
 import { QueryIds, XWAPaths } from '../Types'
 import { generateProfilePicture } from '../Utils/messages-media'
-import { getBinaryNodeChild } from '../WABinary'
+import { getBinaryNodeChild, getBinaryNodeChildren, S_WHATSAPP_NET } from '../WABinary'
 import { makeGroupsSocket } from './groups'
 import { executeWMexQuery as genericExecuteWMexQuery } from './mex'
+import { proto } from '../WAProto'
 
 const parseNewsletterCreateResponse = (response: NewsletterCreateResponse): NewsletterMetadata => {
 	const { id, thread_metadata: thread, viewer_metadata: viewer } = response
 	return {
-		id: id,
+		id,
 		owner: undefined,
 		name: thread.name.text,
 		creation_time: parseInt(thread.creation_time, 10),
@@ -18,24 +19,27 @@ const parseNewsletterCreateResponse = (response: NewsletterCreateResponse): News
 		subscribers: parseInt(thread.subscribers_count, 10),
 		verification: thread.verification,
 		picture: {
-			id: thread.picture.id,
-			directPath: thread.picture.direct_path
+			id: thread.picture?.id,
+			directPath: thread.picture?.direct_path
 		},
 		mute_state: viewer.mute
 	}
 }
 
 const parseNewsletterMetadata = (result: unknown): NewsletterMetadata | null => {
-	if (typeof result !== 'object' || result === null) {
-		return null
-	}
+	if (typeof result !== 'object' || result === null) return null
 
-	if ('id' in result && typeof result.id === 'string') {
+	if ('id' in result && typeof (result as any).id === 'string') {
 		return result as NewsletterMetadata
 	}
 
-	if ('result' in result && typeof result.result === 'object' && result.result !== null && 'id' in result.result) {
-		return result.result as NewsletterMetadata
+	if (
+		'result' in result &&
+		typeof (result as any).result === 'object' &&
+		(result as any).result !== null &&
+		'id' in (result as any).result
+	) {
+		return (result as any).result as NewsletterMetadata
 	}
 
 	return null
@@ -62,29 +66,34 @@ export const makeNewsletterSocket = (config: SocketConfig) => {
 
 	return {
 		...sock,
-		newsletterCreate: async (name: string, description?: string): Promise<NewsletterMetadata> => {
+		executeWMexQuery,
+
+		newsletterCreate: async (name: string, description?: string) => {
 			const variables = {
 				input: {
 					name,
 					description: description ?? null
 				}
 			}
-			const rawResponse = await executeWMexQuery<NewsletterCreateResponse>(
+
+			const raw = await executeWMexQuery<NewsletterCreateResponse>(
 				variables,
 				QueryIds.CREATE,
 				XWAPaths.xwa2_newsletter_create
 			)
-			return parseNewsletterCreateResponse(rawResponse)
+
+			return parseNewsletterCreateResponse(raw)
 		},
 
 		newsletterUpdate,
 
 		newsletterSubscribers: async (jid: string) => {
-			return executeWMexQuery<{ subscribers: number }>(
-				{ newsletter_id: jid },
-				QueryIds.SUBSCRIBERS,
-				XWAPaths.xwa2_newsletter_subscribers
-			)
+			return executeWMexQuery({ newsletter_id: jid }, QueryIds.SUBSCRIBERS, XWAPaths.xwa2_newsletter_subscribers)
+		},
+
+		// NEW (from updated version)
+		newsletterSubscribed: async () => {
+			return executeWMexQuery({}, QueryIds.SUBSCRIBED, XWAPaths.xwa2_newsletter_subscribed)
 		},
 
 		newsletterMetadata: async (type: 'invite' | 'jid', key: string) => {
@@ -97,16 +106,19 @@ export const makeNewsletterSocket = (config: SocketConfig) => {
 					type: type.toUpperCase()
 				}
 			}
+
 			const result = await executeWMexQuery<unknown>(variables, QueryIds.METADATA, XWAPaths.xwa2_newsletter_metadata)
+
 			return parseNewsletterMetadata(result)
 		},
 
+		// UPDATED PATH (join/leave v2)
 		newsletterFollow: (jid: string) => {
-			return executeWMexQuery({ newsletter_id: jid }, QueryIds.FOLLOW, XWAPaths.xwa2_newsletter_follow)
+			return executeWMexQuery({ newsletter_id: jid }, QueryIds.FOLLOW, XWAPaths.xwa2_newsletter_join_v2)
 		},
 
 		newsletterUnfollow: (jid: string) => {
-			return executeWMexQuery({ newsletter_id: jid }, QueryIds.UNFOLLOW, XWAPaths.xwa2_newsletter_unfollow)
+			return executeWMexQuery({ newsletter_id: jid }, QueryIds.UNFOLLOW, XWAPaths.xwa2_newsletter_leave_v2)
 		},
 
 		newsletterMute: (jid: string) => {
@@ -117,21 +129,21 @@ export const makeNewsletterSocket = (config: SocketConfig) => {
 			return executeWMexQuery({ newsletter_id: jid }, QueryIds.UNMUTE, XWAPaths.xwa2_newsletter_unmute_v2)
 		},
 
-		newsletterUpdateName: async (jid: string, name: string) => {
-			return await newsletterUpdate(jid, { name })
+		newsletterUpdateName: (jid: string, name: string) => {
+			return newsletterUpdate(jid, { name })
 		},
 
-		newsletterUpdateDescription: async (jid: string, description: string) => {
-			return await newsletterUpdate(jid, { description })
+		newsletterUpdateDescription: (jid: string, description: string) => {
+			return newsletterUpdate(jid, { description })
 		},
 
 		newsletterUpdatePicture: async (jid: string, content: WAMediaUpload) => {
 			const { img } = await generateProfilePicture(content)
-			return await newsletterUpdate(jid, { picture: img.toString('base64') })
+			return newsletterUpdate(jid, { picture: img.toString('base64') })
 		},
 
-		newsletterRemovePicture: async (jid: string) => {
-			return await newsletterUpdate(jid, { picture: '' })
+		newsletterRemovePicture: (jid: string) => {
+			return newsletterUpdate(jid, { picture: '' })
 		},
 
 		newsletterReactMessage: async (jid: string, serverId: string, reaction?: string) => {
@@ -153,17 +165,22 @@ export const makeNewsletterSocket = (config: SocketConfig) => {
 			})
 		},
 
-		newsletterFetchMessages: async (jid: string, count: number, since: number, after: number) => {
-			const messageUpdateAttrs: { count: string; since?: string; after?: string } = {
-				count: count.toString()
-			}
-			if (typeof since === 'number') {
-				messageUpdateAttrs.since = since.toString()
+		// UPDATED FULL PARSE VERSION
+		newsletterFetchMessages: async (
+			type: 'jid' | 'key',
+			key: string,
+			count: number,
+			after?: number,
+			before?: number
+		) => {
+			const attrs: any = {
+				count: count.toString(),
+				type,
+				[type === 'jid' ? 'jid' : 'key']: key
 			}
 
-			if (after) {
-				messageUpdateAttrs.after = after.toString()
-			}
+			if (after) attrs.after = after.toString()
+			if (before) attrs.before = before.toString()
 
 			const result = await query({
 				tag: 'iq',
@@ -171,19 +188,56 @@ export const makeNewsletterSocket = (config: SocketConfig) => {
 					id: generateMessageTag(),
 					type: 'get',
 					xmlns: 'newsletter',
-					to: jid
+					to: S_WHATSAPP_NET
 				},
 				content: [
 					{
-						tag: 'message_updates',
-						attrs: messageUpdateAttrs
+						tag: 'messages',
+						attrs
 					}
 				]
 			})
-			return result
+
+			const messagesNode = getBinaryNodeChild(result, 'messages')
+			if (!messagesNode) return []
+
+			const newsletterJid = messagesNode.attrs.jid || (type === 'jid' ? key : undefined)
+
+			const messages: any[] = []
+
+			for (const child of getBinaryNodeChildren(messagesNode, 'message')) {
+				const plaintext = getBinaryNodeChild(child, 'plaintext')
+				if (!plaintext?.content) continue
+
+				try {
+					const buf =
+						typeof plaintext.content === 'string'
+							? Buffer.from(plaintext.content, 'binary')
+							: Buffer.from(plaintext.content)
+
+					const msg = proto.Message.decode(buf).toJSON()
+
+					const full = proto.WebMessageInfo.fromObject({
+						key: {
+							remoteJid: newsletterJid,
+							id: child.attrs.id || child.attrs.server_id,
+							server_id: child.attrs.server_id,
+							fromMe: false
+						},
+						message: msg,
+						messageTimestamp: child.attrs.t ? +child.attrs.t : undefined
+					}).toJSON()
+
+					messages.push(full)
+				} catch (e) {
+					// ignore decode error
+				}
+			}
+
+			return messages
 		},
 
-		subscribeNewsletterUpdates: async (jid: string): Promise<{ duration: string } | null> => {
+		subscribeNewsletterUpdates: async (jid: string) => {
 			const result = await query({
 				tag: 'iq',
 				attrs: {
@@ -194,22 +248,25 @@ export const makeNewsletterSocket = (config: SocketConfig) => {
 				},
 				content: [{ tag: 'live_updates', attrs: {}, content: [] }]
 			})
-			const liveUpdatesNode = getBinaryNodeChild(result, 'live_updates')
-			const duration = liveUpdatesNode?.attrs?.duration
-			return duration ? { duration: duration } : null
+
+			const node = getBinaryNodeChild(result, 'live_updates')
+			const duration = node?.attrs?.duration
+
+			return duration ? { duration } : null
 		},
 
-		newsletterAdminCount: async (jid: string): Promise<number> => {
-			const response = await executeWMexQuery<{ admin_count: number }>(
+		newsletterAdminCount: async (jid: string) => {
+			const res = await executeWMexQuery(
 				{ newsletter_id: jid },
 				QueryIds.ADMIN_COUNT,
 				XWAPaths.xwa2_newsletter_admin_count
 			)
-			return response.admin_count
+
+			return res.admin_count
 		},
 
 		newsletterChangeOwner: async (jid: string, newOwnerJid: string) => {
-			await executeWMexQuery(
+			return executeWMexQuery(
 				{ newsletter_id: jid, user_id: newOwnerJid },
 				QueryIds.CHANGE_OWNER,
 				XWAPaths.xwa2_newsletter_change_owner
@@ -217,11 +274,15 @@ export const makeNewsletterSocket = (config: SocketConfig) => {
 		},
 
 		newsletterDemote: async (jid: string, userJid: string) => {
-			await executeWMexQuery({ newsletter_id: jid, user_id: userJid }, QueryIds.DEMOTE, XWAPaths.xwa2_newsletter_demote)
+			return executeWMexQuery(
+				{ newsletter_id: jid, user_id: userJid },
+				QueryIds.DEMOTE,
+				XWAPaths.xwa2_newsletter_demote
+			)
 		},
 
 		newsletterDelete: async (jid: string) => {
-			await executeWMexQuery({ newsletter_id: jid }, QueryIds.DELETE, XWAPaths.xwa2_newsletter_delete_v2)
+			return executeWMexQuery({ newsletter_id: jid }, QueryIds.DELETE, XWAPaths.xwa2_newsletter_delete_v2)
 		}
 	}
 }

@@ -48,6 +48,7 @@ import {
 	isLidUser,
 	isPnUser,
 	jidDecode,
+	isJidNewsletter,
 	jidEncode,
 	jidNormalizedUser,
 	type JidWithDevice,
@@ -629,7 +630,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				const bytes = encodeNewsletterMessage(patched as proto.IMessage)
 				binaryNodeContent.push({
 					tag: 'plaintext',
-					attrs: {},
+					attrs: extraAttrs,
 					content: bytes
 				})
 				const stanza: BinaryNode = {
@@ -971,7 +972,14 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 	}
 
 	const getMessageType = (message: proto.IMessage) => {
-		if (message.pollCreationMessage || message.pollCreationMessageV2 || message.pollCreationMessageV3) {
+		if (
+			message.pollCreationMessage ||
+			message.pollCreationMessageV2 ||
+			message.pollCreationMessageV3 ||
+			message.pollCreationMessageV5 ||
+			message.pollCreationMessageV6 ||
+			message.pollUpdateMessage
+		) {
 			return 'poll'
 		}
 
@@ -1002,7 +1010,11 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 		} else if (message.liveLocationMessage) {
 			return 'livelocation'
 		} else if (message.stickerMessage) {
-			return 'sticker'
+			return message.stickerMessage.isLottie
+				? '1p_sticker'
+				: message.stickerMessage.isAvatar
+					? 'avatar_sticker'
+					: 'sticker'
 		} else if (message.stickerPackMessage) {
 			return 'sticker_pack'
 		} else if (message.listMessage) {
@@ -1188,6 +1200,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 					messageId: generateMessageIDV2(sock.user?.id),
 					...options
 				})
+				const isNewsletter = isJidNewsletter(jid)
 				const isEventMsg = 'event' in content && !!content.event
 				const isDeleteMsg = 'delete' in content && !!content.delete
 				const isEditMsg = 'edit' in content && !!content.edit
@@ -1204,7 +1217,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 						additionalAttributes.edit = '7'
 					}
 				} else if (isEditMsg) {
-					additionalAttributes.edit = '1'
+					additionalAttributes.edit = isNewsletter ? '3' : '1'
 				} else if (isPinMsg) {
 					additionalAttributes.edit = '2'
 				} else if (isPollMessage) {
