@@ -534,8 +534,8 @@ export const downloadContentFromMessage = async (
 	}
 
 	//Fix Download Media Update e2EeMediaKey By FgsiDev
-	if (!mediaKey && contextInfo && contextInfo?.mediaDomainInfo?.e2EeMediaKey) {
-		mediaKey = media.contextInfo.mediaDomainInfo.e2EeMediaKey // ✓ fixed
+	if (!mediaKey && contextInfo?.mediaDomainInfo?.e2EeMediaKey) {
+		mediaKey = contextInfo.mediaDomainInfo.e2EeMediaKey // ✓ fixed
 	}
 
 	const keys = await getMediaKeys(mediaKey, type)
