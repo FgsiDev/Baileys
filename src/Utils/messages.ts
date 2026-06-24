@@ -1076,6 +1076,14 @@ export const downloadMediaMessage = async <Type extends 'buffer' | 'stream'>(
 			download = media
 		}
 
+		//Fix Download Media Update e2EeMediaKey By FgsiDev
+		if ('contextInfo' in media && media.contextInfo?.mediaDomainInfo?.e2EeMediaKey && !('mediaKey' in media)) {
+			download = {
+				...media,
+				mediaKey: media.contextInfo.mediaDomainInfo.e2EeMediaKey // ✓ fixed
+			}
+		}
+
 		const stream = await downloadContentFromMessage(download, mediaType, options)
 		if (type === 'buffer') {
 			const bufferArray: Buffer[] = []
