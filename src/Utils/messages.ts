@@ -1077,7 +1077,7 @@ export const downloadMediaMessage = async <Type extends 'buffer' | 'stream'>(
 		}
 
 		//Fix Download Media Update e2EeMediaKey By FgsiDev
-		if ('contextInfo' in media && media.contextInfo?.mediaDomainInfo?.e2EeMediaKey && !('mediaKey' in media)) {
+		if (!('mediaKey' in media) && ('contextInfo' in media) && media.contextInfo?.mediaDomainInfo?.e2EeMediaKey) {
 			download = {
 				...media,
 				mediaKey: media.contextInfo.mediaDomainInfo.e2EeMediaKey // ✓ fixed
