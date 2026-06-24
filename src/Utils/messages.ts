@@ -1077,11 +1077,16 @@ export const downloadMediaMessage = async <Type extends 'buffer' | 'stream'>(
 		}
 
 		//Fix Download Media Update e2EeMediaKey By FgsiDev
-		const isEmpty = !media?.mediaKey || (media.mediaKey instanceof Uint8Array && media.mediaKey.every(b => b === 0))
-		if (isEmpty && media.contextInfo?.mediaDomainInfo?.e2EeMediaKey) {
-			download = {
-				...media,
-				mediaKey: media.contextInfo.mediaDomainInfo.e2EeMediaKey // ✓ fixed
+		const hasContextKey = 'contextInfo' in media && media.contextInfo?.mediaDomainInfo?.e2EeMediaKey
+		if (hasContextKey) {
+			const origKey = 'mediaKey' in media ? media.mediaKey : undefined
+			const isEmpty = !origKey || (origKey instanceof Uint8Array && origKey.every((b: number) => b === 0))
+
+			if (isEmpty) {
+				download = {
+					...media,
+					mediaKey: media.contextInfo!.mediaDomainInfo!.e2EeMediaKey
+				}
 			}
 		}
 
