@@ -534,12 +534,12 @@ export const downloadContentFromMessage = async (
 	}
 
 	//Fix Download Media Update e2EeMediaKey By FgsiDev
-	if (!mediaKey && contextInfo?.mediaDomainInfo?.e2EeMediaKey) {
+	const isEmpty = !mediaKey || (mediaKey instanceof Uint8Array && mediaKey.every(b => b === 0))
+	if (isEmpty && contextInfo?.mediaDomainInfo?.e2EeMediaKey) {
 		mediaKey = contextInfo.mediaDomainInfo.e2EeMediaKey // ✓ fixed
 	}
 
 	const keys = await getMediaKeys(mediaKey, type)
-
 	return downloadEncryptedContent(downloadUrl, keys, opts)
 }
 
