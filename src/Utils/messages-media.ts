@@ -523,7 +523,7 @@ export type MediaDownloadOptions = {
 export const getUrlFromDirectPath = (directPath: string) => `https://${DEF_HOST}${directPath}`
 
 export const downloadContentFromMessage = async (
-	{ mediaKey, directPath, url }: DownloadableMessage,
+	{ mediaKey, directPath, url, contextInfo }: DownloadableMessage,
 	type: MediaType,
 	opts: MediaDownloadOptions = {}
 ) => {
@@ -531,6 +531,11 @@ export const downloadContentFromMessage = async (
 	const downloadUrl = isValidMediaUrl ? url : getUrlFromDirectPath(directPath!)
 	if (!downloadUrl) {
 		throw new Boom('No valid media URL or directPath present in message', { statusCode: 400 })
+	}
+
+	//Fix Download Media Update e2EeMediaKey By FgsiDev
+	if (!mediaKey && contextInfo && contextInfo?.mediaDomainInfo?.e2EeMediaKey) {
+		mediaKey = media.contextInfo.mediaDomainInfo.e2EeMediaKey // ✓ fixed
 	}
 
 	const keys = await getMediaKeys(mediaKey, type)

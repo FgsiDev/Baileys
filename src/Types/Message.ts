@@ -100,7 +100,12 @@ export type MessageWithContextInfo =
 	| 'pollResultSnapshotMessage'
 	| 'messageHistoryNotice'
 
-export type DownloadableMessage = { mediaKey?: Uint8Array | null; directPath?: string | null; url?: string | null }
+export type DownloadableMessage = {
+	mediaKey?: Uint8Array | null
+	directPath?: string | null
+	url?: string | null
+	contextInfo?: WAContextInfo | null // ← For e2EeMediaKey
+}
 
 export type MessageReceiptType =
 	| 'read'
