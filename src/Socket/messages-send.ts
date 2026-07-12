@@ -976,6 +976,7 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 			message.pollCreationMessage ||
 			message.pollCreationMessageV2 ||
 			message.pollCreationMessageV3 ||
+			message.pollCreationMessageV4 ||
 			message.pollCreationMessageV5 ||
 			message.pollCreationMessageV6 ||
 			message.pollUpdateMessage
