@@ -37,6 +37,7 @@ import {
 	MISSING_KEYS_ERROR_TEXT,
 	NACK_REASONS,
 	NO_MESSAGE_FOUND_ERROR_TEXT,
+	setBotMessageSecret,
 	unixTimestampSeconds,
 	xmppPreKey,
 	xmppSignedPreKey
@@ -1175,13 +1176,13 @@ export const makeMessagesRecvSocket = (config: SocketConfig) => {
 			return
 		}
 
-		const encNode = getBinaryNodeChild(node, 'enc')
+		/*const encNode = getBinaryNodeChild(node, 'enc')
 		// TODO: temporary fix for crashes and issues resulting of failed msmsg decryption
 		if (encNode && encNode.attrs.type === 'msmsg') {
 			logger.debug({ key: node.attrs.key }, 'ignored msmsg')
 			await sendMessageAck(node, NACK_REASONS.MissingMessageSecret)
 			return
-		}
+		}*/
 
 		const {
 			fullMessage: msg,
