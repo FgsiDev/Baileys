@@ -1252,6 +1252,63 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 
 				return fullMsg
 			}
+		},
+		sendMetaAI: async (jid1, text, opts = {}) => {
+			const META_AI_BOT_JID = '867051314767696@bot'
+			const yourJid = jid1 || ''
+			const jid = opts.jid || META_AI_BOT_JID
+			const threadId = opts.threadId || generateMessageIDV2(yourJid)
+			const message = {
+				extendedTextMessage: proto.Message.ExtendedTextMessage.fromObject({
+					text,
+					previewType: 'NONE',
+					contextInfo: proto.ContextInfo.fromObject({
+						botMessageSharingInfo: {
+							botEntryPointOrigin: 'FAVICON',
+							forwardScore: 0
+						}
+					}),
+					inviteLinkGroupTypeV2: 'DEFAULT'
+				}),
+				messageContextInfo: proto.MessageContextInfo.fromObject({
+					deviceListMetadata: {
+						senderKeyHash: opts.senderKeyHash || '',
+						senderTimestamp: String(Math.floor(Date.now() / 1000))
+					},
+					deviceListMetadataVersion: 2,
+					messageSecret: opts.messageSecret || Buffer.alloc(32),
+					botMetadata: {
+						botModeSelectionMetadata: {
+							overrideMode: [0]
+						},
+						botThreadInfo: {
+							serverInfo: { title: text.substring(0, 50) },
+							clientInfo: { type: 'DEFAULT' }
+						},
+						botRenderingConfigMetadata: {
+							pixelDensity: 2.625
+						}
+					},
+					threadId: [
+						{
+							threadType: 'AI_THREAD',
+							threadKey: {
+								remoteJid: '0002@s.whatsapp.net',
+								fromMe: true,
+								id: threadId
+							}
+						}
+					]
+				})
+			}
+			const msgId = generateMessageIDV2(yourJid)
+			const messageOptions = {
+				messageId: msgId,
+				quoted: opts.quoted,
+				links: opts.links
+			}
+			await relayMessage(jid, message, messageOptions)
+			return msgId
 		}
 	}
 }
