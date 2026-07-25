@@ -1253,7 +1253,18 @@ export const makeMessagesSocket = (config: SocketConfig) => {
 				return fullMsg
 			}
 		},
-		sendMetaAI: async (jid1, text, opts = {}) => {
+		sendMetaAI: async (
+			jid1: string,
+			text: string,
+			opts: {
+				jid?: string
+				threadId?: string
+				senderKeyHash?: string
+				messageSecret?: Buffer
+				quoted?: any
+				links?: any
+			} = {}
+		) => {
 			const META_AI_BOT_JID = '867051314767696@bot'
 			const yourJid = jid1 || ''
 			const jid = opts.jid || META_AI_BOT_JID

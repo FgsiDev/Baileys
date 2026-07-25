@@ -192,13 +192,13 @@ const assertRequired = (value: unknown, label: string): void => {
 	}
 }
 
-const decryptWithStrategy = (
+const decryptWithStrategy = async (
 	messageSecret: Uint8Array | Buffer,
 	msMsg: proto.IMessageSecretMessage,
 	strategy: DecryptionStrategy
-): Buffer => {
-	const baseSecret = Buffer.from(hkdf(toBuffer(messageSecret), KEY_LENGTH, { info: BOT_MESSAGE_INFO }))
-	const key = Buffer.from(hkdf(baseSecret, KEY_LENGTH, { info: strategy.info }))
+): Promise<Buffer> => {
+	const baseSecret = Buffer.from(await hkdf(toBuffer(messageSecret), KEY_LENGTH, { info: BOT_MESSAGE_INFO }))
+	const key = Buffer.from(await hkdf(baseSecret, KEY_LENGTH, { info: strategy.info }))
 	const payload = toBuffer(msMsg.encPayload as Uint8Array)
 	const ciphertextWithTag = Buffer.concat([payload.slice(0, -AUTH_TAG_LENGTH), payload.slice(-AUTH_TAG_LENGTH)])
 	return aesDecryptGCM(ciphertextWithTag, key, toBuffer(msMsg.encIv as Uint8Array), strategy.aad)
