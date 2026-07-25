@@ -197,9 +197,9 @@ const decryptWithStrategy = async (
 	msMsg: proto.IMessageSecretMessage,
 	strategy: DecryptionStrategy
 ): Promise<Buffer> => {
-	const baseSecret = Buffer.from(await hkdf(toBuffer(messageSecret), KEY_LENGTH, { info: BOT_MESSAGE_INFO }))
-	const key = Buffer.from(await hkdf(baseSecret, KEY_LENGTH, { info: strategy.info }))
-	const payload = toBuffer(msMsg.encPayload as Uint8Array)
+	const baseSecret = await hkdf(toBuffer(messageSecret), KEY_LENGTH, { info: BOT_MESSAGE_INFO })
+    const key = await hkdf(baseSecret, KEY_LENGTH, { info: strategy.info })
+    const payload = toBuffer(msMsg.encPayload as Uint8Array)
 	const ciphertextWithTag = Buffer.concat([payload.slice(0, -AUTH_TAG_LENGTH), payload.slice(-AUTH_TAG_LENGTH)])
 	return aesDecryptGCM(ciphertextWithTag, key, toBuffer(msMsg.encIv as Uint8Array), strategy.aad)
 }
