@@ -382,7 +382,7 @@ const processMessage = async (
 			case proto.Message.ProtocolMessage.Type.LID_MIGRATION_MAPPING_SYNC:
 				const encodedPayload = protocolMsg.lidMigrationMappingSyncMessage?.encodedMappingPayload!
 				const { pnToLidMappings, chatDbMigrationTimestamp } =
-					proto.LIDMigrationMappingSyncMessage.decode(encodedPayload)
+					proto.LIDMigrationMappingSyncPayload.decode(encodedPayload)
 				logger?.debug({ pnToLidMappings, chatDbMigrationTimestamp }, 'got lid mappings and chat db migration timestamp')
 				const pairs = []
 				for (const { pn, latestLid, assignedLid } of pnToLidMappings) {
